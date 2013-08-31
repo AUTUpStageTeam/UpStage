@@ -1,0 +1,6 @@
+Icons are generated using the font 'Font Awesome'.
+See: http://fortawesome.github.com/Font-Awesome/
+
+icon-film (used for "video stream")
+icon-volume-up (used for "audio stream")
+icon-play-circle (used for "live stream") 

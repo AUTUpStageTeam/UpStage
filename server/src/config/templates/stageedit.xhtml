@@ -1,0 +1,247 @@
+<!--
+Modified by Vibhu Patel 22/07/2011 - Made changes to not conflict with the html changes required to move around
+ 										components. Namely rename fields, move the colour selector.
+ 										Added radio buttons next to fields that need to be modified namely colours.
+Modified by Vibhu Patel 09/08/2011 - Changed the color picker buttons to images and made alignment changes.
+Modified by Daniel Han 27/06/2012	- Changed the color picker sizes and divs
+					- changed spelling and grammar errors
+					- changed the general layout
+					- changed the styles
+					- Added Auto Resize handler
+Modified by Craig Farrell 03/09/2012 - changed delete butten handler to proper delete stage
+Modified by Craig Farrell 02/10/2012 - changed  butten layout so it is clearer to read and understand, fixed typos, changed text of headings and buttons.
+Modified by Scott/Gavin/Craig 10/10/2012 - Added stage_saved python variable and successMsg div 
+Modified by Daniel  10/10/2012  - Removed divMessage and relocated successMsg div to come below the stageselection.
+Modified by Craig Farrell 08/04/2013 - changed all the butten warn() numbers to do what they are meant to. eg save,delete,reset,cancel
+                                     - added the onstagelist checkbox, added text for it, added a heading for it as well.
+                                     - added an hidden input for the onstagelistMsg.
+                                     - added methods to the checkbox to call stageedit.js , so it can send message to server.
+Modified by Gavin Chan 16/04/2013 - Removed code that caused an error when accessing stage edit.                             
+Modified by Craig Farrell 14/04/2013 - added div and heading for the new Media area.
+                                     - added new dropdown boxs for each type of media
+                                     - added new button for unassign and goto for each type of media
+Modified by Craig Farrell 16/04/2013 - added on click new methods for the unassign buttens for each media.
+Modified by Craig Farrell 22/04/2013 - added new view buttons for view media
+Modified by Craig Farrell 24/04/2013 - added new preview div for viewing media
+                                     - added methods for the view buttons
+Modified by Craig Farrell 25/04/2013 - redid the layout of media to get more room for preview image
+Modified by Craig Farrell 30/04/2013 - added new check box for lock stage. 
+                                     - added new heading and comment for lock stage
+                                     - added new hidden input for lock stage
+Modified by Craig Farrell 01/05/2013 - replaced the checkbox with a attr which is linked to python. which replaces it with a checkbox.
+                                     - changed the hidden input value to a different call to python.
+                                     - added new hidden input for owner of stage. 
+Modified by David Daniels 22/05/2013 - fixed captials                                    
+-->
+<!include master_a.inc>
+<!include workshop_nav.inc>
+<script type="text/javascript">
+document.title='Workshop - Stages';
+window.onresize = resizePage;
+
+</script>
+
+<div id="divMessage">
+%(attr:message)s
+</div>
+<div id="stageselection">
+	<h1>Make a new stage, or select one to edit</h1>
+	<!-- FIXME why is this form named 'shaun'? Better name it like what the purpose of this form is ... -->
+	<form name ="shaun" action="%(req:path)s">
+		<select name="shortName" id="listName">
+			%(list_stages)s
+		</select>
+		<input type="button" onclick="stageChooseSubmit();" value="Select"></input>
+	</form>
+</div>
+
+<div id="successMsg">
+    %(attr:message)s
+</div>
+
+<div id="divForm">
+<form name="rupert" action="">
+	<div id="stagename">
+		<h1>Stage name</h1>
+		<table>
+			<tr>
+				<td>Full name:</td>
+				<td><input type="text" name="longName" id = "longName" value="%(name)s" size="20" /></td>
+			</tr>
+			<tr>
+				<td>Short name for URL:</td>
+				<td><input type="text" name="shortName" value="%(ID)s" size="20" readonly="readonly"/>(used for URL)</td>
+			</tr>
+            <tr>
+                <td colspan="2"> %(attr:stage_link)s </td>
+            </tr>
+		</table>
+	</div>
+	<!-- -->
+	<div id="edit">
+		<input type="hidden" name="displayaccess" value="%(display_access)s"></input>
+
+		<div id="editStageColor">
+            <h1>Debug message</h1>
+            <input type="checkbox" id="debug" name="debug" onclick="if (this.checked) {debugChecked()}else{debugUnChecked()}"/>
+            Print debug messages on the backdrop? 
+            <br /> <br />
+            <h1>Stage list</h1> <!--#(08/04/2013)Craig-->
+			<input type="checkbox" id="onstagelist" name="onstagelist"  onclick="if (this.checked) {onStageListChecked()}else{onStageListUnChecked()}"/>
+			Show this stage on stage list?
+            <br /> <br />
+            <h1>Lock stage</h1> <!--#(01/05/2013)Craig-->
+			 %(attr:stage_CB_lock)s 
+			Lock stage: only creater can edit the stage
+            <br /> <br />
+			<h1>Background colour</h1>
+			<table style="padding:5px">
+				<tr>
+					<th style="width:80px"> <a href='javascript:selectColoring("Prop");'><img id="propIm" alt="" src="/image/radioselect.jpg" width="15" height="15" /> Props & Backdrops </a> </th>
+					<th style="width:80px"> <a href='javascript:selectColoring("Chat");'><img id="chatIm" alt="" src="/image/radioNonSelect.jpg" width="15" height="15" /> Chat Window </a> 
+                    </th>
+					<th style="width:80px"> <a href='javascript:selectColoring("Tools");'><img id="toolsIm" alt="" src="/image/radioNonSelect.jpg" width="15" height="15" /> Tool Palette </a> 
+                    </th>
+                    <th style="width:80px"> <a href='javascript:selectColoring("Page");'><img id="pageIm" alt="" src="/image/radioNonSelect.jpg" width="15" height="15" /> Stage Background </a> </th>
+				</tr>
+				<tr>
+					<td id="colProp" style="border:black 1px solid;"> &nbsp; <input type="hidden" name="colourNumProp" id="colourNumProp" maxlength="8" size="8" class="bgPropBgColour" value="" /> </td>
+					<td id="colChat" style="border:black 1px solid;"> &nbsp;  <input type="hidden" name="colourNumChat" id="colourNumChat" maxlength="8" size="8" class="chatBgColour" value="" /> </td>
+					<td id="colTools" style="border:black 1px solid;"> &nbsp;  <input type="hidden" name="colourNumTools" id="colourNumTools" maxlength="8" size="8" class="toolsBgColour" value="" /> </td>
+					<td id="colPage" style="border:black 1px solid;"> &nbsp;  <input type="hidden" name="colourNumPage" id="colourNumPage" maxlength="8" size="8" class="pageBgColour" value="" /> </td>
+				</tr>
+			</table>
+			<table align="left">
+				<tr>
+					<td id="colorpicker"></td>
+				</tr>
+			</table>
+		</div>
+
+		<div id="editStageGeneral">
+		
+			<div id="editStageSplash">		
+				<h1>Splash message</h1>
+				<textarea name="splash_message" class="splash" id="splash_message">%(splash)s</textarea>
+			</div>
+            <br/>
+            <div id="editStageMedia"><!-- Craig Farrell 14/04/2013 -->
+                <h1>Media on stage</h1>
+                <div id="editStageMediaInfo">
+                    <table id="editStageMediaList" style="border-bottom: #690 1px dashed;">
+                        <tr>
+                            <td><h4>Avatars</h4></td>
+                            <td><h4>Props</h4></td>
+                            
+                        </tr>
+                        <tr>
+                            <td><select name="AvatarList"   id="AvatarList"   class="esTypeList">%(list_Avatars)s</select></td>
+                            <td><select name="PropList"     id="PropList"     class="esTypeList">%(list_Props)s</select></td>
+                            
+                        </tr>
+                        <tr><!-- Craig Farrell 16/04/2013 -->
+                            <td><input type="button" id="AvatarUnAssign"   class="esUnAssignBut" onclick="unAssignMedia(1);" value="UnAssign"></input></td>
+                            <td><input type="button" id="PropUnAssign"     class="esUnAssignBut" onclick="unAssignMedia(2);" value="UnAssign"></input></td>
+                            
+                        </tr>
+                        <tr><!-- Craig Farrell 25/04/2013 -->
+                            <td><input type="button" id="AvatarView"   class="esViewBut" onclick="viewMediaImage(1);" value="View"></input></td>
+                            <td><input type="button" id="PropView"     class="esViewBut" onclick="viewMediaImage(2);" value="View"></input></td>
+                            
+                        </tr>
+                        <tr>
+                            <td><h4>Backdrops</h4></td>
+                            <td><h4>Audios</h4></td>
+                        </tr>
+                        <tr><!-- Craig Farrell 24/04/2013 -->
+                            <td><select name="BackdropList" id="BackdropList" class="esTypeList">%(list_Backdrops)s</select></td>
+                            <td><select name="AudioList"    id="AudioList"    class="esTypeList">%(list_Audios)s</select></td>
+                        </tr>
+                        <tr>
+                            <td><input type="button" id="BackdropUnAssign" class="esUnAssignBut" onclick="unAssignMedia(3);" value="UnAssign"></input></td>
+                            <td><input type="button" id="AudioUnAssign"    class="esUnAssignBut" onclick="unAssignMedia(4);" value="UnAssign"></input></td>
+                        </tr>
+                        <tr>
+                            <td><input type="button" id="BackdropView" class="esViewBut" onclick="viewMediaImage(3);" value="View"></input></td>
+                        </tr>
+                    </table>
+                </div>
+                <div id="editStageMediaPreview"><!-- Craig Farrell 25/04/2013 -->
+                    %(attr:stage_ViewImg)s
+                </div>
+            </div>
+			<div id="editStageAccess">
+                <br/>
+				<h1>Users who can access and edit this stage</h1> 
+				<table>
+					<tr>
+						<td>
+							<table>
+								<tr>
+									<td>Audience access only</td>
+									<td></td>
+									<td>Player access</td>
+									<td></td>
+									<td>Player and edit access</td>
+								</tr>
+								<tr>
+									<td>
+										<select size="4" id="cantaccess" name="cantaccess" style="height: 160px; width:140px;" multiple="multiple">
+											%(cant_access)s
+										</select>
+									</td>
+									<td><a class="IconButton" href='javascript:setAccess("one_to_two");'><img src="/image/right.png" alt="&#60;" width="20" height="20" /></a><br />
+										<a class="IconButton" href='javascript:setAccess("two_to_one");'><img src="/image/left.png" alt="&#62;" width="20" height="20" /></a></td>
+									<td>
+										<select size="4" id="canaccess" name="canaccess" style="height: 160px; width:140px;" multiple="multiple">
+											%(can_access)s
+										</select>
+									</td>
+									<td><a class="IconButton" href='javascript:setAccess("two_to_three");'><img src="/image/right.png" alt="&#60;" width="20" height="20" /></a><br />
+										<a class="IconButton" href='javascript:setAccess("three_to_two");'><img src="/image/left.png" alt="&#62;" width="20" height="20" /></a></td>
+									<td>
+										<select size="4" id="stageaccess" name="stageaccess" style="height: 160px; width:140px;" multiple="multiple">
+											%(stage_access)s
+										</select>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						 <td><!--#(08/04/2013)Craig-->
+						  <input type="hidden" name="debugTextMsg" id="debugTextMsg" class="debugMsg" value="%(debugMessages)s" />
+						  <input type="hidden" name="colors" id="colorvals" value="%(colours)s"></input>
+                          <input type="hidden" name="onstagelistMsg" id="onstagelistMsg" class="onstageMsg" value="%(onStageList)s"/>
+                          <input type="hidden" name="lockStageMsg" id="lockStageMsg"  value="%(lockStage)s"/><!--#(01/05/2013)Craig-->
+                          <input type="hidden" name="ownerMsg" id="ownerMsg"  value="%(IsOwner)s"/><!--#(01/05/2013)Craig-->
+						</td>
+					</tr>
+				</table>
+			</div>							
+		</div>
+		<!-- -->
+		<div id="submit">
+			<input type="hidden" name="action" value=""></input>
+			<table>
+				<tr><!--#(08/04/2013)Craig-->
+					<td style="width:0%;"><input type="button" id="seSaveonly" onclick="seSaveOnly();" value="Save stage "></input></td>
+					<td style="width:0%;"><input type="button" id="seSaveReload" onclick="saveStage(0);" value="Save and reload stage"></input></td>
+			  		<td colspan="3" style="width:50%;"><span id="warning">Warning: This will cause the stage to reload for everyone currently on it, and you will lose the chat log.</span></td>
+				</tr>
+				<tr>	
+					<td style="width:0%;"><input type="button" id="seDelete" onclick="warn(5);" value="Delete"></input></td>
+					<td style="width:0%;" ><input type="button" id="seRevertC" onclick="warn(1);" value="Revert changes  "></input></td>					
+					<td style="width:0%;"><input type="button" id="seClearS" onclick="warn(3);" value="Clear stage"></input></td>
+					<td style="width:50%;">Clears the text chat and drawing layers.</td>
+				</tr>	
+				<tr>
+				</tr>
+			</table>
+		</div>
+	
+	</div>
+<script type="text/javascript">stageEdit()</script>
+</form>
+</div>
+<!include master_b.inc>

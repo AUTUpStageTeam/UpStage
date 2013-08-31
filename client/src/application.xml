@@ -29,13 +29,30 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 -->
-<movie width="320" height="200" framerate="25" version="8">
+<movie width="320" height="200" framerate="31" version="8" local-access="network">
+
+  <FileAttributes hasMetaData="0" useNetwork="1" />
+  
+  <background color="#C0C0C0"/>
 	
   <!-- 
        The Application classes have been compiled into the classes.swf file, 
        which we import as an asset. 
     -->
-  <clip import="bin/classes.swf" />
+  <clip import="../../temp/classes.swf" />
+  
+  <!-- imported images -->
+  
+  <clip id="TransparentImage" import="../../temp/transparent_320x240.png" />
+  <clip id="TransparentImageWithMarker" import="../../temp/transparent_marker_320x240.png" />
+  
+  <!-- 
+  <clip id="FilmStripIconImage" import="temp/filmstrip_icon.png" />
+  -->
+  
+  <clip id="ImageIconPlayCircle" import="../../temp/icon-play-circle.png" />
+  <clip id="ImageIconFilm" import="../../temp/icon-film.png" />
+  <clip id="ImageIconVolumeUp" import="../../temp/icon-volume-up.png" />
   
   <frame>
     
@@ -44,7 +61,59 @@
 	 Application class
       -->
     <library>
-      <clip id="App" class="App" />
+    
+    	<!-- library items -->
+    	
+    	<clip id="VideoOverlay">
+    		<frame>
+    			<place id="TransparentImage" />
+    		</frame>
+    	</clip>
+    	
+    	<clip id="VideoOverlayMarker">
+    		<frame>
+    			<place id="TransparentImageWithMarker" />
+    		</frame>
+    	</clip>
+    	
+    	<!-- 
+    	<clip id="FilmStripIcon">
+    		<frame>
+    			<place id="FilmStripIconImage" />
+    		</frame>
+    	</clip>
+    	-->
+    	
+    	<clip id="IconLiveStream">
+    		<frame>
+    			<place id="ImageIconPlayCircle" />
+    		</frame>
+    	</clip>
+    	
+    	<clip id="IconAudioStream">
+    		<frame>
+    			<place id="ImageIconVolumeUp" />
+    		</frame>
+    	</clip>
+    	
+    	<clip id="IconVideoStream">
+    		<frame>
+    			<place id="ImageIconFilm" />
+    		</frame>
+    	</clip>
+    	
+    	<!-- library object for video display -->
+    	
+    	<clip id="VideoDisplay" name="videodisplay">
+			<frame>
+				<video id="VideoSurface" width="320" height="240" />
+				<place id="VideoSurface" name="video" />
+			</frame>
+		</clip>
+		
+    	<!-- the main app -->
+      	<clip id="App" class="App" />
+      	
     </library>
     <!-- 
 	 Place an instance of the Application form on Stage to instantiate 
@@ -52,28 +121,24 @@
       -->
     <place id="App" name="app" x="0" y="0" depth="0" />
     
+    <!-- Embed fonts -->
     
-    <!-- BH, WW 22-Aug-2006 Embed fonts
-  	 VeraBd.ttf has had name binary edited - 
-  	 both fonts were named Bitsream Vera Bold which flash couldn't cope
-  	 with.
-  	 Note that VeraBd.ttf contains only bold fonts 
-  	 (non bold shows nothing)
-  	 Note that Vera.ttf contains only non bold font 
-  	 (bold shows nothing)
-      -->
-    <font id="Bitstream Vera Bold" import="src/util/VeraBd.ttf" 
+    <font id="Bitstream Vera Bold" import="../../temp/VeraBd.ttf" name="Bitstream Vera Bold" 
   	  glyphs="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&lt;&gt;
   	  &#09;&#10;&#13;&#34;&#38;&#32;&#33;&#34;&#35;&#36;&#37;&#38;&#39;&#40;
   	  &#41;&#42;&#43;&#44;&#45;&#46;&#47;&#58;&#59;&#60;&#61;&#62;&#63;&#64;
   	  &#91;&#92;&#93;&#94;&#95;&#96;&#123;&#124;&#125;&#126;0123456789áÁàÀâÂ
   	  åÅãÃäÄæÆçÇéÉèÈêÊëËíÍììÌîÎïÏñÑóÓòÒôÔøØõÕ&#246;ÖßúÚùÙûÛüÜÿ´" />	
     
-    <font id="Bitstream Vera Sans" import="src/util/Vera.ttf" 
+    <font id="Bitstream Vera Sans" import="../../temp/Vera.ttf" name="Bitstream Vera Sans"
 	  glyphs="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&lt;&gt;
   	  &#09;&#10;&#13;&#34;&#38;&#32;&#33;&#34;&#35;&#36;&#37;&#38;&#39;&#40;
   	  &#41;&#42;&#43;&#44;&#45;&#46;&#47;&#58;&#59;&#60;&#61;&#62;&#63;&#64;
   	  &#91;&#92;&#93;&#94;&#95;&#96;&#123;&#124;&#125;&#126;0123456789áÁàÀâÂ
-  	  åÅãÃäÄæÆçÇéÉèÈêÊëËíÍììÌîÎïÏñÑóÓòÒôÔøØõÕ&#246;ÖßúÚùÙûÛüÜÿ´" />		
+  	  åÅãÃäÄæÆçÇéÉèÈêÊëËíÍììÌîÎïÏñÑóÓòÒôÔøØõÕ&#246;ÖßúÚùÙûÛüÜÿ´" />
+  	
+  	<font id="FontAwesome" import="../../temp/fontawesome-webfont.ttf" name="FontAwesome"
+  	  glyphs="&#xf03d;" />
+  	  
   </frame>
 </movie>

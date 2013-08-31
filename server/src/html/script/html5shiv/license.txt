@@ -1,0 +1,4 @@
+Dual licensed under the MIT or GPL Version 2 licenses
+
+see: https://code.google.com/p/html5shim/
+see: https://github.com/aFarkas/html5shiv

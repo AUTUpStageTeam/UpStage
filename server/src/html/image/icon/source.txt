@@ -1,0 +1,13 @@
+Icons are generated using the font 'Font Awesome'.
+See: http://fortawesome.github.com/Font-Awesome/
+
+icon-bullhorn (used for "sound effect")
+icon-music (used for "music")
+
+icon-play-circle (used for "live stream")
+icon-film (used for "video stream")
+icon-volume-up (used for "audio stream")
+
+icon-warning-sign (used for "missing image")
+
+

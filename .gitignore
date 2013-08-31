@@ -4,6 +4,10 @@
 img2swf.log
 upstage.log
 
+# Ant folders
+build/
+temp/
+
 #################
 ## Eclipse
 #################

@@ -1,0 +1,10 @@
+<stages>
+<stage onstagelist="on" name="aa" lockstage="true" towner="cf" active="active" id="aa">
+</stage>
+<stage onstagelist="on" name="gg" lockstage="true" towner="df" active="active" id="gg">
+</stage>
+<stage onstagelist="on" name="test" lockstage="false" towner="admin" active="active" id="test">
+</stage>
+<stage onstagelist="on" name="cf" lockstage="true" towner="admin" active="active" id="cf">
+</stage>
+</stages>

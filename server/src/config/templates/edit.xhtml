@@ -1,0 +1,42 @@
+<!include edit_head.inc>
+<script type="text/javascript" src="/script/ckeditor/ckeditor.js"></script>
+<div id="divShade">
+</div>
+<div id="divPopup">
+%(attr:postback)s
+</div>
+
+<form method="POST">
+<textarea id="editor" name="editor">%(editable)s</textarea>
+<div class="submit_buttons">
+<input type="submit" name="action" value="Submit"/>
+<input type="submit" name="action" value="Default" />
+</div>
+</form>
+<script type="text/javascript">
+//<![CDATA[
+
+function resizeEditor()
+{
+	var newHeight = window.innerHeight-300; 
+	CKEDITOR.instances.editor.resize('100%',newHeight);
+}
+	CKEDITOR.replace( 'editor' ,
+	{
+		on:{
+				instanceReady: function(e) {resizeEditor();}
+			}
+	});
+
+window.onresize = function() { resizeEditor() }
+//]]>
+
+
+if(trim(document.getElementById("divPopup").innerHTML) != "")
+{
+    document.getElementById("divPopup").style.display = 'block';
+    document.getElementById("divShade").style.display = 'block';
+    document.getElementById("divPopup").innerHTML += "<input type='button' onclick=\"hideDiv('divPopup'); hideDiv('divShade');\" value='Close'></input>";;
+}
+</script>
+<!include master_b.inc>

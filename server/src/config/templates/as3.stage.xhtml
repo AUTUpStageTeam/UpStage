@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+	<title>%(stagename)s</title>
+	<link rel="stylesheet" type="text/css" href="/style/main.css" />
+	<script language="javascript" type="text/javascript" src="/script/masterpage.js"></script>
+</head>
+<body class="full">
+	<object id="app" type="application/x-shockwave-flash" data="/swf/classes.swf?%(vars)s"> 
+		<param name="movie" value="/swf/classes.swf?%(vars)s" />
+		<param name="quality" value="high" />
+	</object>
+	<script type="text/javascript">
+	if (navigator.appName.indexOf("Microsoft")!=-1) 
+	{
+	    document.getElementById("app").style.width=""+(document.documentElement.clientWidth*0.98)+"px";
+	    document.getElementById("app").style.height=""+(document.documentElement.clientHeight*0.97)+"px";
+	}
+	else
+	{
+		document.getElementById("app").style.width=""+(window.innerWidth*0.98)+"px";
+		document.getElementById("app").style.height=""+(window.innerHeight*0.97)+"px";
+	}
+	</script>
+</body>
+</html>

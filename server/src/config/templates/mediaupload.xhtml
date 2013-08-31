@@ -1,0 +1,317 @@
+<!include master_a.inc>
+<!include workshop_nav.inc>
+<!-- 
+Changelog: Vibhu Patel - Aut UpStage 2011
+	Combined 2 forms into one, as a fix for chrome / IE and Opera uploading media.
+	Vibhu Patel 22/07/2011 - Modified layout but adding additonal tables.
+	Heath, Corey, Karena 26/08/2011 - Added tags input so tags can be added to media when uploaded
+-->
+<script type ="text/javascript">document.title="UpStage Add Media";</script>
+
+<div id="mediaup">
+	<h1>What type of media are you adding?</h1>
+	<!-- 
+	<p>Choose a name and upload the file(s).<br />For audio use wav and mp3 files.<br />For avatars, backdrops and props use either .jpgs, .swfs, .pngs or .gifs</p>
+	-->
+</div>
+
+<!-- FIXME naming a form 'natasha' seems not appropriate - better name it for what it actually does, probably something like 'form_mediaupload' ... -->
+<form name="natasha" method="post" enctype="multipart/form-data" action="" onsubmit="disableSubmit()"> <!-- action=req:path so you can decide what to do with it??  method="post" enctype="multipart/form-data"  action="/admin/save_thing" action="%(req:path)s" -->
+	
+	<!-- meta data for form submit content -->
+	<input type="hidden" name="uploader" size="16" value="%(user)s" />
+	<input type="hidden" name="is_su" size="16" value="%(can_su)s" />
+	<input type="hidden" name="dateTime" size="16" value="%(datetime)s" />
+	<input type="hidden" name="assign" size="16" value="assignToStages" />
+	
+	<div id="basicSettings">
+		<label for="mediaTypeSelector">Choose media type:</label>
+		<select name="type" id="mediaTypeSelector" onchange="changeMediaTypeControlPanel()">
+			<option value=""> -- select -- </option>
+			<option value="avatar">Avatar</option>
+			<option value="prop">Prop</option>
+			<option value="backdrop">Backdrop</option>
+			<option value="audio">Audio</option>
+		</select>
+		
+	</div>
+	
+	<!-- TODO: why can't one upload a swf with chrome on Mac OSX? should rather go to the bug ticket report than here ... -->
+	<!-- 
+	<p>Please be aware that if you are using the Chrome browser with the Mac OSX Operating systems you cannot upload .swf files.</p>
+	-->
+	
+	<hr />
+	
+	
+	<div id="bottomSettingsContainer">
+		
+		<!-- left content -->
+		<div id="muLeftContent" style="display: none;">
+		<div id=leftHeading></div>
+		
+			<div id="basicSettings" class="fieldrow">
+				<label for="name">Name:</label><input type="text" name="name" id="name" style="width:100px" />
+				<label for="tags">Tags:</label><input type="text" name="tags" id="tags" style="width:250px" />
+			</div>
+			
+			<div id="avatarBits" style="display: none;">
+			
+				<!-- <div id="avatarBits" style="display: none:">-->
+				<!--<form name="voiceform" method="post"> <!-- target="popup" onsubmit="testVoice(popup);" > 
+				<!--<p>
+				Voices: 
+				<select name="voice" size="1" id="voice">
+					%(voice_list)s
+				</select> 
+				</p>
+				<p>
+				<input type="text" name="text" id="text" maxlength="40" value="This is a text to voice test"/>
+				 <button onclick="voiceTest(); return shallContinue();">Test voice</button>
+				</p>
+				</form> -->
+				
+				<!-- select voice -->
+				
+				<div id="voiceselection" class="fieldrow">
+				
+					<label for="voice">Voice:</label>
+					<select name="voice" size="1" id="voice" style="width:100px" onchange="javascript:resetAvatarErrorMessages();checkVoiceTest();">%(voice_list)s</select>
+					
+					<div id="voiceTestPanel" style="display:none">
+						<input type="text" name="text" id="text" maxlength="128" value="The quick brown fox jumps over the lazy dog" style="width:45%"/>
+					 	<input type="button" onclick="voiceTest(); return false;" value="Test voice"  id="buttonTestVoice" />
+					 	<input type="button" onclick="javascript:resetVoiceTest();return false;" value="Cancel" style="display:none" id="cancelVoiceTest" />
+						<div id="voicetest"> 
+					        <div id="voicediv"></div>
+					        <div id="voiceerror"></div>
+						</div>
+					</div>
+				 
+				 </div>
+				
+				<!-- streaming -->
+				
+				<div id="streaming">
+				
+					<input type="hidden" id="hasStreaming" name="hasstreaming" value="false" />
+					<input type="hidden" id="streamtype" name="streamtype" value="auto" />
+			
+					<div id="enableStreaming" class="fieldrow">
+						<label for="checkBoxStreaming">Enable streaming?</label>
+						<input id="checkBoxStreaming" type="checkbox" value="enableStreaming" onclick="javascript:checkStreamSettingsVisibility(this.checked);" />
+					</div>
+			
+					<div id="streamSettings" style="display:none;" class="fieldrow">
+						
+						<div class="fieldrow">
+							<label for="streamserver" style="width:80px;display:inline-block">Stream server:</label>
+							<input type="text" name="streamserver" id="streamserver" maxlength="256" style="width:80%" />
+							<br />
+							<label for="streamname" style="width:80px;display:inline-block">Stream name:</label>
+							<input type="text" name="streamname" id="streamname" maxlength="1024" style="width:80%" />
+						</div>
+						
+						<div class="fieldrow">
+							<label for="streamtypeselector">Stream type:</label>
+							<select name="streamtypeselector" id="streamtypeselector">
+								<option value="auto">Auto-detect</option>
+								<option value="live">Live</option>
+								<option value="audio">Audio</option>
+								<option value="video">Video</option>
+							</select>
+							<input type="button" onclick="javascript:testStream();return false;" value="Test stream" id="buttonStreamTest" />
+							<input type="button" onclick="javascript:resetTestStream();return false;" value="Cancel" style="display:none" id="cancelStreamTest" />
+						</div>
+						
+					</div>
+					
+					<div id="streamtest" class="fieldrow"> 
+						<div id="streamdiv"></div>
+					</div>
+					
+				</div>
+				
+				<!-- choose pre-defined images or upload images -->
+					
+      			<div id="selectAvatarImage" class="fieldrow">
+      			
+      				<input type="hidden" id="imagetype" name="imagetype" value="upload" />
+       				
+       				<input type="radio" value="upload" id="uploadAvatarImage" name="chooseImage" checked="checked" onclick="showAvatarImageUpload()" />
+       				<label for="uploadAvatarImage">Upload your own image(s)</label>
+       				<input type="radio" value="library" id="libraryAvatarImage" name="chooseImage" onclick="hideAvatarImageUpload()" disabled="disabled" />
+       				<label for="libraryAvatarImage">Use builtin image</label>
+       			
+       			</div>
+      			
+				<!-- select file(s) for avatar image -->
+			
+				<div id="avimageselection" style="display:inherit">
+					
+					<div class="fieldrow">
+						<label id="numframe">Number of frames:</label>
+						<select name="avframecount" size="1" id="avframecount" onchange="displayFields('avframecount', 'av');">
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+							<option value="6">6</option>
+							<option value="7">7</option>
+							<option value="8">8</option>
+							<option value="9">9</option>
+							<option value="10">10</option>
+						</select>
+					</div>
+					
+					<div id="avlbl0" class="fileupload"><label for="avcontents0">Filename 1:</label><input type="file" size="50" name="avcontents0" id="avcontents0" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+					<div id="avlbl1" class="fileupload" style="display: none"><label for="avcontents1">Filename 2:</label><input type="file" size="50" name="avcontents1" id="avcontents1" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+					<div id="avlbl2" class="fileupload" style="display: none"><label for="avcontents2">Filename 3:</label><input type="file" size="50" name="avcontents2" id="avcontents2" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+					<div id="avlbl3" class="fileupload" style="display: none"><label for="avcontents3">Filename 4:</label><input type="file" size="50" name="avcontents3" id="avcontents3" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+					<div id="avlbl4" class="fileupload" style="display: none"><label for="avcontents4">Filename 5:</label><input type="file" size="50" name="avcontents4" id="avcontents4" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+					<div id="avlbl5" class="fileupload" style="display: none"><label for="avcontents5">Filename 6:</label><input type="file" size="50" name="avcontents5" id="avcontents5" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+					<div id="avlbl6" class="fileupload" style="display: none"><label for="avcontents6">Filename 7:</label><input type="file" size="50" name="avcontents6" id="avcontents6" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+					<div id="avlbl7" class="fileupload" style="display: none"><label for="avcontents7">Filename 8:</label><input type="file" size="50" name="avcontents7" id="avcontents7" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+					<div id="avlbl8" class="fileupload" style="display: none"><label for="avcontents8">Filename 9:</label><input type="file" size="50" name="avcontents8" id="avcontents8" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+					<div id="avlbl9" class="fileupload" style="display: none"><label for="avcontents9">Filename 10:</label><input type="file" size="50" name="avcontents9" id="avcontents9" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+				
+				</div>
+       			
+			</div>
+			
+			<div id="propBits" style="display: none;">
+				
+				<div class="fieldrow">
+					<label id="numframe">Number of frames:</label>
+					<select name="prframecount" size="1" id="prframecount" onchange="displayFields('prframecount', 'pr', 1);">
+						<option value="1">1</option>
+					</select>
+				</div>
+			
+				<div id="prlbl0" class="fileupload"><label for="prcontents0">Filename 1:</label><input type="file" size="50" name="prcontents0" id="prcontents0" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+				
+			</div>
+			
+			<div id="backdropBits" style="display: none;">
+				
+				<div class="fieldrow">
+					<label id="numframe">Number of frames:</label>
+					<select name="bkframecount" size="1" id="bkframecount" onchange="displayFields('bkframecount', 'bk');">
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+						<option value="6">6</option>
+						<option value="7">7</option>
+						<option value="8">8</option>
+						<option value="9">9</option>
+						<option value="10">10</option>
+					</select>
+				</div>
+			
+				<div id="bklbl0" class="fileupload"><label for="bkcontents0">Filename 1:</label><input type="file" size="50" name="bkcontents0" id="bkcontents0" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+				<div id="bklbl1" class="fileupload" style="display: none"><label for="bkcontents1">Filename 2:</label><input type="file" size="50" name="bkcontents1" id="bkcontents1" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+				<div id="bklbl2" class="fileupload" style="display: none"><label for="bkcontents2">Filename 3:</label><input type="file" size="50" name="bkcontents2" id="bkcontents2" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+				<div id="bklbl3" class="fileupload" style="display: none"><label for="bkcontents3">Filename 4:</label><input type="file" size="50" name="bkcontents3" id="bkcontents3" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+				<div id="bklbl4" class="fileupload" style="display: none"><label for="bkcontents4">Filename 5:</label><input type="file" size="50" name="bkcontents4" id="bkcontents4" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+				<div id="bklbl5" class="fileupload" style="display: none"><label for="bkcontents5">Filename 6:</label><input type="file" size="50" name="bkcontents5" id="bkcontents5" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+				<div id="bklbl6" class="fileupload" style="display: none"><label for="bkcontents6">Filename 7:</label><input type="file" size="50" name="bkcontents6" id="bkcontents6" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+				<div id="bklbl7" class="fileupload" style="display: none"><label for="bkcontents7">Filename 8:</label><input type="file" size="50" name="bkcontents7" id="bkcontents7" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+				<div id="bklbl8" class="fileupload" style="display: none"><label for="bkcontents8">Filename 9:</label><input type="file" size="50" name="bkcontents8" id="bkcontents8" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+				<div id="bklbl9" class="fileupload" style="display: none"><label for="bkcontents9">Filename 10:</label><input type="file" size="50" name="bkcontents9" id="bkcontents9" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+			
+			</div>
+			
+			<div id="audioBits" style="display: none">
+				<div class="fieldrow">
+					<input type="radio" name="audio_type" id="audio_type" value="sfx" checked="checked" /><label for="audio_type">Sound Effect</label><br />
+					<input type="radio" name="audio_type" id="music_type" value="music" /><label for="music_type">Music</label>
+				</div>
+				<div id="aulbl0" class="fileupload"><label for="aucontents0">Filename:</label><input type="file" size="50" name="aucontents0" id="aucontents0" /></div>
+			</div>
+			
+			
+
+			
+			<div id="mediaPreview" style="display: none;">
+				<label id="mFilename"> </label>
+				<label id="mName"> </label>
+				<label id="mType"> </label>
+				<label id="mVoice"> </label>
+				<label id="mDate"> </label>
+				<label id="mUploader"> </label>
+				<br />
+			</div>
+			
+			<div id="submitbuttons">
+				<table>
+					<tr>
+						<td><input id="btnSubmit" type="submit" name="saveMedia" value="Add Media" onclick="checkAllFields(); return sendPostAction();"/></td>
+						<td><input type="reset" name="cancelMedia" value="Reset" onclick="resetForm()" /></td>
+					</tr>
+				</table>
+			</div>
+			
+		</div>
+		<!-- end left content -->
+	
+		<!-- right content -->
+		<div id="muRightContent" style="display: none;">
+			<div id=rightHeading><h1>Assign to a Stage:</h1></div>
+			<div id="stageList" style="display: none;"> 
+				<p> Select stages to assign the media to<br /><em>(Stages will <strong>not</strong> get reloaded)</em>:<p>
+				<table border="0" name="stageTable" id="stageTable" valign="top" style="margin-bottom : 80px;">
+					<tr>
+						<td>
+						<p><b>Unassigned:</b></p>
+							<select size="10" style="width:120px;" name="unassigned" id="unassigned" multiple="multiple">%(stage_list)s</select> 
+						</td>
+						<td>
+							<table>
+								<tr>
+									<td>
+										<button type="button" onclick="switchSelection(unassigned, assigned); return false;"><b>&gt;&gt;</b></button>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<button type="button" onclick="switchSelection(assigned, unassigned); return false;" ><b>&lt;&lt;</b></button>
+									</td>
+								</tr>
+								
+							</table>
+						</td>
+						<td> 
+							<p><b>Assigned:</b></p>
+							<select size="10" style="width:120px;" multiple="multiple" name="assigned" id="assigned">
+							</select> 
+						</td>
+					</tr>
+				</table>
+			</div>
+			<br/>
+		</div>
+		<!-- end right content -->
+
+	</div>
+	<!-- end settings container -->
+	
+
+	<!-- form submit buttons -->
+	<!-- 
+	<div id="submitbuttons">
+		<table>
+			<tr>
+				<td><input id="btnSubmit" type="submit" name="saveMedia" value="Add Media" onclick="checkAllFields(); return sendPostAction();"/></td>
+				<td><input type="reset" name="cancelMedia" value="Clear"/></td>
+			</tr>
+		</table>
+	</div>
+	-->
+	
+	<script type ="text/javascript">resetForm();</script>
+	
+</form>
+<!include master_b.inc>

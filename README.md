@@ -22,40 +22,11 @@ rsynth: wget http://archive.debian.org/debian-archive/debian/pool/non-free/r/rsy
 
 ________
 
-**We will use Ant to build and run UpStage in the near future.**
+Use `ant` to compile/build/run (other targets are not tested yet)
+> Note: you need to install `mtasc` and `swfmill` to compile UpStage client
 
-________
+# Instructions:
 
-### Install Instructions:
-
-As root run: `apt-get install espeak festival gif2png libgif4 netpbm python-twisted timeout`
-> NOTE: You will need to install: swftools, lame, libgdbmg, mbrola and rsynth using your distributions package manager.
-
-If you have downloaded the other dependencies as deb files, install them
-
-- Extract the dependency.tar.gz file
-- `cd` to the dependency folder
-- run as root: `dpkg -i *.deb`
-
-
-If downloaded from GitHub
-
-- Extract the download .zip or .tar.gz
-
-Open a terminal and cd to UpStage directory.
-
-Run: `python install.py`
-This will install upstage. Refer to below instructions for other options
-
-If you prefer to use the deb file there is a built in deb creater but you need to have the following installed:
-
-```
-apt-get install build-essential autoconf automake autotools-dev dh-make debhelper devscripts fakeroot xutils lintian pbuilder
-```
-
-Once the above build tools are installed run: `python install.py deb`
-
-To compile the client if you made changes or just want to make sure the latest client in included, use:
-`python install.py cc /path/to/flex`
-
-If you do not have the flex compiler 2. Then this will not work.
+- `ant compile-swf` to compile client swf files
+- `ant build` to build UpStage, and `build/upstage-server.sh` to run the server manually on default ports
+- `ant run` to  build and run automatically

@@ -1,0 +1,508 @@
+<!include master_a.inc>
+<!include workshop_nav.inc>
+
+<!-- TODO instead of using master_a.inc (containing all scripts and styles) setup own head for this page? -->
+
+<script type="text/javascript">document.title='Workshop - Media'; </script>
+
+<!-- include slickgrid -->
+<script type="text/javascript" src="/script/slickgrid/lib/jquery-1.7.min.js"></script>
+<script type="text/javascript" src="/script/slickgrid/lib/jquery.event.drag-2.0.min.js"></script>
+<script type="text/javascript" src="/script/slickgrid/slick.core.js"></script>
+<script type="text/javascript" src="/script/slickgrid/slick.grid.js"></script>
+<script type="text/javascript" src="/script/slickgrid/plugins/slick.rowselectionmodel.js"></script>
+
+<!-- include jquery.easytabs -->
+<script type="text/javascript" src="/script/jquery.easytabs/jquery.hashchange.min.js"></script>
+<script type="text/javascript" src="/script/jquery.easytabs/jquery.easytabs.min.js"></script>
+
+<!-- include various third party libs -->
+<!-- 
+<script type="text/javascript" src="/script/swfobject/swfobject.js"></script>
+-->
+<script type="text/javascript" src="/script/jquery.swfobject/jquery.swfobject.1-1-1.js"></script>
+<script type="text/javascript" src="/script/spin.js/spin.js"></script>
+<script type="text/javascript" src="/script/jquery.spin.js/jquery.spin.js"></script>
+<script type="text/javascript" src="/script/jquery.colorbox/jquery.colorbox-min.js"></script>
+<script type="text/javascript" src="/script/jquery.multiselect/jquery.multi-select.js"></script>
+<script type="text/javascript" src="/script/chosen/chosen.jquery.min.js"></script>
+<script type="text/javascript" src="/script/jquery.colorpicker/colorpicker.min.js"></script>
+
+
+<h1 style="margin:20px 0;">Edit/View Media</h1>
+
+<div id="filterDiv">
+
+	<div class="filterRow">
+	
+		<p class="filterTitle">Filter:</p>
+		
+		<div class="filterBlock">
+			<label for="filterUser">User:</label>
+			<select id="filterUser" name="filterUser" style="width:150px;">
+				<option value=""></option>
+				%(list_users_as_html_option_tag)s
+			</select>
+		</div>
+		
+		<div class="filterBlock">
+			<label for="filterStage">Stage:</label>
+			<select id="filterStage" name="filterStage" style="width:150px;">
+				<option value=""></option>
+				<option value="^"> -- not assigned -- </option><!-- dummy char '^' used for unassigned stages, see pages.py -->
+				%(list_stages_as_html_option_tag)s
+			</select>
+		</div>
+		
+		<div class="filterBlock">
+			<label for="filterType">Type:</label>
+			<select id="filterType" name="filterType" style="width:100px;">
+				<option value=""></option>
+				<option value="avatar">Avatar</option>
+				<option value="prop">Prop</option>
+				<option value="backdrop">Backdrop</option>
+				<option value="audio">Audio</option>
+			</select>
+		</div>
+			
+		<div class="filterBlock">
+			<label for="filterMedium">Medium:</label>
+			<select id="filterMedium" name="filterMedium" style="width:100px;">
+				<option value=""></option>
+				<option value="stream">Stream</option>
+				<!--<option value="video">Video</option>-->
+				<option value="music">Music</option>
+				<option value="sfx">Sound-Effect</option>
+			</select>
+		</div>
+	
+		<div class="filterBlock">
+		    <input id="buttonUpdateView" type="button" class="button-standard" value="Apply Filter" />
+	    	<input id="buttonResetView" type="button" style="width:60px;" value="Reset" />
+	 	</div>
+	 
+	</div>
+    
+</div>
+
+<hr />
+
+<div id="viewPanel">
+
+	<div id="dataPanel">
+	
+		<!-- TODO SlickGrid Live Update, Clear Button -->
+		
+		<div class="filterRow">
+	
+			<!-- TODO remove this dummy text when quick search is implemented: -->
+			<p class="filterTitle">Please click on table entry to select media:</p>
+	
+			<!-- 
+			<p class="filterTitle">Quick Search:</p>
+	
+			<div class="filterBlock">
+				<label for="filterName">Name:</label>
+				<input type="text" size="20" id="filterName" name="filterName" />
+			</div>
+			
+			<div class="filterBlock">
+				<label for="filterTags">Tags:</label>
+				<input type="text" size="20" id="filterTags" name="filterTags" />
+	 		</div>
+	 		
+	 		<div class="filterBlock">
+		    	<input id="buttonClearQuickSearch" type="button" style="width:60px;" value="Clear" />
+	 		</div>
+	 		-->
+	 
+		</div>
+	
+		<div id="dataGrid"></div>
+		
+		<div id="dataSummary">
+			<p><span id="infoTotalMediaCount">0</span> media entries &ndash; total <span id="infoTotalMediaSize">0 Bytes</span></p>
+		</div>
+		
+		<div id="dataLoadingPanel">
+			<div id="dataLoadingPanelInnerDiv">
+				<div id="spinner"></div>
+				<p style="font-weight:bold">Loading data ...</p>
+			</div>
+		</div>
+		
+	</div>
+	
+	<div id="detailsPanel">
+		
+		<div id="controlButtons" class="buttonRow">
+			<button id="buttonPreviewMedia" type="button" title="Preview" class="controlButton"><i class="icon-eye-open icon-2x"></i></button>
+			<button id="buttonEditMedia" type="button" title="Edit" class="controlButton"><i class="icon-pencil icon-2x"></i></button>
+			<button id="buttonAssignMedia" type="button" title="Assign" class="controlButton"><i class="icon-link icon-2x"></i></button>
+			<button id="buttonTagMedia" type="button" title="Tag" class="controlButton"><i class="icon-tag icon-2x"></i></button>
+			<button id="buttonDownloadMedia" type="button" title="Download" class="controlButton"><i class="icon-download-alt icon-2x"></i></button>
+			<button id="buttonDeleteMedia" type="button" title="Delete" class="controlButton"><i class="icon-trash icon-2x"></i></button>
+		</div>
+		
+		<h4 id="displayName"></h4>
+		
+		<div id="thumbnailPreviewContainer"><div id="thumbnailPreview"></div></div>
+		
+		<table id="tableDetails">
+		
+			<tr>
+				<td class="head">Type:</td>
+				<td><div id="detailType" class="detail"></div></td>
+			</tr>
+			<tr>
+				<td class="head">File:</td>
+				<td><div id="detailFile" class="detail"></div></td>
+			</tr>
+			<tr>
+				<td class="head">Size:</td>
+				<td><div id="detailSize" class="detail"></div></td>
+			</tr>
+			<tr>
+				<td class="head">Date:</td>
+				<td><div id="detailDate" class="detail"></div></td>
+			</tr>
+			<tr>
+				<td class="head">User:</td>
+				<td><div id="detailUser" class="detail"></div></td>
+			</tr>
+			<tr>
+				<td class="head">Voice:</td>
+				<td><div id="detailVoice" class="detail"></div></td>
+			</tr>
+			<tr>
+				<td class="head">Tags:</td>
+				<td><div id="detailTags" class="detail"></div></td>
+			</tr>
+			<tr>
+				<td class="head">Stages:</td>
+				<td><div id="detailStages" class="detail"></div></td>
+			</tr>
+			<tr>
+				<td class="head">Streamserver:</td>
+				<td><div id="detailStreamserver" class="detail"></div></td>
+			</tr>
+			<tr>
+				<td class="head">Streamname:</td>
+				<td><div id="detailStreamname" class="detail"></div></td>
+			</tr>
+			
+		</table>
+		
+	</div>
+
+</div>
+
+<!-- colorbox inline divs, hidden by default -->
+
+<div style="display:none">
+
+	<div id="previewMediaPanel" class="colorboxPanel">
+		<div class="dialogContent">
+		
+			<h1>Preview &quot;<span id="previewMediaName"></span>&quot;</h1>
+			
+			<div id="previewTabsContainer" class="tab-container">
+			
+				<ul class="easytabs">
+					<li id="tabPreviewImage" class="tab"><a href="#panelPreviewImage">Image</a></li>
+					<li id="tabPreviewAudio" class="tab"><a href="#panelPreviewAudio">Audio</a></li>
+					<li id="tabPreviewFlash" class="tab"><a href="#panelPreviewFlash">Flash</a></li>
+					<li id="tabPreviewStream" class="tab"><a href="#panelPreviewStream">Stream</a></li>
+					<li id="tabPreviewDetails" class="tab"><a href="#panelPreviewDetails">Details</a></li>
+				</ul>
+
+				<div id="panelPreviewDetails">
+					<div class="tab-panel">
+					
+						<p>This feature is currently not implemented.</p>
+					
+						<!-- TODO using dummy data for now -->
+						<!-- 
+						<table>
+							<tr>
+								<td>Filetype</td>
+								<td>SWF</td>
+							</tr>
+							<tr>
+								<td>Media file size</td>
+								<td>0 Bytes</td>
+							</tr>
+							<tr>
+								<td>Dimensions</td>
+								<td>100 x 100 Pixel</td>
+							</tr>
+							<tr>
+								<td>Total number of frames</td>
+								<td>1</td>
+							</tr>
+							<tr>
+								<td>Autoplay</td>
+								<td>true</td>
+							</tr>
+							<tr>
+								<td>Thumbnail file size</td>
+								<td>0 Bytes</td>
+							</tr>
+						</table>
+						-->
+						
+					</div>
+				</div>
+
+				<div id="panelPreviewImage">
+					<div class="tab-panel">
+						<p>This feature is currently not implemented.</p>
+					</div>
+				</div>
+				
+				<div id="panelPreviewAudio">
+					<div class="tab-panel">
+						<p>This feature is currently not implemented.</p>
+					</div>
+				</div>
+				
+				<div id="panelPreviewStream">
+					<div class="tab-panel">
+						<p>This feature is currently not implemented.</p>
+					</div>
+				</div>
+				
+				<div id="panelPreviewFlash">
+					<div class="tab-panel">
+						
+						<div id="previewFlash">
+						
+							<p id="previewFlashInfo"></p>
+						
+							<div class="movie"></div>
+							
+							<div class="movie-controls">
+								<button id="previewFlashFirstFrame" type="button" title="Go to first frame" class="controlButton"><i class="icon-backward icon-2x"></i></button>
+								<button id="previewFlashPrevFrame" type="button" title="Go to previous frame" class="controlButton"><i class="icon-step-backward icon-2x"></i></button>
+								<button id="previewFlashPause" type="button" title="Pause flash movie" class="controlButton"><i class="icon-pause icon-2x"></i></button>
+								<button id="previewFlashPlay" type="button" title="Play flash movie" class="controlButton"><i class="icon-play icon-2x"></i></button>
+								<button id="previewFlashNextFrame" type="button" title="Go to next frame" class="controlButton"><i class="icon-step-forward icon-2x"></i></button>
+								<button id="previewFlashLastFrame" type="button" title="Go to last frame" class="controlButton"><i class="icon-forward icon-2x"></i></button>
+								<div class="spacer"></div>
+								<button id="previewFlashZoomIn" type="button" title="Zoom in" class="controlButton"><i class="icon-plus icon-2x"></i></button>
+								<button id="previewFlashZoomOut" type="button" title="Zoom out" class="controlButton"><i class="icon-minus icon-2x"></i></button>
+								<button id="previewFlashFitSize" type="button" title="Fit size" class="controlButton"><i class="icon-fullscreen icon-2x"></i></button>
+								<div class="spacer"></div>
+								<button id="previewFlashToggleTransparency" type="button" title="Toggle transparency" class="controlButton"><i class="icon-adjust icon-2x"></i></button>
+								<button id="previewFlashBackgroundColorSelector" type="button" title="Change background color" class="controlButton"><div class="inner-color-button" style="background-color: rgb(204,204,204)"></div></button>
+								
+							</div>
+							
+						</div>
+						
+					</div>
+				</div>
+				
+				<div class="dialogButtonRow">
+					<input type="button" class="buttonClose button-standard" value="Close" />
+				</div>
+				
+			</div>
+			
+		</div>
+	</div>
+	
+	<div id="assignMediaPanel" class="colorboxPanel">
+	
+		<div class="dialogContent">
+			<h1>Assign &quot;<span id="assignMediaName"></span>&quot; to stages</h1>
+			
+			<div id="assignMediaToStageSelectorPanel"></div>
+			
+			<p class="dialogNote"><strong>Note:</strong> Changes will force a reload only of the newly assigned and unassigned stages</p>
+			
+			<div class="dialogButtonRow">
+				<input type="button" class="buttonClose button-standard" value="Cancel" />
+				<input type="button" class="button-standard" id="buttonExecuteAssign" value="Apply" />
+			</div>
+		
+		</div>
+		
+	</div>
+	
+	<div id="tagMediaPanel" class="colorboxPanel">
+		
+		<div class="dialogContent">
+			<h1>Set Tags for &quot;<span id="tagMediaName"></span>&quot;</h1>
+			
+			<div id="tagMediaSelectorPanel"></div>
+			
+			<div class="dialogButtonRow">
+				<input type="button" class="buttonClose button-standard" value="Cancel" />
+				<input type="button" class="button-standard" id="buttonExecuteTag" value="Apply" />
+			</div>
+			
+		</div>
+
+	</div>
+
+	<div id="editMediaPanel" class="colorboxPanel">
+		<div class="dialogContent">
+		
+			<h1>Edit &quot;<span id="editMediaName"></span>&quot;</h1>
+			
+			<div id="editTabsContainer" class="tab-container">
+			
+				<ul class="easytabs">
+					<li id="tabEditName" class="tab"><a href="#panelEditName">Name</a></li>
+					<li id="tabEditVoice" class="tab"><a href="#panelEditVoice">Voice</a></li>
+					<li id="tabEditStream" class="tab"><a href="#panelEditStream">Stream</a></li>
+					<li id="tabEditAudio" class="tab"><a href="#panelEditAudio">Type</a></li>
+					<!--<li id="tabEditVideo" class="tab"><a href="#panelEditVideo">Video Image</a></li>-->
+				</ul>
+
+				<div id="panelEditName">
+					<div class="tab-panel">
+						<div class="fieldrow">
+							<label class="field-label" for="editName">Name:</label>
+							<input type="text" name="editName" id="inputEditName" value="" size="65" />
+						</div>
+					</div>
+				</div>
+				
+				<div id="panelEditVoice">
+					<div class="tab-panel">
+						<div class="fieldrow">
+				
+							<label class="field-label" for="editVoice">Voice:</label>
+							<select name="editVoice" size="1" id="selectEditVoice" class="field-select">%(list_voices_as_html_option_tag)s</select>
+							
+							<!-- TODO add voice test for preview -->
+							<!-- 
+							<div id="voiceTestPanel" style="display:inline-block">
+								<input type="text" name="text" id="text" maxlength="128" value="The quick brown fox jumps over the lazy dog" style="width:45%" />
+							 	<input type="button" value="Test voice"  id="buttonEditVoiceTest" />
+							 	<input type="button" value="Cancel" style="display:none" id="buttonCancelEditVoiceTest" />
+								<div id="editVoiceTest"> 
+							        <div id="editVoiceTestDiv"></div>
+							        <div id="editVoiceTestError"></div>
+								</div>
+							</div>
+						 	-->
+						 
+						 </div>
+						
+					</div>
+				</div>
+				
+				<div id="panelEditStream">
+					<div class="tab-panel">
+						
+						<div class="fieldrow">
+							<label for="editStreamserver" class="field-label-large">Stream server:</label>
+							<input type="text" name="editStreamserver" id="inputEditStreamserver" maxlength="256" class="field-input" />
+							<br />
+							<label for="editStreamname" class="field-label-large">Stream name:</label>
+							<input type="text" name="editStreamname" id="inputEditStreamname" maxlength="1024" class="field-input" />
+						</div>
+						
+						<!-- TODO add stream test later -->
+						<!-- 
+						<div class="fieldrow">
+							<label for="editStreamserverTypeSelector">Stream type:</label>
+							<select name="editStreamserverTypeSelector" id="selectStreamserverType">
+								<option value="auto">Auto-detect</option>
+								<option value="live">Live</option>
+								<option value="audio">Audio</option>
+								<option value="video">Video</option>
+							</select>
+							<input type="button" value="Test stream" id="buttonEditStreamTest" />
+							<input type="button" value="Cancel" style="display:none" id="buttonCancelStreamTest" />
+						</div>
+						
+						<div id="editStreamTest" class="fieldrow"> 
+							<div id="editStreamTestDiv"></div>
+						</div>
+						-->
+						
+					</div>
+				</div>
+				
+				<div id="panelEditAudio">
+					<div class="tab-panel">
+						<div class="fieldrow">
+							<input type="radio" name="editAudioType" id="inputEditAudioTypeSfx" value="sfx" /><label for="inputEditAudioTypeSfx">Sound Effect</label>
+							<br />
+							<input type="radio" name="editAudioType" id="inputEditAudioTypeMusic" value="music" /><label for="inputEditAudioTypeMusic">Music</label>
+						</div>
+					</div>
+				</div>
+				
+			<!-- Lisa Helm (30/08/13) removed Video avatar code-->	
+				
+				<div id="editMediaForceReloadDisplay">
+					<p>Assigned to <strong><span id="editMediaAssignedStages"></span></strong>.</p>
+					<input type="checkbox" name="editMediaForceReload" id="editMediaForceReload" />
+					<label for="editMediaForceReload"><em>force reload of all assigned stages when modified</em></label>
+				</div>
+				
+				<div class="dialogButtonRow">
+					<input type="button" class="button-standard" id="buttonExecuteEditCancel" value="Cancel" />
+					<input type="button" class="button-standard" id="buttonExecuteEdit" value="Apply" />
+				</div>
+			
+			</div>
+		
+		</div>
+		
+	</div>
+
+	<div id="deleteMediaPanel" class="colorboxPanel">
+	
+		<div class="dialogContent">
+			<h1>Delete &quot;<span id="deleteMediaName"></span>&quot;?</h1>
+			<div id="deleteEvenIfInUseDisplay">
+				<p>Assigned to <strong><span id="deleteMediaAssignedStages"></span></strong>.</p>
+				<input type="checkbox" name="deleteEvenIfInUse" id="deleteEvenIfInUse" />
+				<label for="deleteEvenIfInUse">confirm to delete from all assigned stages <em>(forces stage reload)</em></label>
+			</div>
+			
+			<div class="dialogButtonRow">
+				<input type="button" class="buttonClose button-standard" value="Cancel" />
+				<input type="button" class="button-standard" id="buttonExecuteDelete" value="Delete" />
+			</div>	
+		
+		</div>
+		
+	</div>
+	
+	<div id="errorPanel" class="colorboxPanel colorboxErrorPanel">
+		
+		<div class="dialogContent errorContent">
+			<h1><span id="errorTitle"></span></h1>
+			<span id="errorMessage"></span>
+		
+			<div class="dialogButtonRow">
+				<input type="button" class="buttonClose button-standard" value="Close" />
+			</div>
+		
+		</div>
+
+	</div>
+	
+</div>
+
+<div id="downloadContainer" style="display:none;visibility:hidden"></div>
+
+<script type="text/javascript">
+var stageList = %(list_stages_as_json)s;
+$(document).ready(function(){
+	setupMediaEdit("%(req:path)s","%(user)s",stageList.sort(),true);
+	
+	// default close function for all close buttons (closing colorbox)
+	$(".buttonClose").click(function(){ $.fn.colorbox.close(); return false; });
+
+})
+</script>
+
+<!include master_b.inc>

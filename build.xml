@@ -1,0 +1,842 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+This is a generic ANT buildfile for
+UpStage (http://upstage.org.nz)
+
+(for ant details see: http://ant.apache.org/)
+
+Copyright (C) 2011-2013 Martin Eisenbarth, eyesee[a]foobarlab.net
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <http://www.gnu.org/licenses/>.
+
+Short description:
+==================
+
+This script allows automatic compilation and deployment.
+
+The current operating system is 'automagically' detected and
+proper settings are used for the specific platform.
+
+If you want to change the settings you have to change them
+in the separate properties file named 'build.properties'.
+
+@author: Martin Eisenbarth
+ 
+Changelog:
+ 
+March 2011		Initial Version for Version 2.1
+January 2013 	Adopted for UpStage 2.4.2 video hack
+March 2013		Added minify with YUI Compressor
+
+-->
+<project name="UpStage" default="help" basedir=".">
+	
+	<!-- the default property file containing all variable settings -->
+	<property file="build.properties"  />
+	
+	<!-- load environment variables -->
+	<property environment="env" />
+	
+	<!-- as2lib ant tasks: compiling as2 files with ant, see: http://osflash.org/ant -->
+	<taskdef name="swf" classname="org.as2lib.ant.Swf" classpath="${upstage.dir.antlib}/as2ant.jar" />
+	<taskdef name="mtasc" classname="org.as2lib.ant.Mtasc" classpath="${upstage.dir.antlib}/as2ant.jar" />
+	<taskdef name="swfmill" classname="org.as2lib.ant.Swfmill" classpath="${upstage.dir.antlib}/as2ant.jar" />
+	
+	<!-- doxygen-task: generating doxygen documentation, see: http://ant-doxygen.blogspot.com/ -->
+	<taskdef name="doxygen" classname="org.doxygen.tools.DoxygenTask" classpath="${upstage.dir.antlib}/ant_doxygen.jar" />
+	
+	<!-- pyanttask: python ant tasks, see: http://code.google.com/p/pyanttasks/ -->
+	<taskdef resource="pyAntTasks.properties" classpath="${upstage.dir.antlib}/pyAntTasks-1.3.3.jar" />
+
+	<!-- ant-contrib: additional ant tasks, see: http://ant-contrib.sourceforge.net/ -->
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+	    <pathelement location="${upstage.dir.antlib}/ant-contrib-1.0b3.jar" />
+	  </classpath>
+	</taskdef>
+	
+	<!-- yui-compressor-ant-task: minify JavaScript and CSS, see: https://github.com/n0ha/yui-compressor-ant-task/ -->
+	<property name="yui-compressor.jar" location="${upstage.dir.antlib}/yuicompressor-2.4.7.jar" />
+	<property name="yui-compressor-ant-task.jar" location="${upstage.dir.antlib}/yui-compressor-ant-task-0.5.1.jar" />
+	<path id="task.yuicompressor.classpath">
+		<pathelement location="${yui-compressor.jar}" />
+		<pathelement location="${yui-compressor-ant-task.jar}" />
+	</path>
+	<taskdef name="yui-compressor" classname="net.noha.tools.ant.yuicompressor.tasks.YuiCompressorTask">
+		<classpath refid="task.yuicompressor.classpath" />
+	</taskdef>
+	
+	<!-- target for initialization procedure - called from other tasks -->
+	<target name="init" depends="set-variables" >
+		<echo message="Finished initialization." />
+	</target>
+	
+	<!-- target to set initial variables - called from other tasks -->
+	<target name="set-variables">
+		
+		<echo message="Setting dynamic variables ..." />
+		
+		<!-- detect underlying operating system -->
+		<echo message="Detected operating system: ${os.name} ${os.version} (${os.arch})" />
+		
+		<!-- Is it Mac OS X? -->
+		<condition property="isMacOSX">
+			<and>
+				<os family="mac" />
+				<os family="unix" />
+			</and>
+		</condition>
+				
+		<!-- Is it Windows? -->
+		<condition property="isWindows">
+			<and>
+				<os family="windows" />
+			</and>
+		</condition>
+				
+		<!-- Is it Linux? -->
+		<condition property="isLinux">
+			<and>
+				<os family="unix" />
+				<not>
+					<os family="mac" />
+				</not>
+			</and>
+		</condition>
+		
+		<!-- if you have another operating system, just add another a detector for it -->
+		
+		<!-- set executables depending on os -->
+		
+		<!-- Windows -->
+		<condition property="upstage.python.executable" value="${upstage.python.executable.win}">
+			<and>
+				<isset property="isWindows" />
+				<isset property="upstage.python.executable.win" />
+			</and>
+		</condition>
+		<condition property="upstage.doxygen.executable" value="${upstage.doxygen.executable.win}">
+			<and>
+				<isset property="isWindows" />
+				<isset property="upstage.doxygen.executable.win" />
+			</and>
+		</condition>
+		<condition property="upstage.mtasc.executable" value="${upstage.mtasc.executable.win}">
+			<and>
+				<isset property="isWindows" />
+				<isset property="upstage.mtasc.executable.win" />
+			</and>
+		</condition>
+		<condition property="upstage.swfmill.executable" value="${upstage.swfmill.executable.win}">
+			<and>
+				<isset property="isWindows" />
+				<isset property="upstage.swfmill.executable.win" />
+			</and>
+		</condition>
+		
+		<!-- MacOSX -->
+		<condition property="upstage.python.executable" value="${upstage.python.executable.mac}">
+			<and>
+				<isset property="isMacOSX" />
+				<isset property="upstage.python.executable.mac" />
+			</and>
+		</condition>
+		<condition property="upstage.doxygen.executable" value="${upstage.doxygen.executable.mac}">
+			<and>
+				<isset property="isMacOSX" />
+				<isset property="upstage.doxygen.executable.mac" />
+			</and>
+		</condition>
+		<condition property="upstage.mtasc.executable" value="${upstage.mtasc.executable.mac}">
+			<and>
+				<isset property="isMacOSX" />
+				<isset property="upstage.mtasc.executable.mac" />
+			</and>
+		</condition>
+		<condition property="upstage.swfmill.executable" value="${upstage.swfmill.executable.mac}">
+			<and>
+				<isset property="isMacOSX" />
+				<isset property="upstage.swfmill.executable.mac" />
+			</and>
+		</condition>
+		
+		<!-- Linux -->
+		<condition property="upstage.python.executable" value="${upstage.python.executable.linux}">
+			<and>
+				<isset property="isLinux" />
+				<isset property="upstage.python.executable.linux" />
+			</and>
+		</condition>
+		<condition property="upstage.doxygen.executable" value="${upstage.doxygen.executable.linux}">
+			<and>
+				<isset property="isLinux" />
+				<isset property="upstage.doxygen.executable.linux" />
+			</and>
+		</condition>
+		<condition property="upstage.mtasc.executable" value="${upstage.mtasc.executable.linux}">
+			<and>
+				<isset property="isLinux" />
+				<isset property="upstage.mtasc.executable.linux" />
+			</and>
+		</condition>
+		<condition property="upstage.swfmill.executable" value="${upstage.swfmill.executable.linux}">
+			<and>
+				<isset property="isLinux" />
+				<isset property="upstage.swfmill.executable.linux" />
+			</and>
+		</condition>
+		
+		<echo message="______________________________________________________" />
+		<echo message="Python      : ${upstage.python.executable}" />
+		<echo message="Doxygen     : ${upstage.doxygen.executable}" />
+		<echo message="MTASC       : ${upstage.mtasc.executable}" />
+		<echo message="swfmill     : ${upstage.swfmill.executable}" />
+		<echo message="______________________________________________________" />
+		<echo message="ANT_HOME    : ${env.ANT_HOME}" />
+		<echo message="JAVA_HOME   : ${env.JAVA_HOME}" />
+		<echo message="TEMP        : ${env.TEMP}" />
+		<echo message="______________________________________________________" />
+		<!--
+		<echo message="PLAYERGLOBAL_HOME    : ${env.PLAYERGLOBAL_HOME}" />
+		<echo message="FLASHPLAYER_DEBUGGER : ${env.FLASHPLAYER_DEBUGGER}" />
+		<echo message="______________________________________________________" />
+		-->
+		
+	</target>
+	
+	<!-- target to check requirements - called from other tasks -->
+	<target name="check-requirements">
+		
+		<echo message="Checking requirements ..." />
+		
+		<!-- check for absent properties -->
+		<condition property="property-missing">
+			<not>
+				<and>
+					<isset property="upstage.version" />
+					<isset property="upstage.debug" />
+					<isset property="upstage.dir.antlib" />
+					<isset property="upstage.dir.as2src" />
+					<isset property="upstage.dir.build" />
+					<isset property="upstage.python.executable" />
+					<isset property="upstage.doxygen.executable" />
+					<isset property="upstage.mtasc.executable" />
+					<isset property="upstage.swfmill.executable" />
+				</and>
+			</not>
+		</condition>
+				
+		<!-- check supported operating system -->
+		<condition property="os-not-supported">
+			<not>
+				<or>
+					<isset property="isWindows" />
+					<isset property="isMacOSX" />
+					<isset property="isLinux" />
+				</or>
+			</not>
+		</condition>
+
+		<!-- check for failure -->
+		<condition property="hasFailed">
+			<or>
+				<isset property="os-not-supported" />
+				<isset property="property-missing" />
+			</or>
+		</condition>
+		<antcall target="check-fail" />
+		
+		<!-- check currently installed python version and libraries -->
+		<exec executable="${upstage.python.executable}" failonerror="true" dir="${upstage.dir.antlib}/scripts/">
+			<arg value="check_python.py"/>
+		</exec>
+		
+	</target>
+	
+	<!-- target is executed when failed -->
+	<target name="check-fail" if="hasFailed">
+		<echo message="Failure detected ..." />
+		<echo message="Properties:" />
+		<echoproperties prefix="upstage" />
+		<echoproperties destfile="failure.properties" failonerror="false" />
+		<echo message="All currently set properties have been written to the file 'failure.properties' ..." />
+		<fail message="Sorry, your operating system (${os.name} ${os.version} [${os.arch}]) is currently not supported." if="os-not-supported" />
+		<fail message="Sorry, missing some properties. See 'failure.properties' for currently set properties." if="property-missing" />
+		<fail message="Sorry, unable to complete the build process. Please check all previous messages for further details." />
+	</target>
+	
+	<!-- clean the directory tree to get the original state before compilation -->
+	<target name="clean" depends="kill,init" description="clean up temporary files">
+		<delete dir="${upstage.dir.dist}" />
+		<delete dir="${upstage.dir.build}" />
+		<delete dir="${upstage.dir.tmp}" />
+		<delete dir="${upstage.dir.apidoc}/client/html" />
+		<delete dir="${upstage.dir.apidoc}/server/html" />
+		<delete file="${upstage.dir.src}/${upstage.dir.templ}/swf/client.swf" />
+	</target>
+	
+	<!-- just compile everything -->
+	<target name="compile" description="compile all" depends="init,check-requirements,compile-swf,compile-python">
+		<echo message="Compile finished." />
+	</target>
+	
+	<target name="compile-swf" depends="init">
+		<mkdir dir="${upstage.dir.tmp}"/>
+		<echo message="Compiling swf ..." />
+		<!-- compile classes with mtasc -->
+		<mtasc 	src="${upstage.mtasc.client}"
+				
+				swf="${upstage.mtasc.swf}"
+				classpath="${upstage.dir.as2src}"
+				header="${upstage.swf.width}:${upstage.swf.height}:${upstage.swf.framerate}"
+				version="${upstage.swf.version}"
+				wimp="true"
+				strict="true"
+				frame="1"
+				msvc="true"
+				trace="${upstage.mtasc.debug}"
+				verbose="${upstage.verbose}"
+				mtasc="${upstage.mtasc.executable}" />
+		<!-- prepare files for swfmill -->
+		<copy todir="${upstage.dir.tmp}">
+			<fileset dir="${upstage.swfmill.fonts}">
+				<include name="*.ttf" />
+			</fileset>
+			<fileset dir="${upstage.swfmill.images}">
+				<include name="*.png" />
+			</fileset>
+		</copy>
+		<!-- link files with swfmill -->
+		<swfmill cmd="simple"
+		     src="${upstage.swfmill.src}"
+			 dest="${upstage.swfmill.dest}"
+			 swfmill="${upstage.swfmill.executable}"
+			 quiet="false"
+		     verbose="${upstage.verbose}" />
+	</target>
+	
+	<!-- compiles the python part -->
+	<target name="compile-python" depends="init">
+		
+		<property name="upstage.dir.compile" value="${upstage.dir.tmp}/${upstage.dir.python}" />
+		
+		<!-- create temp dir -->
+		<mkdir dir="${upstage.dir.tmp}" />
+		
+		<!-- copy upstage server modules to the above temp folder -->
+		<copy todir="${upstage.dir.compile}">
+			<fileset dir="${upstage.dir.src}/${upstage.dir.python}">
+				<exclude name="**/EMPTY" />
+		    	<include name="**/*" />
+			</fileset>
+		</copy>		
+		
+		<echo message="Compiling python ..." />
+		<py-compile dir="${upstage.dir.compile}"
+					pythonpath="${upstage.dir.compile}"
+					python="${upstage.python.executable}"
+					failonerror="true"
+					quiet="true"
+					optimize="1" />
+	</target>
+	
+	<!-- minify javascript and css -->
+	<target name="minify">
+		<if>
+			<istrue value="${upstage.minify}" />
+				<then>
+					
+					<echo message="Invoking YUI compressor for minification ..." />
+		
+					<!-- TODO: explicit concatenation of files? -->
+					<!-- see also: http://heliologue.com/2008/09/22/using-yui-compressor-in-a-web-project/ -->
+				
+					<!-- invoke compressor globally on js and css -->
+					<yui-compressor
+						warn="false"
+						charset="UTF-8"
+						fromdir="${upstage.dir.build}"
+						todir="${upstage.dir.build}" 
+						jssuffix=".js.${upstage.minify.extension}"
+						csssuffix=".css.${upstage.minify.extension}"
+						munge="true"
+						optimize="true"
+						preserveallsemicolons="false"
+						linebreakposition="4000">
+						
+						<!-- include all js and css files -->
+						<include name="**/*.css" />
+						<include name="**/*.js" />
+						
+						<!-- exclude explicit given patterns -->
+						<exclude name="${upstage.minify.exclude}" />
+						
+					</yui-compressor>
+		
+					<!-- clean up files afterward -->
+					
+					<echo message="Postprocessing ..." />
+					
+					<!-- get all files which have been compressed and overwrite the old ones-->
+					<move todir="${upstage.dir.build}">
+						<fileset dir="${upstage.dir.build}">
+							<include name="**/*.js.${upstage.minify.extension}" />
+							<include name="**/*.css.${upstage.minify.extension}" />
+						</fileset>
+						<!-- rename file extensions -->
+						<mapper type="regexp" from="^(.*)\.${upstage.minify.extension}$" to="\1"/>
+					</move>
+
+				</then>
+				<else>
+					
+					<echo message="Minify disabled." />
+				
+				</else>
+			</if>
+					
+	</target>
+	
+	<!-- TODO: remove comments from html code to reduce size -->
+	<!--
+	<target name="html-remove-comments">
+	</target>
+	-->
+	
+	<!-- generate batch/shell-scripts -->
+	<target name="create-scripts" depends="set-variables">
+		
+		<echo message="Creating scripts ..." />
+		
+		<echo file="${upstage.dir.tmp}/upstage-server.bat" message="${upstage.script.upstage-server.win}" />
+		<echo file="${upstage.dir.tmp}/upstage-server.command" message="${upstage.script.upstage-server.mac}" />
+		<echo file="${upstage.dir.tmp}/upstage-server.sh" message="${upstage.script.upstage-server.linux}" />
+		
+		<condition property="upstage.python.executable.replace.win" value="${upstage.python.executable.win}">
+			<isset property="upstage.python.executable.win" />
+		</condition>
+		
+		<condition property="upstage.python.executable.replace.mac" value="${upstage.python.executable.mac}">
+			<isset property="upstage.python.executable.mac" />
+		</condition>
+		
+		<condition property="upstage.python.executable.replace.linux" value="${upstage.python.executable.linux}">
+			<isset property="upstage.python.executable.linux" />
+		</condition>
+		
+		<replaceregexp file="${upstage.dir.tmp}/upstage-server.bat" match="\$\{upstage.python.executable\}" replace="${upstage.python.executable.replace.win}" flags="g" />
+		<replaceregexp file="${upstage.dir.tmp}/upstage-server.command" match="\$\{upstage.python.executable\}" replace="${upstage.python.executable.replace.mac}" flags="g" />
+		<replaceregexp file="${upstage.dir.tmp}/upstage-server.sh" match="\$\{upstage.python.executable\}" replace="${upstage.python.executable.replace.linux}" flags="g" />
+		
+		<loadfile property="upstage.file.bat" srcfile="${upstage.dir.tmp}/upstage-server.bat" />
+		<loadfile property="upstage.file.command" srcfile="${upstage.dir.tmp}/upstage-server.command" />
+		<loadfile property="upstage.file.sh" srcfile="${upstage.dir.tmp}/upstage-server.sh" />	
+		
+		<echo message="________________________________________" />
+		<echo message="&lt;upstage.bat&gt;" />
+		<echo message="${upstage.file.bat}" />
+		<echo message="________________________________________" />
+		<echo message="&lt;upstage.command&gt;" />
+		<echo message="${upstage.file.command}" />
+		<echo message="________________________________________" />
+		<echo message="&lt;upstage.sh&gt;" />
+		<echo message="${upstage.file.sh}" />
+		<echo message="________________________________________" />
+		
+	</target>
+	
+	<!-- create a build directory and copy necessary files -->
+	<target name="build" depends="compile,create-scripts" description="make build">
+		
+		<!-- show some info -->
+		<echo message="==============================================" />
+		<echo message="Ant Build for UpStage ${upstage.version}.${upstage.revision} ..." />
+		<echo message="==============================================" />
+
+		<!-- create build dir -->
+		<mkdir dir="${upstage.dir.build}" />
+		
+		<!-- copy upstage server -->
+		<copy todir="${upstage.dir.build}/${upstage.dir.python}">
+			<fileset dir="${upstage.dir.src}/${upstage.dir.python}">
+				<exclude name="${upstage.build.excludes}" />
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		
+		<!-- copy templates -->
+		<copy todir="${upstage.dir.build}/${upstage.dir.templ}">
+			<fileset dir="${upstage.dir.src}/${upstage.dir.templ}">
+				<exclude name="${upstage.build.excludes}" />
+		    	<include name="**/*" />
+			</fileset>
+		</copy>
+		
+		<!-- copy configuration -->
+		<copy todir="${upstage.dir.build}/${upstage.dir.conf}">
+			<fileset dir="${upstage.dir.src}/${upstage.dir.conf}">
+				<exclude name="${upstage.build.excludes}" />
+		    	<include name="**/*" />
+			</fileset>
+		</copy>
+		
+		<!-- copy scripts -->
+		<copy todir="${upstage.dir.build}">
+			<fileset dir="${upstage.dir.src}">
+				
+				<exclude name="${upstage.build.excludes}" />
+				
+				<!-- exclude development scripts -->
+				<exclude name="**/jslint*" />
+				<exclude name="**/pychecker*" />
+				<exclude name="**/install.py" /> <!-- unused -->
+				<exclude name="**/uninstall.sh" /> <!-- unused -->
+				
+				<include name="**/*.py"/>
+				<include name="**/*.sh"/>
+				<include name="**/*.bat"/>
+				<include name="**/*.command"/>
+				<include name="**/*.conf"/> <!-- is this used? -->
+				
+			</fileset>
+		</copy>
+		
+		<!-- chmod scripts in lib folder: make scripts executable -->
+		<chmod perm="755">
+			<fileset dir="${upstage.dir.build}">
+				<include name="**/*.py"/>
+				<include name="**/*.sh"/>
+				<include name="**/*.bat"/>
+				<include name="**/*.command"/>
+			</fileset>
+		</chmod>
+		
+		<!-- copy client swf -->
+		<copy todir="${upstage.dir.build}/${upstage.dir.templ}/swf">
+			<fileset dir="${upstage.dir.tmp}">
+				<include name="**/client.swf"/>
+			</fileset>
+		</copy>
+		
+		<!-- copy generated scripts -->
+		<copy todir="${upstage.dir.build}">
+			<fileset dir="${upstage.dir.tmp}">
+				<include name="**/*.sh"/>
+				<include name="**/*.bat"/>
+				<include name="**/*.command"/>
+			</fileset>
+		</copy>
+
+		<!-- change permissions of bin directory (affects linux/mac only)-->
+		<chmod perm="ago+rx" type="file" failonerror="false">
+			<fileset dir="${upstage.dir.build}">
+				<include name="*.sh"/>
+				<include name="*.command"/>
+				<include name="*.bat"/>
+				<include name="*.py"/>
+			</fileset>
+		</chmod>
+		
+		<!-- run minify -->
+		<antcall target="minify" inheritall="true" />
+		
+	</target>
+	
+	<!-- create distributable files -->
+	<target name="dist" depends="clean,doc,build" description="create distribution files">
+		
+		<!-- generate timestamp and release info -->
+		<if>
+			<istrue value="${upstage.isrelease}" />
+			<then>
+				<property name="TIMESTAMP" value="" />
+				<property name="RELEASEINFO" value="" />
+			</then>
+			<else>
+				<tstamp><format property="TIMESTAMP" pattern=".yyyy-MM-dd-HHmmss" /></tstamp>
+				<property name="RELEASEINFO" value=".dev" />
+			</else>
+		</if>
+		
+		<!-- create dist dir -->
+		<mkdir dir="${upstage.dir.dist}" />
+		
+		<!-- create zip archives -->
+		<zip destfile="${upstage.dir.dist}/upstage-${upstage.version}.${upstage.revision}${RELEASEINFO}-bin${TIMESTAMP}.zip">
+			<zipfileset dir="${upstage.dir.build}" excludes="**/EMPTY,**/*.pyc,**/pychecker*" />
+			<fileset dir="${basedir}" includes="LICENSE.txt" />
+		</zip>
+		
+		<zip destfile="${upstage.dir.dist}/upstage-${upstage.version}.${upstage.revision}${RELEASEINFO}-src${TIMESTAMP}.zip">
+			<zipfileset dir="${upstage.dir.src}" prefix="server" excludes="**/EMPTY,**/*.pyc" />
+			<zipfileset dir="${upstage.dir.as2src}" prefix="client" excludes="**/EMPTY" />
+			<fileset dir="${basedir}" includes="LICENSE.txt" />
+		</zip>
+		
+		<zip destfile="${upstage.dir.dist}/upstage-${upstage.version}.${upstage.revision}${RELEASEINFO}-doc${TIMESTAMP}.zip">
+			<zipfileset dir="${upstage.dir.apidoc}" prefix="api" excludes="**/EMPTY" />
+		</zip>
+		
+	</target>
+	
+	<!-- run the application-->
+	<target name="run" depends="clean,build" description="run the application">
+		
+		<!-- determine executable depending on os -->
+
+		<!-- DEBUG: check properties -->
+		<!--
+		<echo message="isWindows: ${isWindows} - isMacOSX: ${isMacOsX} - isLinux: ${isLinux}" />
+		-->
+		
+		<condition property="exec.command" value="cmd">
+			<isset property="isWindows" />
+		</condition>
+		<condition property="exec.argline-server" value="/c upstage-server.bat">
+			<isset property="isWindows" />
+		</condition>
+		
+		<condition property="exec.command" value="/bin/sh">
+			<isset property="isMacOSX" />
+		</condition>
+		<condition property="exec.argline-server" value="upstage-server.command">
+			<isset property="isMacOSX" />
+		</condition>
+		
+		<condition property="exec.command" value="/bin/sh">
+			<isset property="isLinux" />
+		</condition>
+		<condition property="exec.argline-server" value="upstage-server.sh">
+			<isset property="isLinux" />
+		</condition>
+		
+		<!-- DEBUG -->
+		<echo message="______________________________________________________" />
+		<echo message="Generated command-line to start services:" />
+		<echo message="execution directory : ${upstage.dir.build}" />
+		<echo message="upstage             : ${exec.command} ${exec.argline-server}" />
+		<echo message="______________________________________________________" />
+		
+		<!-- start server -->
+		<echo message="Starting 'upstage-server' ... " />
+		<exec executable="${exec.command}" dir="${upstage.dir.build}">
+			<arg line="${exec.argline-server}" />
+		</exec>
+		
+	</target>
+	
+	<!-- kill all running server/policyd instances -->
+	<target name="kill" depends="set-variables">
+		
+		<!-- TODO: check availability of executables? -->
+		
+		<!-- taskkill.exe might not be available on Windows XP SP3 Home -->
+		
+		<!-- determine kill command depending on os -->
+				
+		<condition property="exec.command" value="cmd">
+			<isset property="isWindows" />
+		</condition>
+		<!-- TODO replace executable from properties (without path) -->
+		<condition property="exec.argline-python-kill" value="/c taskkill.exe /F /IM python2.7.exe">
+			<isset property="isWindows" />
+		</condition>
+		
+		<condition property="exec.command" value="/bin/sh">
+			<isset property="isMacOSX" />
+		</condition>
+		<condition property="exec.argline-python-kill" value='-c "killall -v -m -9 [Pp]ython"'>
+			<isset property="isMacOSX" />
+		</condition>
+		
+		<condition property="exec.command" value="/bin/sh">
+			<isset property="isLinux" />
+		</condition>
+		<condition property="exec.argline-python-kill" value='-c "killall -v -r -9 [Pp]ython"'>
+			<isset property="isLinux" />
+		</condition>
+		
+		<!-- kill all python processes -->		
+		<echo message="Executing command to kill running programs ..." />
+		<echo message="${exec.command} ${exec.argline-python-kill}" />
+		<exec executable="${exec.command}" outputproperty="exec.out" resultproperty ="exec.result">
+			<arg line="${exec.argline-python-kill}" />
+		</exec>
+		
+		<!-- TODO: output exec.error property if return code != 128 -->
+		<echo level="debug" message="Return code: ${exec.out} (${exec.result})" />
+
+	</target>
+	
+	<!-- generate doxygen api documentation -->
+	<target name="doc" depends="init" description="generate api documentation (using Doxygen)">
+		
+		<!-- generate client (as2) documentation -->
+		<mkdir dir="${upstage.dir.apidoc}/client" />
+		<doxygen doxygenPath="${upstage.doxygen.executable}">
+			<property name="INPUT" value="${upstage.dir.as2src}/upstage" />
+			<property name="PROJECT_NAME" value="UpStage Client API" />
+			<property name="PROJECT_NUMBER" value="${upstage.version}.${upstage.revision}" />
+			<property name="OUTPUT_DIRECTORY" value="${upstage.dir.apidoc}/client" />
+			<property name="RECURSIVE" value="YES" />
+			<property name="GENERATE_LATEX" value="FALSE" />
+			<property name="FILE_PATTERNS" value="*.as" />
+			<!--
+			<property name="STRIP_CODE_COMMENTS" value="yes" />
+			-->
+		</doxygen>
+		
+		<!-- generate server (python) documentation -->
+		<mkdir dir="${upstage.dir.apidoc}/server" />
+		<doxygen doxygenPath="${upstage.doxygen.executable}">
+			<property name="INPUT" value="${upstage.dir.src}" />
+			<property name="PROJECT_NAME" value="UpStage Server API" />
+			<property name="PROJECT_NUMBER" value="${upstage.version}.${upstage.revision}" />
+			<property name="OUTPUT_DIRECTORY" value="${upstage.dir.apidoc}/server" />
+			<property name="RECURSIVE" value="YES" />
+			<property name="GENERATE_LATEX" value="FALSE" />
+			<property name="FILE_PATTERNS" value="*.py" />
+			<!--
+			<property name="STRIP_CODE_COMMENTS" value="yes" />
+			-->
+		</doxygen>
+		
+	</target>
+	
+	<!-- generate automatic report for source code issues -->
+	<target name="report" depends="clean,build" description="automatic report and source code analysis">
+		
+		<!-- run pychecker -->
+		<antcall target="pychecker" inheritall="true" />
+		
+		<!-- run jslint -->
+		<antcall target="jslint" inheritall="true" />
+		
+	</target>
+	
+	<!-- run jslint on javascript sources -->
+	<target name="jslint" depends="build">
+		
+		<if>
+			<istrue value="${upstage.jslint}" />
+			<then>
+				
+				<echo message="Invoking JSLint ..." />
+				
+		        <apply dir="${upstage.dir.build}" executable="java" failonerror="${upstage.jslint.failonerror}">
+		            <fileset dir="${upstage.dir.build}">
+		                
+		            	<include name="**/*.js" />
+		            	
+		            	<!-- exclude 3rd party sources -->
+						<exclude name="**/html/ckedit/**" />
+		            	<exclude name="**/html/client.js" />
+		            	<exclude name="**/html/md5.js" />
+		            	<exclude name="**/html/jwplayer.js" />
+		            	
+		            </fileset>
+		            <arg value="-jar" />
+		            <arg path="${upstage.jslint.rhino}" />
+		            <arg path="${upstage.jslint.script}" />
+		            <srcfile />
+		        	
+		        </apply>
+			</then>
+			<else>
+				<echo message="JSLint disabled." />
+			</else>
+		</if>
+		
+    </target>
+	
+	<!-- run pychecker on python sources -->
+	<target name="pychecker" depends="build">
+		
+		<if>
+			<istrue value="${upstage.pychecker}" />
+			<then>
+						
+				<echo message="Invoking PyChecker ..." />
+			
+				<!-- TODO -->
+				
+			</then>
+			<else>
+				<echo message="PyChecker disabled." />
+			</else>
+		</if>	
+	
+	</target>
+	
+	<!-- deploy via FTP -->
+	<target name="deploy-ftp" description="upload for deployment via FTP" depends="build">
+		
+		<echo message="Deploying via FTP to ftp://${upstage.deploy.ftp.username}:${upstage.deploy.ftp.password}@${upstage.deploy.ftp.server}:21/${upstage.deploy.ftp.remotedir} ..." />
+		
+		<!-- make remote dir if not existant -->
+		<!--
+		<ftp verbose="${upstage.verbose}"
+			passive="${upstage.deploy.ftp.passive}"
+			action="mkdir"
+			server="${upstage.deploy.ftp.server}"
+		    userid="${upstage.deploy.ftp.username}"
+		    password="${upstage.deploy.ftp.password}"
+		    remotedir="${upstage.deploy.ftp.remotedir}" />
+		-->
+		
+		<!-- copy files -->
+		<ftp verbose="${upstage.verbose}"
+			passive="${upstage.deploy.ftp.passive}"
+			server="${upstage.deploy.ftp.server}"
+		    userid="${upstage.deploy.ftp.username}"
+		    password="${upstage.deploy.ftp.password}"
+			depends="true"
+			newer="true"
+			remotedir="${upstage.deploy.ftp.remotedir}">
+		    <fileset dir="${basedir}/${upstage.dir.build}">
+		    	<exclude name="**/*.pyc" />
+		    	<exclude name="**/*.pyo" />
+		    	<include name="**/*" />
+			</fileset>
+		</ftp>
+		
+		<!-- TODO remove 'EMPTY' files afterwards -->
+				
+		<!-- set permissions to 755 -->
+		<ftp verbose="${upstage.verbose}"
+			passive="${upstage.deploy.ftp.passive}"
+			server="${upstage.deploy.ftp.server}"
+			action="chmod"
+			chmod="755"
+			remotedir="${upstage.deploy.ftp.remotedir}"
+			userid="${upstage.deploy.ftp.username}"
+			password="${upstage.deploy.ftp.password}">
+			<fileset>
+				<include name="**/*.py" />
+				<include name="**/*.sh" />
+				<include name="**/*.command" />
+			 </fileset>
+		</ftp>
+		
+	</target>
+	
+	<!-- default task to print some help -->
+	<target name="help" description="show some help for usage">
+		<echo message="Usage:" />
+		<echo message="ant &lt;target&gt;" />
+		<echo message="To get a list of available targets type 'ant -p'" />
+	</target>
+	
+</project>

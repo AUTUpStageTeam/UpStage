@@ -58,9 +58,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
 
-import Transport;
-import Client;
-import util.Construct;
+import upstage.Transport;
+import upstage.Client;
+import upstage.util.Construct;
 
 
 
@@ -110,7 +110,7 @@ class App extends MovieClip
 		}
     };
 
-    function debug(x : Object) :Void
+    static function debug(x : Object) :Void
     {
         
         if (Client.LOG_TO_SCREEN && debugMsg != null)

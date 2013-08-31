@@ -1,0 +1,53 @@
+/* easytabs */
+
+.easytabs {
+	margin: 0;
+	padding: 0;
+}
+
+.tab {
+	display: inline-block;
+	zoom:1;
+	background: #eee;
+	border: solid 1px #eee;
+	border-radius: 2px;
+	padding:2px;
+}
+
+.tab:hover {
+	background:#ddd;
+	border-color:#333;
+}
+
+.tab a {
+	font-size: 13px;
+	line-height: 2em;
+	display: block;
+	padding: 0 10px;
+	outline: none;
+	text-decoration:none;
+	color:#999;
+}
+
+.tab a:hover {
+	color:#333;
+}
+
+.tab.active {
+	background: #fff;
+	position: relative;
+	border-color: #aaa;
+}
+
+.tab a.active {
+	font-weight: bold;
+	color:#669900;
+}
+
+.tab a.active:hover {
+	color:#669900;
+}
+
+.tab-panel {
+	margin:20px 0 0 0;
+}
