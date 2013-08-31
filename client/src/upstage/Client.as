@@ -556,7 +556,8 @@ class upstage.Client
     //------------------where to log-------------------
 
     //should debug messages get sent to the server
-    public static var LOG_TO_SERVER : Boolean = false;
+    public static var LOG_TO_SERVER : Boolean = true;
+    
     //should debug messages go to screen
     public static var LOG_TO_SCREEN : Boolean = true;
 

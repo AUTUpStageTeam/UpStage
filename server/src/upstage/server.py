@@ -27,6 +27,7 @@ Modified by:    Daniel Han  13/09/2012  -   on handle_DRAW... it checks if it is
                                                 it sends attached avatar id.
                                                 
 Modified by:    Daniel Han  14/09/2012      on handle_loaded, added self.stage.draw_avatar_replay(self) so it draws avatar drawing "AFTER" it is fully loaded
+Modified by:    Nitkalya Wiriyanuparb  29/08/2013  -  add handle_TOGGLE_STREAM_AUDIO to mute/unmute streaming avatar 
             
 Notes: 
 """
@@ -644,6 +645,10 @@ class _UpstageSocket(LineOnlyReceiver):
 	
     def handle_ROTATE_AVATAR(self):
         self.stage.rotate_avatar(self.avatar.ID)
+
+    def handle_TOGGLE_STREAM_AUDIO(self, isMuted):
+        # log.msg('in server.py, isMuted = ' + isMuted)
+        self.stage.toggle_stream_audio(isMuted, self.avatar.ID)
 
 
 class SocketFactory(Factory):

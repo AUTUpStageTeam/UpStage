@@ -23,6 +23,7 @@ import upstage.Transport;
  * Purpose: Send messages to server.
  * Modified by: Endre Bernhardt, Phillip Quinlan, Lauren Kilduff
  * Modified by: Wendy, Candy and Aaron 30/10/2008
+ * Modified by: Nitkalya Wiriyanuparb  29/08/2013  - add TOGGLE_STREAM_AUDIO
  * Notes: 
  */
 
@@ -36,9 +37,9 @@ class upstage.Sender
      */
     function Sender(transport :Transport)
     {
-	this.transport = transport;
-	trace('Sender constructor...');
-	this.iCount = 0;
+		this.transport = transport;
+		trace('Sender constructor...');
+		this.iCount = 0;
     }
 
 
@@ -409,6 +410,12 @@ class upstage.Sender
 	{
 		this.send('ROTATE_AVATAR');
 	}
+
+    // Toggle audio of streaming avatar
+    function TOGGLE_STREAM_AUDIO(isMuted:Number)
+    {
+        this.send('TOGGLE_STREAM_AUDIO', 'isMuted', isMuted);
+    }
 
     /**
      * @brief Client finished loading images

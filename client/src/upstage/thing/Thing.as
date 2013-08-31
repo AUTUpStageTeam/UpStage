@@ -20,6 +20,7 @@ import upstage.util.Icon;
 import upstage.Client;
 import upstage.util.LoadTracker;
 //import upstage.util.Construct;
+// import flash.external.ExternalInterface;
 
 
 /**
@@ -29,6 +30,7 @@ import upstage.util.LoadTracker;
  *                                                       to scale the prop on stage
  * Modified by: Craig Farrell (CF) 08/04/2013 - added: checks the size of prop and resizes it to the correct size for the stage when loaded
  * Modified by: David Daniels & Lisa Helm 27/08/2013 - Merged in Martins fork
+ * Modified by: Nitkalya Wiriyanuparb  29/08/2013  - Modify avatar streaming code and add setVolumeAccordingToMuteStatus() to mute/unmute
  */
 class upstage.thing.Thing extends MovieClip
 {
@@ -68,7 +70,10 @@ class upstage.thing.Thing extends MovieClip
 	public var streamServer : String;		// url of the stream server, e.g. 'rtmp://localhost/oflaDemo'
 	private var connection:NetConnection;	// the network connection to the stream server
 	private var stream:NetStream;			// the network stream of a connected stream server
-	
+    // Mute and unmute live stream avatar - Ing - 28/8/13
+    // FIXME all of streaming related stuff should not be in Thing.as, maybe Avatar.as
+    public var isMuted :Boolean;
+    private var soundStream :Sound;
 
     /**
      * @brief Constructor
@@ -93,8 +98,8 @@ class upstage.thing.Thing extends MovieClip
         thing.medium = medium;
         thing.streamName = streamname;
         thing.streamServer = streamserver;
-        
-        
+        thing.isMuted = false;
+
         if (medium == 'stream') {
         	thing.streamInit();
         }
@@ -286,8 +291,8 @@ class upstage.thing.Thing extends MovieClip
         
         this._alpha = 100;
         this._visible = true;
-        
-        if (this.medium == 'stream') {
+        // set up stream only if not already setup
+        if (this.medium == 'stream' && this.connection == null) {
         	trace("medium stream recognized");
         	
         	// start stream
@@ -298,7 +303,7 @@ class upstage.thing.Thing extends MovieClip
         	//this.image._visible = false;
         	
         	// create connection to server if parameter is given
-			if(this.connection == null) this.connection = new NetConnection();
+			this.connection = new NetConnection();
 			if(this.streamServer == '') {
 				this.connection.connect(null);
 			} else {
@@ -320,7 +325,12 @@ class upstage.thing.Thing extends MovieClip
 			// start playing
 			//this.stream.play(this.streamName, -1);	// did not work playing flv files
 			this.stream.play(this.streamName);
-		
+
+            var sound:MovieClip = this.videodisplay.createEmptyMovieClip("sound",this.videodisplay.getNextHighestDepth());
+            sound.attachAudio(this.stream);
+            this.soundStream = new Sound(sound);
+            this.setVolumeAccordingToMuteStatus();
+
 			// handle events
 			
 			var thing:Thing = this;	// get reference to thing (needed for handling events)
@@ -411,6 +421,7 @@ class upstage.thing.Thing extends MovieClip
 			
 			// clear video
 			this.video.clear();
+            this.connection = null;
         }
         
         this._visible = false;
@@ -426,6 +437,13 @@ class upstage.thing.Thing extends MovieClip
         this._x = x - (this.image._width * 0.5);
         this._y = y - (this.image._height * 0.5);
     };
+
+    // FIXME should not be in Thing.as, move to Avatar.as?
+    function setVolumeAccordingToMuteStatus() {
+        var newVolume:Number = isMuted ? 0 : 100;
+        this.soundStream.setVolume(newVolume);
+        // ExternalInterface.call("alert", "Audio, isMute = " + this.isMuted + ", newVol = " + newVolume + ", realVol = " + this.soundStream.getVolume());
+    }
 
     function Thing(){};
 };

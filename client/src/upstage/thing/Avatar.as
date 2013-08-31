@@ -39,6 +39,7 @@ import upstage.util.LoadTracker;
  * Modified by: Heath Behrens & Vibhu Patel 08/08/2011 - Modified function calcSize() line 164 to scale
  *                                                       avatar on stage. 
  * Modified by David Daniels & Lisa Helm 27/08/2013 - Merged Martins fork
+ * Modified by: Nitkalya Wiriyanuparb  29/08/2013  - Add isStream to identify streaming avatar for mute/unmute
  */
  
 class upstage.thing.Avatar extends Thing
@@ -80,7 +81,10 @@ class upstage.thing.Avatar extends Thing
 	
 	// Daniel 13/09/2012	- For drawable avatar.
 	public var drawable:MovieClip;
-	
+
+    // for identifying streaming avatar - Ing - 28/8/13
+    public var isStream:Boolean;
+
     private static var symbolName:String = "__Packages.upstage.thing.Avatar";
     private static var symbolLinked:Boolean = Object.registerClass(symbolName, Avatar);
 
@@ -109,8 +113,10 @@ class upstage.thing.Avatar extends Thing
         av.layerOffset = 1;
         av.frameNumber = frame;
         //trace(['av', baseLayer, 'name', av.tfLayer]);
-        
-        if (scrollBar){            
+
+        av.isStream = !!(streamname && streamserver);
+
+        if (scrollBar){
             // set up icon
             av.iconLayer = Client.L_AV_ICON -(-ID * Client.AV_ICON_LAYERS); 
             av.icon = AvScrollBarItem.create(av, scrollBar, available);

@@ -68,6 +68,8 @@ Modified by: Craig Farrell  01/05/2013  - added new tOwner varible
                                         - added two new methods : set_tOwner() && get_tOwner()
                                         - changed parse_element to include the new tOwner Attribute.
                                         - added new tOwner node to write_element()
+
+Modified by: Nitkalya Wiriyanuparb  29/08/2013  - add toggle_stream_audio to mute/unmute streaming avatar
 """
 
 #std lib
@@ -1051,11 +1053,7 @@ class _Stage(object):
         except IndexError:
             print "can't modify style of layer '%s'" % layer
             return
-
-        
-            
-        
-        
+       
         if layer == 4:
             #Daniel (14/09/2012) - Check if draw_avatar_stacks contains avid, if it does, add action.
             if avid in self.draw_avatar_stacks:
@@ -1107,7 +1105,19 @@ class _Stage(object):
                             thickness=x[2], alpha=x[3], layer=4, AV=k)
                 elif x[0] == 'ROTATE_AVATAR':
                     socket.send('ROTATE_AVATAR', AV=x[1])
-            
+
+    # Toggle streaming avatar audio
+    def toggle_stream_audio(self, isMuted, avid=None):
+        if avid is None:
+            log.msg('Avatar ID cannot be None type')
+        else:
+            if avid in self.draw_avatar_stacks:
+                self.draw_avatar_stacks[avid].append(('TOGGLE_STREAM_AUDIO', avid, isMuted))
+            else:
+                self.draw_avatar_stacks[avid] = [('TOGGLE_STREAM_AUDIO', avid, isMuted)]
+            # log.msg("in stage.py, ready to broadcast, mute=" + isMuted);
+            self.broadcast('TOGGLE_STREAM_AUDIO', AV=avid, MUTED=isMuted);
+
     def broadcast_numbers(self):
         """Broadcast player, audience count to players"""
         p = len(self.player_sockets)

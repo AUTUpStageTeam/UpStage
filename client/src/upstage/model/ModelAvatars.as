@@ -46,7 +46,8 @@ import upstage.model.TransportInterface;
  *                                         - added  rotate left(ani-clockwise)
  *                                         - added new right click 'rotate avatar left' menu item.
  * Modified by David Daniels & Lisa Helm 27/08/2013 - Merged Martins fork
- *                                         
+ * Modified by: Nitkalya Wiriyanuparb  29/08/2013 - Add Toggle Mute/Unmute context menu item to streaming avatars
+ * 												  - Add TOGGLE_STREAM_AUDIO() and GET_STREAM_AUDIO()
  */
 class upstage.model.ModelAvatars implements TransportInterface
 {
@@ -426,7 +427,20 @@ class upstage.model.ModelAvatars implements TransportInterface
                 this.sender.PROP(propID);
             }
     }
-    
+
+    // Toggle audio of streaming avatar - send as number for easy casting back and forth between Number/Boolean
+    function TOGGLE_STREAM_AUDIO()
+    {
+        this.sender.TOGGLE_STREAM_AUDIO(Number(!this.avatar.isMuted));
+    }
+
+    function GET_STREAM_AUDIO(avID:Number, muteStatus:Boolean)
+    {
+        // ExternalInterface.call("alert", "beforeSet: muteStatus = " + muteStatus + ", isMuted = " + avatars[avID].isMuted);
+        avatars[avID].isMuted = muteStatus;
+        // ExternalInterface.call("alert", "afterSet: isMuted = " + avatars[avID].isMuted);
+        avatars[avID].setVolumeAccordingToMuteStatus();
+    }
 
 
     //-------------------------------------------------------------------------
@@ -619,7 +633,18 @@ class upstage.model.ModelAvatars implements TransportInterface
         });
 		
 		drawAvatarMenuItem.separatorBefore = true;
-		
+
+        // Mute/Unmute streaming avatar - Ing - 28/8/13
+        if (av.isStream) {
+            var toggleAudioMenuItem:ContextMenuItem = new ContextMenuItem("Toggle Mute/Unmute", function(){
+                modelAv.TOGGLE_STREAM_AUDIO();
+            });
+
+            // add it at the top
+            rotateAvatarRightMenuItem.separatorBefore = true;
+            myMenu.customItems.push(toggleAudioMenuItem);
+        }
+
         myMenu.customItems.push(rotateAvatarRightMenuItem,rotateAvatarLeftMenuItem, moveupMenuItem, movedownMenuItem, movefastMenuItem, moveSlowMenuItem, drawAvatarMenuItem, clearDrawingMenuItem, renameMenuItem);
 
         av.menu = myMenu;

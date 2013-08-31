@@ -38,7 +38,7 @@ import upstage.model.ModelDrawing;
  * Modified by: Heath / Vibhu 09/08/2011 - Added function CHAT_COLOUR so part of fix for media management system colour changing.
  * Modified by: Vibhu 31/08/2011 - Added function PAGE_COLOUR and TOOL_COLOUR so part of fix for media management system colour changing.
  * Modified by: Craig Farrell 07/05/2013 - added this.satge.debug(msg) so when something is called it is put on screen if debug is on
- * Notes: 
+ * Modified by: Nitkalya Wiriyanuparb  29/08/2013  - add TOGGLE_STREAM_AUDIO
  */
 
 class upstage.Transport extends XMLSocket
@@ -924,6 +924,15 @@ class upstage.Transport extends XMLSocket
         this.modelChat.GET_CONFIRM_LOADED();
         trace('Server Confirmed ready');
 		ExternalInterface.call("stage_loaded()");
+    }
+
+    // Toggle audio of streaming avatar
+    function TOGGLE_STREAM_AUDIO(msg:Object)
+    {
+      var avId:Number = Number(msg.AV);
+      var isMuted:Boolean = Boolean(Number(msg.MUTED));
+      // ExternalInterface.call("alert", "in Transport.as, isMuted=" + isMuted + ", msg = " + msg);
+      this.modelAvatars.GET_STREAM_AUDIO(avId, isMuted);
     }
 
 
