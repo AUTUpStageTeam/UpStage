@@ -31,6 +31,7 @@ import upstage.view.DrawTools;
 import upstage.view.AuScrollBar;
 import upstage.model.ModelSounds;
 import upstage.model.TransportInterface;
+import flash.external.ExternalInterface;
 
 /**
  * Author: 
@@ -48,6 +49,7 @@ import upstage.model.TransportInterface;
  * Modified by David Daniels & Lisa Helm 27/08/2013 - Merged Martins fork
  * Modified by: Nitkalya Wiriyanuparb  29/08/2013 - Add Toggle Mute/Unmute context menu item to streaming avatars
  * 												  - Add TOGGLE_STREAM_AUDIO() and GET_STREAM_AUDIO()
+ *                                                - Support mute/unmute globally and locally
  */
 class upstage.model.ModelAvatars implements TransportInterface
 {
@@ -431,15 +433,18 @@ class upstage.model.ModelAvatars implements TransportInterface
     // Toggle audio of streaming avatar - send as number for easy casting back and forth between Number/Boolean
     function TOGGLE_STREAM_AUDIO()
     {
-        this.sender.TOGGLE_STREAM_AUDIO(Number(!this.avatar.isMuted));
+        this.sender.TOGGLE_STREAM_AUDIO(Number(!this.avatar.isMutedGlobally));
     }
 
     function GET_STREAM_AUDIO(avID:Number, muteStatus:Boolean)
     {
-        // ExternalInterface.call("alert", "beforeSet: muteStatus = " + muteStatus + ", isMuted = " + avatars[avID].isMuted);
-        avatars[avID].isMuted = muteStatus;
-        // ExternalInterface.call("alert", "afterSet: isMuted = " + avatars[avID].isMuted);
-        avatars[avID].setVolumeAccordingToMuteStatus();
+        if (avatars[avID].isMutedGlobally == avatars[avID].isMutedLocally) { // always true for audiences
+            avatars[avID].isMutedLocally = muteStatus;
+        }
+
+        avatars[avID].isMutedGlobally = muteStatus;
+        // ExternalInterface.call("alert", "afterSet: isMuted = " + avatars[avID].isMutedGlobally);
+        avatars[avID].setVolumeAccordingToLocalMuteStatus();
     }
 
 
@@ -636,13 +641,22 @@ class upstage.model.ModelAvatars implements TransportInterface
 
         // Mute/Unmute streaming avatar - Ing - 28/8/13
         if (av.isStream) {
-            var toggleAudioMenuItem:ContextMenuItem = new ContextMenuItem("Toggle Mute/Unmute", function(){
+            var toggleLocalAudioMenuItem:ContextMenuItem = new ContextMenuItem("Toggle Mute/Unmute Locally", function(){
+                av.isMutedLocally = !av.isMutedLocally;
+                av.setVolumeAccordingToLocalMuteStatus();
+
+                if (!av.isMutedLocally && av.isMutedGlobally) {
+                    ExternalInterface.call("alert", "Audiences do not currently hear you; you might also want to unmute globally.");
+                }
+            });
+
+            var toggleGlobalAudioMenuItem:ContextMenuItem = new ContextMenuItem("Toggle Mute/Unmute Globally", function(){
                 modelAv.TOGGLE_STREAM_AUDIO();
             });
 
             // add it at the top
             rotateAvatarRightMenuItem.separatorBefore = true;
-            myMenu.customItems.push(toggleAudioMenuItem);
+            myMenu.customItems.push(toggleLocalAudioMenuItem, toggleGlobalAudioMenuItem);
         }
 
         myMenu.customItems.push(rotateAvatarRightMenuItem,rotateAvatarLeftMenuItem, moveupMenuItem, movedownMenuItem, movefastMenuItem, moveSlowMenuItem, drawAvatarMenuItem, clearDrawingMenuItem, renameMenuItem);

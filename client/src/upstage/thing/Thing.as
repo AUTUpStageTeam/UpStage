@@ -31,6 +31,7 @@ import upstage.util.LoadTracker;
  * Modified by: Craig Farrell (CF) 08/04/2013 - added: checks the size of prop and resizes it to the correct size for the stage when loaded
  * Modified by: David Daniels & Lisa Helm 27/08/2013 - Merged in Martins fork
  * Modified by: Nitkalya Wiriyanuparb  29/08/2013  - Modify avatar streaming code and add setVolumeAccordingToMuteStatus() to mute/unmute
+ *                                                 - Support mute/unmute globally and locally
  */
 class upstage.thing.Thing extends MovieClip
 {
@@ -72,7 +73,8 @@ class upstage.thing.Thing extends MovieClip
 	private var stream:NetStream;			// the network stream of a connected stream server
     // Mute and unmute live stream avatar - Ing - 28/8/13
     // FIXME all of streaming related stuff should not be in Thing.as, maybe Avatar.as
-    public var isMuted :Boolean;
+    public var isMutedGlobally :Boolean;
+    public var isMutedLocally :Boolean;
     private var soundStream :Sound;
 
     /**
@@ -98,7 +100,8 @@ class upstage.thing.Thing extends MovieClip
         thing.medium = medium;
         thing.streamName = streamname;
         thing.streamServer = streamserver;
-        thing.isMuted = false;
+        thing.isMutedLocally = false;
+        thing.isMutedGlobally = false;
 
         if (medium == 'stream') {
         	thing.streamInit();
@@ -329,7 +332,7 @@ class upstage.thing.Thing extends MovieClip
             var sound:MovieClip = this.videodisplay.createEmptyMovieClip("sound",this.videodisplay.getNextHighestDepth());
             sound.attachAudio(this.stream);
             this.soundStream = new Sound(sound);
-            this.setVolumeAccordingToMuteStatus();
+            this.setVolumeAccordingToLocalMuteStatus();
 
 			// handle events
 			
@@ -439,10 +442,10 @@ class upstage.thing.Thing extends MovieClip
     };
 
     // FIXME should not be in Thing.as, move to Avatar.as?
-    function setVolumeAccordingToMuteStatus() {
-        var newVolume:Number = isMuted ? 0 : 100;
+    function setVolumeAccordingToLocalMuteStatus() {
+        var newVolume:Number = isMutedLocally ? 0 : 100;
         this.soundStream.setVolume(newVolume);
-        // ExternalInterface.call("alert", "Audio, isMute = " + this.isMuted + ", newVol = " + newVolume + ", realVol = " + this.soundStream.getVolume());
+        // ExternalInterface.call("alert", "Audio, isMute = " + this.isMutedLocally + ", newVol = " + newVolume + ", realVol = " + this.soundStream.getVolume());
     }
 
     function Thing(){};
