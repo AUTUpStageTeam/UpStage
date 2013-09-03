@@ -51,7 +51,7 @@ var cookieChecked = false;
 var signup = '<a href="javascript:navSignup()">Request an Account</a> or ';
 var loginLinks= '<a href="javascript:login()">Sign In</a>';
 var signup_html = '<a href="javascript:navSignup();">Dont have an account? Find out how to get involved.</a>';
-var warningMessages = ['This will save the stage, losing any previous settings and Reload the stage. Do you wish to proceed?',
+var warningMessages = ['This will reload the stage for all players and audience currently on it. Do you wish to proceed?',
                        'You will lose any chages you have made. Do you wish to proceed?',
                        'This will delete the selected stage. Do you wish to proceed?',
                        'Warning: This will cause the stage to reload for everyone currently on it, and you will loose the chat log. Do you wish to proceed?',
