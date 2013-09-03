@@ -83,8 +83,8 @@ MUSIC_ICON_IMAGE_URL    = '/image/icon/icon-music.png'
 SFX_ICON_IMAGE_URL      = '/image/icon/icon-bullhorn.png'
 
 # icon styles for music and sfx thumbnails
-#MUSIC_ICON	= 'icon-music' #Martins
-#SFX_ICON	= 'icon-bullhorn' #Martins
+MUSIC_ICON	= 'icon-music' #Martins
+SFX_ICON	= 'icon-bullhorn' #Martins
 
 # file system paths
 # these relate to the above url paths
