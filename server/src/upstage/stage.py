@@ -70,6 +70,7 @@ Modified by: Craig Farrell  01/05/2013  - added new tOwner varible
                                         - added new tOwner node to write_element()
 
 Modified by: Nitkalya Wiriyanuparb  29/08/2013  - add toggle_stream_audio to mute/unmute streaming avatar
+Modified by: Nitkalya Wiriyanuparb  04/09/2013  - clear user access list (access_level_one/two/three) before appending items to them to avoid duplicates
 """
 
 #std lib
@@ -229,17 +230,17 @@ class _Stage(object):
             if pageBgColorNodes and pageBgColorNodes[0].firstChild() is not None:
                 self.pageBgColour = pageBgColorNodes[0].firstChild().toxml()
             if accessOneNodes and accessOneNodes[0].firstChild() is not None:
-                #Heath Behrens 10/08/2011 - loop over the items in the node and split by comma                 
-                for x in accessOneNodes[0].firstChild().toxml().split(','):  
-                    self.access_level_one.append(x) # Heath Behrens 10/08/2011 - append the item to the list
+                self.access_level_one = []
+                for x in accessOneNodes[0].firstChild().toxml().split(','):
+                    self.access_level_one.append(x)
             if accessTwoNodes and accessTwoNodes[0].firstChild() is not None:
-                #Heath Behrens 10/08/2011 - loop over the items in the node and split by comma
-                for x in accessTwoNodes[0].firstChild().toxml().split(','): 
-                    self.access_level_two.append(x) # Heath Behrens 10/08/2011 - append the item to the list
+                self.access_level_two = []
+                for x in accessTwoNodes[0].firstChild().toxml().split(','):
+                    self.access_level_two.append(x)
             if accessThreeNodes and accessThreeNodes[0].firstChild() is not None:
-                #Heath Behrens 10/08/2011 - loop over the items in the node and split by comma
-                for x in accessThreeNodes[0].firstChild().toxml().split(','): 
-                    self.access_level_three.append(x) # Heath Behrens 10/08/2011 - append the item to the list
+                self.access_level_three = []
+                for x in accessThreeNodes[0].firstChild().toxml().split(','):
+                    self.access_level_three.append(x)
             if debugScreenNodes and debugScreenNodes[0].firstChild() is not None:
                 self.debugMessages = debugScreenNodes[0].firstChild().toxml()
             if onStageListNodes and onStageListNodes[0].firstChild() is not None:#(08/04/2013)Craig
