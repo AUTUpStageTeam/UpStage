@@ -39,20 +39,20 @@
        The Application classes have been compiled into the classes.swf file, 
        which we import as an asset. 
     -->
-  <clip import="../../temp/classes.swf" />
+  <clip import="temp/classes.swf" />
   
   <!-- imported images -->
   
-  <clip id="TransparentImage" import="../../temp/transparent_320x240.png" />
-  <clip id="TransparentImageWithMarker" import="../../temp/transparent_marker_320x240.png" />
+  <clip id="TransparentImage" import="temp/transparent_320x240.png" />
+  <clip id="TransparentImageWithMarker" import="temp/transparent_marker_320x240.png" />
   
   <!-- 
   <clip id="FilmStripIconImage" import="temp/filmstrip_icon.png" />
   -->
   
-  <clip id="ImageIconPlayCircle" import="../../temp/icon-play-circle.png" />
-  <clip id="ImageIconFilm" import="../../temp/icon-film.png" />
-  <clip id="ImageIconVolumeUp" import="../../temp/icon-volume-up.png" />
+  <clip id="ImageIconPlayCircle" import="temp/icon-play-circle.png" />
+  <clip id="ImageIconFilm" import="temp/icon-film.png" />
+  <clip id="ImageIconVolumeUp" import="temp/icon-volume-up.png" />
   
   <frame>
     
@@ -123,21 +123,21 @@
     
     <!-- Embed fonts -->
     
-    <font id="Bitstream Vera Bold" import="../../temp/VeraBd.ttf" name="Bitstream Vera Bold" 
+    <font id="Bitstream Vera Bold" import="temp/VeraBd.ttf" name="Bitstream Vera Bold" 
   	  glyphs="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&lt;&gt;
   	  &#09;&#10;&#13;&#34;&#38;&#32;&#33;&#34;&#35;&#36;&#37;&#38;&#39;&#40;
   	  &#41;&#42;&#43;&#44;&#45;&#46;&#47;&#58;&#59;&#60;&#61;&#62;&#63;&#64;
   	  &#91;&#92;&#93;&#94;&#95;&#96;&#123;&#124;&#125;&#126;0123456789áÁàÀâÂ
   	  åÅãÃäÄæÆçÇéÉèÈêÊëËíÍììÌîÎïÏñÑóÓòÒôÔøØõÕ&#246;ÖßúÚùÙûÛüÜÿ´" />	
     
-    <font id="Bitstream Vera Sans" import="../../temp/Vera.ttf" name="Bitstream Vera Sans"
+    <font id="Bitstream Vera Sans" import="temp/Vera.ttf" name="Bitstream Vera Sans"
 	  glyphs="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&lt;&gt;
   	  &#09;&#10;&#13;&#34;&#38;&#32;&#33;&#34;&#35;&#36;&#37;&#38;&#39;&#40;
   	  &#41;&#42;&#43;&#44;&#45;&#46;&#47;&#58;&#59;&#60;&#61;&#62;&#63;&#64;
   	  &#91;&#92;&#93;&#94;&#95;&#96;&#123;&#124;&#125;&#126;0123456789áÁàÀâÂ
   	  åÅãÃäÄæÆçÇéÉèÈêÊëËíÍììÌîÎïÏñÑóÓòÒôÔøØõÕ&#246;ÖßúÚùÙûÛüÜÿ´" />
   	
-  	<font id="FontAwesome" import="../../temp/fontawesome-webfont.ttf" name="FontAwesome"
+  	<font id="FontAwesome" import="temp/fontawesome-webfont.ttf" name="FontAwesome"
   	  glyphs="&#xf03d;" />
   	  
   </frame>
