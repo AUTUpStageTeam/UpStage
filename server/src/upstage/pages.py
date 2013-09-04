@@ -95,7 +95,8 @@ Modified by: Craig Farrell  02/05/2013  - added new varible to EditStage page  f
                                         - added if statement to let superuser to edit locked stages.
 Modified by: Craig Farrell  05/05/2013  - added new redirect to the errorpage
                                         - added new redirect to the 'something went wrong' page
-Modified by: Lisa Helm 21/08/2013       - removed all code relating to old video avatar                                        
+Modified by: Lisa Helm 21/08/2013       - removed all code relating to old video avatar
+Modified by: Lisa Helm 04/09/2013       - called a correct method when clearing a stage
 """
 
 #standard lib
@@ -1006,10 +1007,11 @@ class StageEditPage(Workshop):
                 self.message+='Stage saved! '
                 self.stage_saved += 'Stage saved! '
         
-        elif action=='reset':
+        elif action=='reset': # Ing - 4/9/13 - Fix clear stage button
             if self.stage:
-                self.stage.set_default()
-                self.message+='Stage has set to default! '
+                # self.stage.set_default()  # Is this needed? It doesn't do anything.
+                self.stage.reset() # Correct method to use
+                self.message+='Stage has been cleared!'
             
         elif action=='delete':
             log.msg('In Deleted Function');

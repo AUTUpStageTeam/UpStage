@@ -37,6 +37,8 @@
             Modified by Gavin (28/5/2013): Made a navAdmin() function to replace the navWorkshop() function when the user logs in 
                                           - Added a conditional statement to navWorkshop() for different links depending if the user is logged in or not, changed the link location of navWorkshop() to /home instead of /admin to fix the workshop login issue.  
             Modified by Vanessa (28/08/2013): Merged Martins fork of code to working copy
+            Modified by Nitkalya (3/9/2013): Fix confusing "save and reload stage" message
+            Modified by Nitkalya (4/9/2013): Edit clear stage warning message as clients requested
  */
 
 //Instance type variables
@@ -54,7 +56,7 @@ var signup_html = '<a href="javascript:navSignup();">Dont have an account? Find 
 var warningMessages = ['This will reload the stage for all players and audience currently on it. Do you wish to proceed?',
                        'You will lose any chages you have made. Do you wish to proceed?',
                        'This will delete the selected stage. Do you wish to proceed?',
-                       'Warning: This will cause the stage to reload for everyone currently on it, and you will loose the chat log. Do you wish to proceed?',
+                       'Warning: This will clear the chat log and any drawings from the stage, and the stage will reload for all players and audience on it. Do you wish to proceed?',
                        'Any changes you have made will be saved, overwriting prevoius settings. Do you wish to proceed?',
                        'This stage will be permanently deleted. Do you wish to proceed? (This will not delete any media that has been assigned to this stage.)',
                        'This will save the stage, losing any previous settings without reloading the stage. Do you wish to proceed?',
