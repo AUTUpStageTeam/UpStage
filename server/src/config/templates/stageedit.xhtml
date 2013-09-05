@@ -127,6 +127,7 @@ window.onresize = resizePage;
             <br/>
             <div id="editStageMedia"><!-- Craig Farrell 14/04/2013 -->
                 <h1>Media on stage</h1>
+                <p>Warning: clicking any 'Unassign' button will instantly unassign the selected media item from this stage.</p>
                 <div id="editStageMediaInfo">
                     <table id="editStageMediaList" style="border-bottom: #690 1px dashed;">
                         <tr>
@@ -140,8 +141,8 @@ window.onresize = resizePage;
                             
                         </tr>
                         <tr><!-- Craig Farrell 16/04/2013 -->
-                            <td><input type="button" id="AvatarUnAssign"   class="esUnAssignBut" onclick="unAssignMedia(1);" value="UnAssign"></input></td>
-                            <td><input type="button" id="PropUnAssign"     class="esUnAssignBut" onclick="unAssignMedia(2);" value="UnAssign"></input></td>
+                            <td><input type="button" id="AvatarUnAssign"   class="esUnAssignBut" onclick="unAssignMedia(1);" value="Unassign"></input></td>
+                            <td><input type="button" id="PropUnAssign"     class="esUnAssignBut" onclick="unAssignMedia(2);" value="Unassign"></input></td>
                             
                         </tr>
                         <tr><!-- Craig Farrell 25/04/2013 -->
@@ -158,8 +159,8 @@ window.onresize = resizePage;
                             <td><select name="AudioList"    id="AudioList"    class="esTypeList">%(list_Audios)s</select></td>
                         </tr>
                         <tr>
-                            <td><input type="button" id="BackdropUnAssign" class="esUnAssignBut" onclick="unAssignMedia(3);" value="UnAssign"></input></td>
-                            <td><input type="button" id="AudioUnAssign"    class="esUnAssignBut" onclick="unAssignMedia(4);" value="UnAssign"></input></td>
+                            <td><input type="button" id="BackdropUnAssign" class="esUnAssignBut" onclick="unAssignMedia(3);" value="Unassign"></input></td>
+                            <td><input type="button" id="AudioUnAssign"    class="esUnAssignBut" onclick="unAssignMedia(4);" value="Unassign"></input></td>
                         </tr>
                         <tr>
                             <td><input type="button" id="BackdropView" class="esViewBut" onclick="viewMediaImage(3);" value="View"></input></td>
