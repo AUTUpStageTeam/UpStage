@@ -28,6 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *                                                       avatars and props. 
  * Modified by: Daniel Han					13/09/2012 - Added ADMIN_STAGE_URL, visibility property for DrawingLayers 
  * Modified by: Craig Farrell (CF) 08/04/2013 -  changed prop max height and width to 50 because props aren't meant to be big.
+ * Modified by: Nitkalya Wiriyanuparb  05/09/2013  - Removed video avatar related properties
  */
 class upstage.Client
 {
@@ -226,10 +227,6 @@ class upstage.Client
     public static var DISPLAY_AV       :Number = 6;     // Number of avatars to show at once 22-Sep-2006
  	//LK added 25/6/07
     public static var DISPLAY_PROP     :Number = 8;
-
-    public static var VIDEO_INTERVAL_TARGET :Number = 1500; //tries to adapt wait time to reach this rate
-    public static var VIDEO_INTERVAL_MIN    :Number = 500;  //but never waits for less than this.
-    public static var VIDEO_MAX_FAILURES    :Number = 10;   // this many consequtive 404s before quitting
 	
 	public static var STREAM_BUFFER_TIME	:Number = 0.1;	// for streaming audio/video (see: http://docs.brajeshwar.com/as2/NetStream.html#bufferTime)
 	public static var STREAM_DEFAULT_WIDTH	:Number = 320;
