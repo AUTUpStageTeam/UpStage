@@ -26,6 +26,7 @@ import upstage.util.LoadTracker;
  * Class handles a backdrop on stage.
  *
  * Modified by: Heath / Vibhu 08/08/2011 - modified function finalize to the scale the backdrop on stage.
+ * Modified by: David / Nikos 05/09/2013 - removed resizing
  */
 class upstage.thing.BackDrop extends Thing
 {	
@@ -91,9 +92,7 @@ class upstage.thing.BackDrop extends Thing
 
 		// Break animation of backdrop initially
         this.frame(this.frameNumber);
-        //Modified by: Heath and vibhu 08/08/2011 - Added to scale backdrops.
-        this.image._width = Client.SCREEN_WIDTH;
-        this.image._height = Client.SCREEN_HEIGHT;
+        //Modified by: David and Nikos removed resizing
 
         // Fit to screen onload without changing aspect ratio
         //But no resizing up.

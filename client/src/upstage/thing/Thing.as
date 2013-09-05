@@ -121,46 +121,11 @@ class upstage.thing.Thing extends MovieClip
 
     function loadImage(url : String, layer: Number, listener: Object, is_prop: Boolean)
     {
-        //Heath Behrens / Vibhu Patel 08/08/2011 - Added to check if current thing is a prop and then scale accordingly. 
-        if(is_prop && !listener){
-            var thing: Thing = this;
-            listener = LoadTracker.getLoadListener();
-            listener.onLoadInit = function(mc: MovieClip) {
-                //CF - checks the size of prop and resizes it to the correct size for the stage.
-                var rightHeight :Boolean =false;
-                var rightWidth :Boolean =false;
-                while(rightWidth == false)
-                {
-                    if (mc._width <= Client.PROP_MAX_WIDTH )
-                    {rightWidth = true; } 
-                    else 
-                    {
-                        mc._width = (mc._width - (mc._width * .1)) 
-                        mc._height = (mc._height - (mc._height * .1)) 
-                    }
-                }
-                while(rightHeight == false)
-                {
-                    if (mc._height <= Client.PROP_MAX_HEIGHT)
-                    {rightHeight = true; } 
-                    else 
-                    {
-                        mc._width = (mc._width - (mc._width * .1)) 
-                        mc._height = (mc._height - (mc._height * .1))
-                    }
-                }  
-                //Modified by: Heath / Vibhu 08/08/2011 - Added to scale the prop on stage.
-                //mc._width = Client.PROP_MAX_WIDTH;
-                //mc._height = Client.PROP_MAX_HEIGHT;  
-                thing.image = mc;
-                thing.finalise();
-            };
-        }
-        else if (!listener){
+        //David / Nikos Removed resizing
+        if (!listener){
             var thing: Thing = this;
             listener = LoadTracker.getLoadListener();
             listener.onLoadInit = function(mc: MovieClip){
-                
                 thing.image = mc;
                 thing.finalise();
             };
