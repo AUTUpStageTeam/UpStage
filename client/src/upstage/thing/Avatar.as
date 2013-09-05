@@ -40,6 +40,7 @@ import upstage.util.LoadTracker;
  *                                                       avatar on stage. 
  * Modified by David Daniels & Lisa Helm 27/08/2013 - Merged Martins fork
  * Modified by: Nitkalya Wiriyanuparb  29/08/2013  - Add isStream to identify streaming avatar for mute/unmute
+ * Modified by: Nitkalya Wiriyanuparb  05/09/2013  - Fix issue where avatars with different sizes appear to be the same size on stage
  */
  
 class upstage.thing.Avatar extends Thing
@@ -190,8 +191,10 @@ class upstage.thing.Avatar extends Thing
     function calcSize()
     {
         trace('calculating size for ' + this);
-        //Added by heath & vibhu 08/08/2011 - used to scale the avatar on stage
-        this.scale = Construct.constrainSize(this.image, Client.AVATAR_MAX_WIDTH, Client.AVATAR_MAX_HEIGHT);
+        if (this.isStream) { // Ing - do this for streaming avatar only
+            // Added by heath & vibhu 08/08/2011 - used to scale the avatar on stage
+            this.scale = Construct.constrainSize(this.image, Client.AVATAR_MAX_WIDTH, Client.AVATAR_MAX_HEIGHT);
+        }
 
         var im :MovieClip = this.image;
         this.centreX = im._width * 0.5;
