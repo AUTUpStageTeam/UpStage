@@ -25,7 +25,10 @@ ________
 Use `ant` to compile/build/run (other targets are not tested yet)
 > Note: you need to install `mtasc` and `swfmill` to compile UpStage client
 
-# Instructions:
+## Instructions:
+
+- `ant start` to run UpStage as a background process
+- `ant stop` to stop UpStage server that is currently running in the background
 
 - `ant compile-swf` to compile client swf files
 - `ant build` to build UpStage, and `build/upstage-server.sh` to run the server manually on default ports

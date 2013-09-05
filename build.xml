@@ -40,6 +40,9 @@ March 2011		Initial Version for Version 2.1
 January 2013 	Adopted for UpStage 2.4.2 video hack
 March 2013		Added minify with YUI Compressor
 
+Modified by Nitkalya Wiriyanuparb
+05/09/2013 - Added 'start' and 'stop' to start and stop UpStage daemon
+
 -->
 <project name="UpStage" default="help" basedir=".">
 	
@@ -423,6 +426,14 @@ March 2013		Added minify with YUI Compressor
 		<echo file="${upstage.dir.tmp}/upstage-server.bat" message="${upstage.script.upstage-server.win}" />
 		<echo file="${upstage.dir.tmp}/upstage-server.command" message="${upstage.script.upstage-server.mac}" />
 		<echo file="${upstage.dir.tmp}/upstage-server.sh" message="${upstage.script.upstage-server.linux}" />
+
+		<echo file="${upstage.dir.tmp}/upstage-server-daemon.bat" message="${upstage.script.upstage-server-daemon.win}" />
+		<echo file="${upstage.dir.tmp}/upstage-server-daemon.command" message="${upstage.script.upstage-server-daemon.mac}" />
+		<echo file="${upstage.dir.tmp}/upstage-server-daemon.sh" message="${upstage.script.upstage-server-daemon.linux}" />
+
+		<echo file="${upstage.dir.tmp}/upstage-server-kill.bat" message="${upstage.script.upstage-server-kill.win}" />
+		<echo file="${upstage.dir.tmp}/upstage-server-kill.command" message="${upstage.script.upstage-server-kill.mac}" />
+		<echo file="${upstage.dir.tmp}/upstage-server-kill.sh" message="${upstage.script.upstage-server-kill.linux}" />
 		
 		<condition property="upstage.python.executable.replace.win" value="${upstage.python.executable.win}">
 			<isset property="upstage.python.executable.win" />
@@ -439,6 +450,14 @@ March 2013		Added minify with YUI Compressor
 		<replaceregexp file="${upstage.dir.tmp}/upstage-server.bat" match="\$\{upstage.python.executable\}" replace="${upstage.python.executable.replace.win}" flags="g" />
 		<replaceregexp file="${upstage.dir.tmp}/upstage-server.command" match="\$\{upstage.python.executable\}" replace="${upstage.python.executable.replace.mac}" flags="g" />
 		<replaceregexp file="${upstage.dir.tmp}/upstage-server.sh" match="\$\{upstage.python.executable\}" replace="${upstage.python.executable.replace.linux}" flags="g" />
+
+		<replaceregexp file="${upstage.dir.tmp}/upstage-server-daemon.bat" match="\$\{upstage.python.executable\}" replace="${upstage.python.executable.replace.win}" flags="g" />
+		<replaceregexp file="${upstage.dir.tmp}/upstage-server-daemon.command" match="\$\{upstage.python.executable\}" replace="${upstage.python.executable.replace.mac}" flags="g" />
+		<replaceregexp file="${upstage.dir.tmp}/upstage-server-daemon.sh" match="\$\{upstage.python.executable\}" replace="${upstage.python.executable.replace.linux}" flags="g" />
+
+		<replaceregexp file="${upstage.dir.tmp}/upstage-server-kill.bat" match="\$\{upstage.python.executable\}" replace="${upstage.python.executable.replace.win}" flags="g" />
+		<replaceregexp file="${upstage.dir.tmp}/upstage-server-kill.command" match="\$\{upstage.python.executable\}" replace="${upstage.python.executable.replace.mac}" flags="g" />
+		<replaceregexp file="${upstage.dir.tmp}/upstage-server-kill.sh" match="\$\{upstage.python.executable\}" replace="${upstage.python.executable.replace.linux}" flags="g" />
 		
 		<loadfile property="upstage.file.bat" srcfile="${upstage.dir.tmp}/upstage-server.bat" />
 		<loadfile property="upstage.file.command" srcfile="${upstage.dir.tmp}/upstage-server.command" />
@@ -635,6 +654,90 @@ March 2013		Added minify with YUI Compressor
 			<arg line="${exec.argline-server}" />
 		</exec>
 		
+	</target>
+
+	<!-- run the application as a daemon-->
+	<target name="start" depends="clean,build" description="run the application as a backgroup process">
+		
+		<!-- determine executable depending on os -->
+
+		<!-- DEBUG: check properties -->
+		<!--
+		<echo message="isWindows: ${isWindows} - isMacOSX: ${isMacOsX} - isLinux: ${isLinux}" />
+		-->
+		
+		<condition property="exec.command" value="cmd">
+			<isset property="isWindows" />
+		</condition>
+		<condition property="exec.argline-server" value="/c upstage-server-daemon.bat">
+			<isset property="isWindows" />
+		</condition>
+		
+		<condition property="exec.command" value="/bin/sh">
+			<isset property="isMacOSX" />
+		</condition>
+		<condition property="exec.argline-server" value="upstage-server-daemon.command">
+			<isset property="isMacOSX" />
+		</condition>
+		
+		<condition property="exec.command" value="/bin/sh">
+			<isset property="isLinux" />
+		</condition>
+		<condition property="exec.argline-server" value="upstage-server-daemon.sh">
+			<isset property="isLinux" />
+		</condition>
+		
+		<!-- DEBUG -->
+		<echo message="______________________________________________________" />
+		<echo message="Generated command-line to start services:" />
+		<echo message="execution directory : ${upstage.dir.build}" />
+		<echo message="upstage             : ${exec.command} ${exec.argline-server}" />
+		<echo message="______________________________________________________" />
+		
+		<!-- start server -->
+		<echo message="Starting UpStage as a backgroup process.." />
+		<exec executable="${exec.command}" dir="${upstage.dir.build}">
+			<arg line="${exec.argline-server}" />
+		</exec>
+		
+	</target>
+
+	<!-- kill UpStage started as a daemon -->
+	<target name="stop" depends="set-variables">
+		
+		<condition property="exec.command" value="cmd">
+			<isset property="isWindows" />
+		</condition>
+		<condition property="exec.argline-server" value="/c upstage-server-kill.bat">
+			<isset property="isWindows" />
+		</condition>
+		
+		<condition property="exec.command" value="/bin/sh">
+			<isset property="isMacOSX" />
+		</condition>
+		<condition property="exec.argline-server" value="upstage-server-kill.command">
+			<isset property="isMacOSX" />
+		</condition>
+		
+		<condition property="exec.command" value="/bin/sh">
+			<isset property="isLinux" />
+		</condition>
+		<condition property="exec.argline-server" value="upstage-server-kill.sh">
+			<isset property="isLinux" />
+		</condition>
+		
+		<!-- DEBUG -->
+		<echo message="______________________________________________________" />
+		<echo message="Generated command-line to kill UpStage:" />
+		<echo message="execution directory : ${upstage.dir.build}" />
+		<echo message="upstage             : ${exec.command} ${exec.argline-server}" />
+		<echo message="______________________________________________________" />
+		
+		<!-- kill server -->
+		<exec executable="${exec.command}" dir="${upstage.dir.build}">
+			<arg line="${exec.argline-server}" />
+		</exec>
+
 	</target>
 	
 	<!-- kill all running server/policyd instances -->

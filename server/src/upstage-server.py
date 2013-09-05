@@ -61,7 +61,7 @@ def daemonise(pidfile, errlog, outlog=None):
     if os.fork():   # launch child and...
         os._exit(0) # kill off parent again.
     os.umask(0033)
-    print 'creating daemon'
+    # print 'creating daemon'
     try:
         err = open(errlog, 'a+', 0)
         if outlog:
