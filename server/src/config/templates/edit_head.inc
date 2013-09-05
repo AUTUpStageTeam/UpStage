@@ -187,6 +187,7 @@ button:hover
                 <li> <a href="/admin/edit/workshop"> Edit Workshop Page</a> </li>
                 <li> <a href="/admin/edit/nonadmin"> Edit Non-Admin(Guest Player) Page </a> </li>
                 <li> <a href="/admin/edit/stages"> Edit Stages Page</a> </li>
+                <li> <a href="/admin/edit/signup"> Edit Sign Up Page</a> </li>
            	</ul>
         </div>
 </div>

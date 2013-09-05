@@ -97,6 +97,7 @@ Modified by: Craig Farrell  05/05/2013  - added new redirect to the errorpage
                                         - added new redirect to the 'something went wrong' page
 Modified by: Lisa Helm 21/08/2013       - removed all code relating to old video avatar
 Modified by: Lisa Helm 04/09/2013       - called a correct method when clearing a stage
+Modified by: Lisa Helm 05/09/2013       - added Sign Up page edit mode 
 """
 
 #standard lib
@@ -561,6 +562,51 @@ class NonAdminEditPage(AdminBase):
 
         return AdminBase.render_POST(self, request)
         
+"""
+Added by: Lisa Helm(05/09/2012) 
+"""
+class SignupEditPage(AdminBase):
+
+    filename="edit.xhtml"
+    postback = ''
+    def __init__(self, player, collection={}):
+        AdminBase.__init__(self, player, collection)
+        self.player = player
+        self.collection = collection
+    
+    def text_editable(self, request):
+        s = get_template('signup_editable.inc')	
+        form = request.args
+
+        if 'action' in form:
+            content = form.get('action',[''])[0]
+
+            if content == 'Default':
+                s = get_template('signup_editable.default')
+                print 'error'
+
+        return s
+
+    def render_GET(self, request):
+        return AdminBase.render_GET(self, request)
+
+    def render_POST(self, request):
+        """Save changes and create new state"""
+        form = request.args
+        if 'action' in form:		
+            content = form["action"][0]
+            if content == 'Submit':
+                if 'editor' in form:
+                    content = form["editor"][0]
+                    f = open(os.path.join(config.TEMPLATE_DIR, 'signup_editable.inc'), 'w')
+                    f.write(content)
+                    f.close()
+                    self.postback = "Successfully Saved"
+        return AdminBase.render_POST(self, request)
+
+
+ 
+ 
 class AdminWarning(AdminError):
     """A wrapper for errors (warnings)"""
     errorRedirect = '<META HTTP-EQUIV="refresh" CONTENT="10;URL=/home"/>'#(05-05-2013) Craig

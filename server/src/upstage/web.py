@@ -36,6 +36,7 @@ Modified by: Daniel, Scott 11/09/2012   - Added Audio Upload Postback and File s
 Modified by: Gavin          5/10/2012   - Imported AdminError class from pages.py to change the errorMsg variable title for different errors
                                         - Implemented changes to errorMsg in def failure() and def render()
 Modified by: Lisa Helm 21/08/2013       - removed all code relating to old video avatar    
+Modified by: Lisa Helm 05/09/2013       - added Edit/Signup 
 """
 
 
@@ -60,7 +61,7 @@ from upstage.pages import  AdminLoginPage, AdminBase, errorpage, Workshop, HomeP
                            MediaUploadPage, MediaEditPage, CreateDir, \
                            NewPlayer, EditPlayer, NewAvatar, NewProp, NewBackdrop, NewAudio,     \
                            ThingsList, StagePage, UserPage, NonAdminPage, PageEditPage, HomeEditPage, WorkshopEditPage, SessionCheckPage, successpage,\
-                           NonAdminEditPage, StagesEditPage, AdminError #VideoThing, AudioThing, 
+                           NonAdminEditPage, StagesEditPage, SignupEditPage, AdminError #VideoThing, AudioThing, 
 
 #twisted
 from twisted.python import log
@@ -258,7 +259,8 @@ class AdminRealm:
 				edit_pages = {'home' : (HomeEditPage, self.data),
 							  'workshop' : (WorkshopEditPage, self.data),
                               'nonadmin' : (NonAdminEditPage, self.data),
-                              'stages' : (StagesEditPage, self.data)}
+                              'stages' : (StagesEditPage, self.data),
+                              'signup' : (SignupEditPage, self.data)}
 				tree.putChild('edit', PageEditPage(player, edit_pages))
                 
 
