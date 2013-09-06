@@ -323,7 +323,7 @@ class AdminError(AdminBase):
     log_message = 'Reporting Error: %s'
     code = 500
     errorMsg = 'Something went wrong'
-    errorRedirect = '<META HTTP-EQUIV="refresh" CONTENT="6;URL=/home"/>'#(05-05-2013) Craig
+    errorRedirect = '<META HTTP-EQUIV="refresh" CONTENT="2;URL=/admin"/>'#(05-05-2013) Craig
     
     def __init__(self, error, code=None):
         log.msg(self.log_message % error)
