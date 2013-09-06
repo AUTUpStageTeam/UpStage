@@ -38,7 +38,7 @@ class upstage.util.LayerPicker extends MovieClip
     private var ti           :Object;
     public  var activeLayer  :Number;
 
-    public static var symbolName :String = '__Packages.util.LayerPicker';
+    public static var symbolName :String = '__Packages.upstage.util.LayerPicker';
     private static var symbolLinked :Boolean = Object.registerClass(symbolName, LayerPicker);
 
     static public function factory(parent :MovieClip, layer:Number,
