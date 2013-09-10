@@ -29,6 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * Modified by: Daniel Han					13/09/2012 - Added ADMIN_STAGE_URL, visibility property for DrawingLayers 
  * Modified by: Craig Farrell (CF) 08/04/2013 -  changed prop max height and width to 50 because props aren't meant to be big.
  * Modified by: Nitkalya Wiriyanuparb  05/09/2013  - Removed video avatar related properties
+ * Modified by: Nitkalya Wiriyanuparb  10/09/2013  - Added SCREEN_SIZE_DIVISOR for stage assets resizing calculation
  */
 class upstage.Client
 {
@@ -36,6 +37,7 @@ class upstage.Client
 	public static var POLICY_PORT  	 :Number = 3000;
     public static var SCREEN_WIDTH   :Number = 320;
     public static var SCREEN_HEIGHT  :Number = 200;
+    public static var SCREEN_SIZE_DIVISOR   :Number = 4; // swf stretches to full screen, suppose 1280x800
 
     //----------- sizes --------------------------//
     public static var AVATAR_MAX_WIDTH   :Number = 100;

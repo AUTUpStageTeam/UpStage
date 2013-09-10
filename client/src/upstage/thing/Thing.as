@@ -20,7 +20,7 @@ import upstage.util.Icon;
 import upstage.Client;
 import upstage.util.LoadTracker;
 //import upstage.util.Construct;
-// import flash.external.ExternalInterface;
+//import flash.external.ExternalInterface;
 
 
 /**
@@ -33,6 +33,7 @@ import upstage.util.LoadTracker;
  * Modified by: Nitkalya Wiriyanuparb  29/08/2013  - Modify avatar streaming code and add setVolumeAccordingToMuteStatus() to mute/unmute
  *                                                 - Support mute/unmute globally and locally
  * Modified by: Nitkalya Wiriyanuparb  05/09/2013  - Removed video avatar code
+ * Modified by: Nitkalya Wiriyanuparb  10/09/2013  - Added correct Prop resizing in loadImage()
  */
 class upstage.thing.Thing extends MovieClip
 {
@@ -110,13 +111,17 @@ class upstage.thing.Thing extends MovieClip
     *
     */
 
-    function loadImage(url : String, layer: Number, listener: Object, is_prop: Boolean)
+    function loadImage(url : String, layer: Number, listener: Object, swfwidth: Number, swfheight: Number)
     {
-        //David / Nikos Removed resizing
+        // Ing - add correct prop resizing
         if (!listener){
             var thing: Thing = this;
             listener = LoadTracker.getLoadListener();
             listener.onLoadInit = function(mc: MovieClip){
+                if (swfwidth && swfheight) {
+                    mc._width = swfwidth / Client.SCREEN_SIZE_DIVISOR;
+                    mc._height = swfheight / Client.SCREEN_SIZE_DIVISOR;
+                }
                 thing.image = mc;
                 thing.finalise();
             };

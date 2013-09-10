@@ -39,6 +39,8 @@ import upstage.util.ScrollButton;
  *
  * This is where screen action happens.
  * the main things are classes for avatars and props.
+ *
+ * Modified by: Nitkalya Wiriyanuparb  10/09/2013  - Added swf width and height parameters in addItem() for prop resizing
  */
 
 class upstage.view.ItemGroup extends MovieClip
@@ -169,7 +171,7 @@ class upstage.view.ItemGroup extends MovieClip
      * @brief Add an item to the group
      */
     function addItem(Class :Object, ID : Number, name :String, url :String,
-                     thumbnail :String, medium :String)
+                     thumbnail :String, medium :String, swfwidth: Number, swfheight: Number)
     {
         trace("in ItemGroup.addItem");
         
@@ -177,7 +179,7 @@ class upstage.view.ItemGroup extends MovieClip
         
         item = Class.factory(_parent, this, ID,
                              name, url, thumbnail,
-                             medium);
+                             medium, swfwidth, swfheight);
                                     
  		this.items.push(item);
  		

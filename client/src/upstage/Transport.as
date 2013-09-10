@@ -39,6 +39,7 @@ import upstage.model.ModelDrawing;
  * Modified by: Vibhu 31/08/2011 - Added function PAGE_COLOUR and TOOL_COLOUR so part of fix for media management system colour changing.
  * Modified by: Craig Farrell 07/05/2013 - added this.satge.debug(msg) so when something is called it is put on screen if debug is on
  * Modified by: Nitkalya Wiriyanuparb  29/08/2013  - add TOGGLE_STREAM_AUDIO
+ * Modified by: Nitkalya Wiriyanuparb  10/09/2013  - Added swf width and height in LOAD_AV and LOAD_PROP for resizing
  */
 
 class upstage.Transport extends XMLSocket
@@ -590,7 +591,8 @@ class upstage.Transport extends XMLSocket
         var available :Boolean = (x.available == 'True');
         
     	this.modelAvatars.GET_LOAD_AV(ID, x.name, x.url, x.thumbnail, allowed,
-                                      available, x.medium, x.frame, x.streamserver, x.streamname);
+                                      available, x.medium, x.frame, x.streamserver, x.streamname, 
+                                      Number(x.swfwidth), Number(x.swfheight));
     };
 
 
@@ -623,7 +625,8 @@ class upstage.Transport extends XMLSocket
     {
         var ID : Number = x.ID;
         var show :Boolean = (x.show == 'True');
-        this.modelAvatars.GET_LOADPROP(ID, x.name, x.url, x.thumbnail, x.medium, show);
+        this.modelAvatars.GET_LOADPROP(ID, x.name, x.url, x.thumbnail, x.medium, show,
+                                        Number(x.swfwidth), Number(x.swfheight));
     };
     
     private function LOAD_AUDIO (x :Object) :Void

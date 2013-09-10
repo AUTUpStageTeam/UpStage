@@ -33,8 +33,8 @@ Modified by: Heath Behrens 16/08/2011 - added code in update_from_form to extrac
                                                       re added to keep the current tags            
              Heath Behrens / Corey / Karena 26/08/2011 - Added code to update media name, along with a fix for tags which kept adding
                                                         a blank tag when saving name.  
-Modified by: Lisa Helm 21/08/2013       - removed all code relating to old video avatar                                                                                                                              
-
+Modified by: Lisa Helm 21/08/2013       - removed all code relating to old video avatar
+Modified by: Nitkalya Wiriyanuparb  10/09/2013  - Added media width and height in various placess (for avatar and prop resizing issues)
 Notes: 
 """
 
@@ -104,11 +104,11 @@ class _MediaFile(object):
         self.name = kwargs.pop('name', 'nameless').strip()
         self.voice = kwargs.pop('voice', None)
         self._type = kwargs.pop('type', None)
-        self.height = kwargs.pop('height', None)
-        self.width = kwargs.pop('width', None)
+        self.height = kwargs.pop('height', '')
+        self.width = kwargs.pop('width', '')
         self.medium = kwargs.pop('medium', None) # medium: 'video' for video, 'stream' for streaming, None for stills.
         self.description = kwargs.pop('description', '').strip() # no form entry for it.
-        
+
         # AC (29.09.07) - 
         self.uploader = kwargs.pop('uploader', '').strip() # user name of uploader.
         self.dateTime = kwargs.pop('dateTime', '').strip() # Date and time of upload.
@@ -157,6 +157,8 @@ class MediaDict(Xml2Dict):
         av = _MediaFile(file=f,
                         name=node.getAttribute('name') or 'untitled',
                         voice=node.getAttribute('voice') or '',
+                        height=node.getAttribute('height') or '',
+                        width=node.getAttribute('width') or '',
                         medium=node.getAttribute('medium') or '',
                         thumbnail=node.getAttribute('thumbnail') or '',
                         uploader=node.getAttribute('uploader') or '', # AC - Adds uploader field to dictionary.
@@ -178,7 +180,7 @@ class MediaDict(Xml2Dict):
         # AC (29.09.07) - Added uploader and datetime fields in XML media item files.
         node = root.add(self.element, file=mf.file, url=mf.url, name=mf.name,
                         thumbnail=mf.thumbnail, uploader=mf.uploader, dateTime=mf.dateTime, tags=mf.tags,
-                        streamserver=mf.streamserver, streamname=mf.streamname)
+                        streamserver=mf.streamserver, streamname=mf.streamname, width=mf.width, height=mf.height)
         
         #for attr in ('voice', 'medium'):
         for attr in ('voice', 'medium', 'streamserver', 'streamname'):
@@ -755,7 +757,9 @@ class MediaDict(Xml2Dict):
                             'row_class':v.medium,
                             'stages':'',
                             'tags':v.tags, # Vibhu and Heath (01/09/2011) - Added tags attribute to return associated tags for a media.
-                            
+                            'width':v.width,
+                            'height':v.height,
+
                             # add stream parameters:
                             'streamname':v.streamname,
                             'streamserver':v.streamserver,

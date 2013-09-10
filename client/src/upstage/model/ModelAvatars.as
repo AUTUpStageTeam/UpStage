@@ -50,6 +50,7 @@ import flash.external.ExternalInterface;
  * Modified by: Nitkalya Wiriyanuparb  29/08/2013 - Add Toggle Mute/Unmute context menu item to streaming avatars
  * 												  - Add TOGGLE_STREAM_AUDIO() and GET_STREAM_AUDIO()
  *                                                - Support mute/unmute globally and locally
+ * Modified by: Nitkalya Wiriyanuparb  10/09/2013  - Added swf width/height in GET_LOADPROP and GET_LOAD_AV for correct prop and avatar resizing
  */
 class upstage.model.ModelAvatars implements TransportInterface
 {
@@ -561,12 +562,14 @@ class upstage.model.ModelAvatars implements TransportInterface
      */
     function GET_LOAD_AV(ID :Number, name :String, url :String,
                          thumbnail :String, allowed :Boolean, available :Boolean,
-                         medium :String, frame: Number, streamserver :String, streamname :String)
+                         medium :String, frame: Number, streamserver :String, streamname :String,
+                         swfwidth: Number, swfheight: Number)
     {
         var av :Avatar;
 
         av = Avatar.factory(stage, ID, name, url, thumbnail,
-                            medium, this.avScrollBar, available, frame, streamserver, streamname);
+                            medium, this.avScrollBar, available, frame, streamserver, streamname,
+                            swfwidth, swfheight);
 
         //XXX this.avatars *might* be a sparse array -- ID range is not necessarily contiguous
         trace(ID);
@@ -874,9 +877,9 @@ class upstage.model.ModelAvatars implements TransportInterface
     /**
      * @brief Server wants model to load a prop
      */
-    function GET_LOADPROP(ID : Number, name :String, url :String, thumbnail :String, medium :String, show :Boolean)
+    function GET_LOADPROP(ID : Number, name :String, url :String, thumbnail :String, medium :String, show :Boolean, swfwidth: Number, swfheight: Number)
     {
-        this.propIcons.addItem(Prop, ID, name, url, thumbnail, medium);
+        this.propIcons.addItem(Prop, ID, name, url, thumbnail, medium, swfwidth, swfheight);
         //XXX ignoring show attribute.
         // it is no use anyway - an unbound prop is hidden
     }

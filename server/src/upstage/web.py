@@ -37,13 +37,14 @@ Modified by: Gavin          5/10/2012   - Imported AdminError class from pages.p
                                         - Implemented changes to errorMsg in def failure() and def render()
 Modified by: Lisa Helm 21/08/2013       - removed all code relating to old video avatar    
 Modified by: Lisa Helm 05/09/2013       - added Edit/Signup 
+Modified by: Nitkalya Wiriyanuparb  10/09/2013  - Added swfdump calls to get swf file's width and height for resizing media on stage in success_upload()
 """
 
 
 """Defines the web tree."""
 
 #standard lib
-import os, random, datetime, tempfile, string
+import os, random, datetime, tempfile, string, commands
 from urllib import urlencode
 
 # TODO for compressing
@@ -718,7 +719,14 @@ class SwfConversionWrapper(Resource):
         log.msg("success_upload(): thumbnail_full = %s" % thumbnail_full)
         log.msg("success_upload(): now = %s" % now)
         log.msg("success_upload(): voice = %s" % voice)
-        
+
+        size_x = ''
+        size_y = ''
+        # get actual swf width and height from the file
+        if swf.endswith('.swf'):
+            size_x = commands.getoutput("swfdump -X html/media/" + swf).split()[1];
+            size_y = commands.getoutput("swfdump -Y html/media/" + swf).split()[1];
+
         #if not mimetype.startswith('image/'):
         if not is_image:
             self.media_dict.add(file=swf,
@@ -731,6 +739,8 @@ class SwfConversionWrapper(Resource):
                                 streamserver=streamserver,
                                 streamname=streamname,
                                 medium=medium,
+                                width=size_x,
+                                height=size_y,
                                 )
 
         else:

@@ -21,6 +21,7 @@
  * class for prop images.
  * Modified by: Heath Behrens & Vibhu Patel 08/08/2011 - Modified function Added line which calls Construct
  *                                                       to scale the prop on stage
+ * Modified by: Nitkalya Wiriyanuparb  10/09/2013  - Added swf width and height for correct resizing
  */
 
 
@@ -39,7 +40,7 @@ class upstage.thing.Prop extends Thing
 
     static function factory(imgParent : MovieClip, iconParent : MovieClip, ID :Number,
                             name :String, url :String, thumbnail :String,
-                            medium :String): Prop
+                            medium :String, swfwidth: Number, swfheight :Number): Prop
     {
         var baseLayer:Number = Client.L_PROPS_IMG -(-ID *  Client.THING_IMG_LAYERS);
     	  var baseName: String = 'prop_' + ID;
@@ -47,8 +48,8 @@ class upstage.thing.Prop extends Thing
                                         thumbnail, medium, baseLayer, imgParent, Prop);
         var prop: Prop = Prop(thing);
         //modified: Heath / Vibhu 08/08/2011 - added parameters to identify prop. 
-        prop.loadImage(prop.url, baseLayer + 1, null ,true);
-        
+        prop.loadImage(prop.url, baseLayer + 1, null, swfwidth, swfheight);
+
         // Create icon & ask for it to load
         var iLayer :Number = Client.L_UI_ICONS_BASE + ID * Client.ICON_IMG_LAYERS;
         var iUrl :String = thumbnail || url;

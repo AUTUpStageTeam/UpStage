@@ -41,6 +41,7 @@ import upstage.util.LoadTracker;
  * Modified by David Daniels & Lisa Helm 27/08/2013 - Merged Martins fork
  * Modified by: Nitkalya Wiriyanuparb  29/08/2013  - Add isStream to identify streaming avatar for mute/unmute
  * Modified by: Nitkalya Wiriyanuparb  05/09/2013  - Fix issue where avatars with different sizes appear to be the same size on stage
+ * Modified by: Nitkalya Wiriyanuparb  10/09/2013  - Really fix avatar resizing issue using real swf width/height, see comment in calcSize()
  */
  
 class upstage.thing.Avatar extends Thing
@@ -97,7 +98,8 @@ class upstage.thing.Avatar extends Thing
     public static function factory(parent: MovieClip, ID :Number, name :String, url :String,
                                    thumbnail :String, medium :String,
                                    scrollBar: AvScrollBar, available:Boolean, frame: Number,
-                                   streamserver :String, streamname :String):Avatar
+                                   streamserver :String, streamname :String, 
+                                   swfwidth: Number, swfheight: Number):Avatar
     {
         //trace("Avatar factory");
         var baseLayer:Number = Client.L_AV_IMG -(-ID * Client.AV_IMG_LAYERS); 
@@ -128,7 +130,7 @@ class upstage.thing.Avatar extends Thing
             //trace('av onLoadInit for ' + av.ID );
             av.images[av.layerOffset] = mc;
             av.image = mc;
-            av.calcSize();
+            av.calcSize(swfwidth, swfheight);
             av.finalise();
             //XXX could call finalise here.
         };
@@ -188,12 +190,17 @@ class upstage.thing.Avatar extends Thing
      * Modified by heath & Vibhu 08/08/2011 - Aded line 168 to scale avatar on stage
      *
      */
-    function calcSize()
+    function calcSize(swfwidth: Number, swfheight: Number)
     {
         trace('calculating size for ' + this);
-        if (this.isStream) { // Ing - do this for streaming avatar only
+        // Ing - restrict size for streaming avatar only, otherwise display it according to its original size
+        // since client.swf is stretched from 320x200, avatars inside the client will be stretched along with it
+        // the SCREEN_SIZE_DIVISOR is calculated from 1280x800 (a popular size for laptops)
+        if (this.isStream) {
             // Added by heath & vibhu 08/08/2011 - used to scale the avatar on stage
             this.scale = Construct.constrainSize(this.image, Client.AVATAR_MAX_WIDTH, Client.AVATAR_MAX_HEIGHT);
+        } else {
+            this.scale = Construct.constrainSize(this.image, swfwidth / Client.SCREEN_SIZE_DIVISOR, swfheight / Client.SCREEN_SIZE_DIVISOR);
         }
 
         var im :MovieClip = this.image;
@@ -503,28 +510,26 @@ class upstage.thing.Avatar extends Thing
 	 * @brief	Rotation function which only rotates actual images not Avatar object.
 	 */
 	function setRotation(angle:Number)
-	{		
+	{
 		trace("ROTATING");
 		rotation = (rotation + angle) % 360;
-		
+
 		// Rotate Image
 		var myMat:Matrix = new Matrix();
-		myMat.translate( -centreX / scale, -centreY / scale);
-
+		myMat.translate( -centreX / this.scale, -centreY / this.scale);
 		myMat.rotate((rotation / 180) * Math.PI);
-		myMat.translate((centreX / scale), (centreY / scale));
-		myMat.scale(scale, scale);
+		myMat.translate((centreX / this.scale), (centreY / this.scale));
+        myMat.scale(this.scale, this.scale);
 		image.transform.matrix = myMat;
-		
+
 		// Rotate Drawing
 		var drawMat:Matrix = new Matrix();
 		drawMat.identity();
 		drawMat.translate( -centreX, -centreY);
-
 		drawMat.rotate((rotation / 180) * Math.PI);
 		drawMat.translate((centreX), (centreY));
 		drawable.transform.matrix = drawMat;
-		
+
 	}
 
     /**
