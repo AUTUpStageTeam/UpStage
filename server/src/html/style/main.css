@@ -32,6 +32,7 @@
             14/09/2012  Daniel - Added min-width in #masterpage so it doesn't mess up the layout.
 2.0			5/10/12	   Craig Farrell	- added padding to stage list table headers		
 2.1			28/08/13	Nikos Phillips	- merged Martin's fork	
+2.2			11/09/13	Nitkalya Wiriyanuparb	- Prefectly centered stage loading box and removed green background
 */
 
 
@@ -115,6 +116,7 @@ th
 
 body.full
 {
+	display: table;
 	margin: 0px;
 	height: 100%;
 }
@@ -904,32 +906,26 @@ a.IconButton
 
 #stagePopUp
 {
-    display: block;
+	text-align: center;
+	vertical-align: middle;
+	display: table-cell;
     padding:0px;
     margin:0px;
-    position: fixed;
     height: 100%;
     width: 100%;
-    background-color: #6a9;
-
-    top: 0px;
-    left: 0px;
     z-index: 9998;
 }
 
 
 .loadingBox
 {
-    position: absolute;
-    margin-left: 50%;
-    left: -150px;
+	margin: auto;
     background-color: #fff;
     color: #000;
     border-radius: 20px;
     border: #eee 2px solid;
     width: 300px;
     text-align: center;
-    margin-top: 20%;
     padding: 20px;
     box-shadow: #333 1px 1px 10px;
 }

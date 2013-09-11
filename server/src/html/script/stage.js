@@ -11,6 +11,7 @@
  * Modified By Vanessa Henderson - 28/08/2013 - Merged Martins fork with current working code
  * @version   0.1
                     0.2 - stage_error() added.   
+ * Modified By Nitkalya Wiriyanuparg - 11/09/2013 - Made sure stage loading percentage never exceeds 100
  **/
  
  var hasError = false;
@@ -39,6 +40,7 @@
  
  function stage_loading(percentage)
  {
+    if (percentage > 100) percentage = 100;
     if(!hasError)
         document.getElementById('loading').innerHTML = "Loading... " + percentage + "%";
  }
