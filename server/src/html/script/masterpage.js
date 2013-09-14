@@ -39,6 +39,7 @@
             Modified by Vanessa (28/08/2013): Merged Martins fork of code to working copy
             Modified by Nitkalya (3/9/2013): Fix confusing "save and reload stage" message
             Modified by Nitkalya (4/9/2013): Edit clear stage warning message as clients requested
+            Modified by Nitkalya (14/9/2013): Make player/audience stat info clearer, and fix issues when it displays NaN audiences on some pages
  */
 
 //Instance type variables
@@ -104,9 +105,6 @@ function countPlayerAndAudience()
 			}
 		}
 		catch(ex){}
-	}
-	if(document.hidden_form.user_name.value != '_NO_PLAYER_') {
-		document.getElementById('signup').innerHTML = 'Welcome back, ' +document.hidden_form.user_name.value +'!<br/><a href="javascript:logout();">logout</a><br /><br />Server info: Players - ' + playerCount +' | Audience - ' + audCount;
 	}
 }
 
@@ -183,11 +181,6 @@ function clearLogin()
 				var temp1 = new Array();
 				temp1 = usernameCookie.split('=');
 				document.hidden_form.user_name.value = temp1[0];
-				
-				//var serverInfo = document.hidden_form.server_details.value;
-				//var temp = new Array();
-				//temp = serverInfo.split('#');
-				//document.getElementById('signup').innerHTML = 'Welcome back, ' +temp1[0] +'!<br/><a href="javascript:logout();">logout</a><br /><br />Server info: Players - ' + temp[0] +' | Audience - ' + temp[1];
 			}
 			else
 			{
@@ -211,7 +204,7 @@ function clearLogin()
 			var serverInfo = document.hidden_form.server_details.value;
 			var temp = new Array();
 			temp = serverInfo.split('#');
-			document.getElementById('signup').innerHTML = 'Welcome back, ' +loggedInPlayer +'!<br/><a href="javascript:logout();">logout</a><br /><br />Server info: Players - ' + temp[0] +' | Audience - ' + temp[1];
+			document.getElementById('signup').innerHTML = 'Welcome back, ' +loggedInPlayer +'!<br/><a href="javascript:logout();">logout</a><br /><br /><strong>Currently on Stages</strong><br />Registered Players : ' + temp[0] + '<br />Guest Audiences : ' + temp[1];
 		}
 	}
 	catch(ex)

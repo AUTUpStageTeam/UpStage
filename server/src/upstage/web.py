@@ -38,6 +38,7 @@ Modified by: Gavin          5/10/2012   - Imported AdminError class from pages.p
 Modified by: Lisa Helm 21/08/2013       - removed all code relating to old video avatar    
 Modified by: Lisa Helm 05/09/2013       - added Edit/Signup 
 Modified by: Nitkalya Wiriyanuparb  10/09/2013  - Added swfdump calls to get swf file's width and height for resizing media on stage in success_upload()
+Modified by: Nitkalya Wiriyanuparb  14/09/2013  - Fixed player/audience stat info bug in workshop by passing the whole data collection
 """
 
 
@@ -186,10 +187,10 @@ def _getWebsiteTree(data):
     docroot.putChild(config.MEDIA_SUBURL, media)
     #docroot.putChild(config.SWF_SUBURL, NoCacheFile(config.SWF_DIR))
     docroot.putChild(config.SWF_SUBURL, CachedFile(config.SWF_DIR))     # cached  
-    docroot.putChild('stages', ThingsList(data.players.audience, childClass=StagePage, collection=data.stages))
+    docroot.putChild('stages', ThingsList(data.players.audience, childClass=StagePage, collection=data))
     docroot.putChild('admin', adminWrapper(data))
     # Shaun Narayan (02/01/10) - Added home and signup pages to docroot.
-    docroot.putChild('home', HomePage(data.stages))
+    docroot.putChild('home', HomePage(data))
     docroot.putChild('signup', SignUpPage())
  	# Daniel Han (03/07/2012) - Added this session page.
     docroot.putChild('session', SessionCheckPage(data.players))
@@ -235,9 +236,9 @@ class AdminRealm:
 			workshop_pages = {'stage' : (StageEditPage, self.data),
 							  'mediaupload' : (MediaUploadPage, self.data),
 							  'mediaedit' : (MediaEditPage, self.data),
-							  'user' : (UserPage, self.data.players),
-							  'newplayer' : (NewPlayer, self.data.players),
-							  'editplayers' : (EditPlayer, self.data.players)
+							  'user' : (UserPage, self.data),
+							  'newplayer' : (NewPlayer, self.data),
+							  'editplayers' : (EditPlayer, self.data)
 							  }
 
 			""" Admin Only  - Password Page """      
@@ -268,15 +269,15 @@ class AdminRealm:
 		# player, but not admin.
 		elif player.can_act():
 		# Daniel modified 27/06/2012
-			tree = NonAdminPage(player, self.data.stages)	    
+			tree = NonAdminPage(player, self.data)	    
 			tree.putChild('id', SessionID(player, self.data.clients))
 		# anon - the audience.
 		else:
 			tree = AdminLoginPage(player)
 			tree.putChild('id', SessionID(player, self.data.clients))
         
-		tree.putChild('home', HomePage(self.data.stages, player))
-		tree.putChild('stages', ThingsList(player, childClass=StagePage, collection=self.data.stages)) 
+		tree.putChild('home', HomePage(self.data, player))
+		tree.putChild('stages', ThingsList(player, childClass=StagePage, collection=self.data)) 
 		return (IResource, tree, lambda : None)
 
 

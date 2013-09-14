@@ -98,6 +98,7 @@ Modified by: Craig Farrell  05/05/2013  - added new redirect to the errorpage
 Modified by: Lisa Helm 21/08/2013       - removed all code relating to old video avatar
 Modified by: Lisa Helm 04/09/2013       - called a correct method when clearing a stage
 Modified by: Lisa Helm 05/09/2013       - added Sign Up page edit mode 
+Modified by: Nitkalya Wiriyanuparb  14/09/2013  - Fixed player/audience stat info bug in workshop. AdminBase needs data.stages collection (from web.py) to calculate the stat
 """
 
 #standard lib
@@ -647,9 +648,9 @@ class NonAdminPage(AdminBase):
         return Template.render(self, request)
 
     def text_list(self, request):
-        html_list = '<table id="playerAudience" class="stage_list" cellspacing="0"><tr><th> Name (url)</th><th>Players</th><th>Audience</th><th>Your Access</th></tr>'
+        html_list = '<table id="playerAudience" class="stage_list" cellspacing="0"><tr><th>Name (url)</th><th>Players</th><th>Audience</th><th>Your Access</th></tr>'
         #slist = self.collection.load_StageList()#(08/04/2013) Craig
-        html_list += self.collection.html_list(self.text_username(request))#,slist)
+        html_list += self.collection.stages.html_list(self.text_username(request))#,slist)
         html_list += '</table>'
         return html_list
 
@@ -688,9 +689,9 @@ class HomePage(AdminBase):
         return Template.render(self, request)
     
     def text_list(self, request):
-        html_list = '<table id="playerAudience" class="stage_list" cellspacing="0"><tr><th> Name (url)</th><th>Players</th><th>Audience</th><th>Your Access</th></tr>'
-        slist = self.collection.load_StageList()#(08/04/2013) Craig
-        html_list += self.collection.html_list(self.text_username(request),slist)
+        html_list = '<table id="playerAudience" class="stage_list" cellspacing="0"><tr><th>Name (url)</th><th>Players</th><th>Audience</th><th>Your Access</th></tr>'
+        slist = self.collection.stages.load_StageList()#(08/04/2013) Craig
+        html_list += self.collection.stages.html_list(self.text_username(request),slist)
         html_list += '</table>'
         return html_list
  
@@ -2148,7 +2149,7 @@ class NewPlayer(AdminBase):
         form = request.args
         if 'submit' in form:
             try:
-                self.collection.update_from_form(form, self.player)
+                self.collection.players.update_from_form(form, self.player)
                 request.redirect("/admin/workshop/user")
                                               
             except UpstageError, e:
@@ -2180,7 +2181,7 @@ class EditPlayer(AdminBase):
         if submit == 'getplayer':
             try:
                 name = _value('name')
-                player = self.collection.getPlayer(name)
+                player = self.collection.players.getPlayer(name)
                 
                 response = \
                 "<name>" + player.name + "<name>" + \
@@ -2199,14 +2200,14 @@ class EditPlayer(AdminBase):
             
         elif submit == 'updateplayer':
             try:
-                self.collection.update_player(form, self.player, False)
+                self.collection.players.update_player(form, self.player, False)
             except UpstageError, e:
                 log.msg(e)
                 return errorpage(request, "That didn't work! %s" % e)
             
         elif submit == 'deleteplayer':
             try:
-                self.collection.delete_player(form)
+                self.collection.players.delete_player(form)
             except UpstageError, e:
                 log.msg(e)
                 return errorpage(request, "That didn't work! %s" % e)
@@ -2238,7 +2239,7 @@ class EditPlayer(AdminBase):
         except:
             search = ''
         
-        playerlist = self.collection.html_list(search)
+        playerlist = self.collection.players.html_list(search)
 
         # Total Number of pages
         num_pages = len(playerlist) / user_per_page
@@ -2367,7 +2368,7 @@ class ThingsList(AdminBase):
         """if given arguments, refer to the collection"""
         if request.args:
             try:
-                self.collection.update_from_form(request.args, self.player)
+                self.collection.stages.update_from_form(request.args, self.player)
                 self.message = "Yay, it works."
             except UpstageError, e:
                 self.message = str(e) #useful message
@@ -2378,12 +2379,12 @@ class ThingsList(AdminBase):
         #print self.childClass, self.collection
         """ Modified by Alan (05.02.08) - Added the ability to group media 
         asset lists by stage. Only media asset lists are grouped using 'media_type'. """
-        html_list = self.collection.html_list
+        html_list = self.collection.stages.html_list
            
 
         # --- Group media asset lists by stage ---
         if hasattr(self.childClass, 'media_type'):
-            html_list = self.collection.html_list_grouped
+            html_list = self.collection.stages.html_list_grouped
             
             if hasattr(self.childClass, 'list_template'):
                 if hasattr(self.childClass, 'group_header'):
@@ -2394,8 +2395,8 @@ class ThingsList(AdminBase):
         if hasattr(self.childClass, 'list_template'):
             return html_list(self.childClass.list_template)
 
-        html_list_text = '<table id="playerAudience" class="stage_list" cellspacing="0"><tr><th> Name (url)</th><th>Players</th><th>Audience</th><th>Your Access</th></tr>'
-        slist = self.collection.load_StageList()#(08/04/2013) Craig
+        html_list_text = '<table id="playerAudience" class="stage_list" cellspacing="0"><tr><th>Name (url)</th><th>Players</th><th>Audience</th><th>Your Access</th></tr>'
+        slist = self.collection.stages.load_StageList()#(08/04/2013) Craig
         html_list_text += html_list(self.text_username(request),slist)
         html_list_text += '</table>' 
         return html_list_text
@@ -2410,7 +2411,7 @@ class ThingsList(AdminBase):
         if name == 'player':
             return EditPassword(self.player, self.collection)
 
-        f = self.collection.get(name)
+        f = self.collection.stages.get(name)
         if f and self.childClass is not None:
             x = self.childClass(self.player, self.collection, f)
             if x.allows_player(self.player):
@@ -2506,13 +2507,13 @@ class UserPage(AdminBase):
             if submit == 'savepassword':               
                 try:
                     #(19/05/11) Mohammed and Heath - True means that only the password is being saved to the XML
-                    self.collection.update_player(form, self.player, True)
+                    self.collection.players.update_player(form, self.player, True)
                 except UpstageError, e:
                     request.redirect(errorpage(request, str(e)))
                 
             elif submit == 'saveemail':
                 try:
-                    self.collection.update_email(request.args, self.player)
+                    self.collection.players.update_email(request.args, self.player)
                 except UpstageError, e:
                     request.redirect(errorpage(request, str(e)))
                     
