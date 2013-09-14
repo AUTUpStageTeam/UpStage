@@ -119,6 +119,7 @@ body.full
 	display: table;
 	margin: 0px;
 	height: 100%;
+	width: 100%;
 }
 tr.inactive
 {
@@ -916,6 +917,11 @@ a.IconButton
     z-index: 9998;
 }
 
+.ie #stagePopUp,
+.ie10  #stagePopUp
+{
+	padding-top: 18%;
+}
 
 .loadingBox
 {

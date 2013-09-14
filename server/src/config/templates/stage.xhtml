@@ -1,9 +1,16 @@
-<html>
+<!--[if IE]> <html class="ie" xmlns="http://www.w3.org/1999/xhtml"> <![endif]--> 
+<!--[if !IE]><!--> <html xmlns="http://www.w3.org/1999/xhtml"> <!--<![endif]--> 
 <head>
 	<meta http-equiv="X-UA-Compatible" content="IE=8, IE=9, IE=10" />
 	<title>%(stagename)s</title>
 	<link rel="stylesheet" type="text/css" href="/style/main.css" />
 	<script language="javascript" type="text/javascript" src="/script/stage.js"></script>
+  <!-- detect ie10, normal conditionals don't work anymore -->
+  <!--[if !IE]><!--><script>
+  if (/*@cc_on!@*/false) {
+    document.documentElement.className+=' ie10';
+  }
+</script><!--<![endif]-->
 </head>
 
 <body class="full" onload="onStageLoad()">
