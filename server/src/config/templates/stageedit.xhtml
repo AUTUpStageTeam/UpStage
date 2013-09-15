@@ -53,7 +53,7 @@ window.onresize = resizePage;
 		<select name="shortName" id="listName">
 			%(list_stages)s
 		</select>
-		<input type="button" onclick="stageChooseSubmit();" value="Select"></input>
+		<input type="button" onclick="stageChooseSubmit();" value="Select" />
 	</form>
 </div>
 
@@ -81,7 +81,7 @@ window.onresize = resizePage;
 	</div>
 	<!-- -->
 	<div id="edit">
-		<input type="hidden" name="displayaccess" value="%(display_access)s"></input>
+		<input type="hidden" name="displayaccess" value="%(display_access)s" />
 
 		<div id="editStageColor">
             <h1>Debug message</h1>
@@ -143,13 +143,13 @@ window.onresize = resizePage;
                             
                         </tr>
                         <tr><!-- Craig Farrell 16/04/2013 -->
-                            <td><input type="button" id="AvatarUnAssign"   class="esUnAssignBut" onclick="unAssignMedia(1);" value="Unassign"></input></td>
-                            <td><input type="button" id="PropUnAssign"     class="esUnAssignBut" onclick="unAssignMedia(2);" value="Unassign"></input></td>
+                            <td><input type="button" id="AvatarUnAssign"   class="esUnAssignBut" onclick="unAssignMedia(1);" value="Unassign" /></td>
+                            <td><input type="button" id="PropUnAssign"     class="esUnAssignBut" onclick="unAssignMedia(2);" value="Unassign" /></td>
                             
                         </tr>
                         <tr><!-- Craig Farrell 25/04/2013 -->
-                            <td><input type="button" id="AvatarView"   class="esViewBut" onclick="viewMediaImage(1);" value="View"></input></td>
-                            <td><input type="button" id="PropView"     class="esViewBut" onclick="viewMediaImage(2);" value="View"></input></td>
+                            <td><input type="button" id="AvatarView"   class="esViewBut" onclick="viewMediaImage(1);" value="View" /></td>
+                            <td><input type="button" id="PropView"     class="esViewBut" onclick="viewMediaImage(2);" value="View" /></td>
                             
                         </tr>
                         <tr>
@@ -161,11 +161,11 @@ window.onresize = resizePage;
                             <td><select name="AudioList"    id="AudioList"    class="esTypeList">%(list_Audios)s</select></td>
                         </tr>
                         <tr>
-                            <td><input type="button" id="BackdropUnAssign" class="esUnAssignBut" onclick="unAssignMedia(3);" value="Unassign"></input></td>
-                            <td><input type="button" id="AudioUnAssign"    class="esUnAssignBut" onclick="unAssignMedia(4);" value="Unassign"></input></td>
+                            <td><input type="button" id="BackdropUnAssign" class="esUnAssignBut" onclick="unAssignMedia(3);" value="Unassign" /></td>
+                            <td><input type="button" id="AudioUnAssign"    class="esUnAssignBut" onclick="unAssignMedia(4);" value="Unassign" /></td>
                         </tr>
                         <tr>
-                            <td><input type="button" id="BackdropView" class="esViewBut" onclick="viewMediaImage(3);" value="View"></input></td>
+                            <td><input type="button" id="BackdropView" class="esViewBut" onclick="viewMediaImage(3);" value="View" /></td>
                         </tr>
                     </table>
                 </div>
@@ -214,7 +214,7 @@ window.onresize = resizePage;
 					<tr>
 						 <td><!--#(08/04/2013)Craig-->
 						  <input type="hidden" name="debugTextMsg" id="debugTextMsg" class="debugMsg" value="%(debugMessages)s" />
-						  <input type="hidden" name="colors" id="colorvals" value="%(colours)s"></input>
+						  <input type="hidden" name="colors" id="colorvals" value="%(colours)s" />
                           <input type="hidden" name="onstagelistMsg" id="onstagelistMsg" class="onstageMsg" value="%(onStageList)s"/>
                           <input type="hidden" name="lockStageMsg" id="lockStageMsg"  value="%(lockStage)s"/><!--#(01/05/2013)Craig-->
                           <input type="hidden" name="ownerMsg" id="ownerMsg"  value="%(IsOwner)s"/><!--#(01/05/2013)Craig-->
@@ -225,18 +225,18 @@ window.onresize = resizePage;
 		</div>
 		<!-- -->
 		<div id="submit">
-			<input type="hidden" name="action" value=""></input>
+			<input type="hidden" name="action" value="" />
 			<table>
 				<tr><!--#(08/04/2013)Craig-->
-					<td style="width:0%;"><input type="button" id="seSaveonly" onclick="seSaveOnly();" value="Save stage "></input></td>
-					<td style="width:0%;"><input type="button" id="seSaveReload" onclick="saveStage(0);" value="Save and reload stage"></input></td>
+					<td style="width:0%;"><input type="button" id="seSaveonly" onclick="seSaveOnly();" value="Save stage " /></td>
+					<td style="width:0%;"><input type="button" id="seSaveReload" onclick="saveStage(0);" value="Save and reload stage" /></td>
 			  		<!-- <td colspan="3" style="width:50%;"><span id="warning">Warning: This will cause the stage to reload for everyone currently on it, and you will lose the chat log.</span></td> -->
 				</tr>
 				<tr>	
                 <!--#(06/09/2013) Vanessa-->
-                    <td style="width:0%;" ><input type="button" id="seCancel" onclick="warn(1);" value="Cancel"></input></td>
-					<td style="width:0%;"><input type="button" id="seDelete" onclick="warn(5);" value="Delete"></input></td>				
-					<td style="width:0%;"><input type="button" id="seClearS" onclick="warn(3);" value="Clear stage"></input></td>
+                    <td style="width:0%;" ><input type="button" id="seCancel" onclick="warn(1);" value="Cancel" /></td>
+					<td style="width:0%;"><input type="button" id="seDelete" onclick="warn(5);" value="Delete" /></td>				
+					<td style="width:0%;"><input type="button" id="seClearS" onclick="warn(3);" value="Clear stage" /></td>
 					<td style="width:50%;">Clears the text chat and drawing layers.</td>
 				</tr>	
 				<tr>

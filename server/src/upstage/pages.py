@@ -993,7 +993,7 @@ class StageEditPage(Workshop):
             if self.player.name == self.stage.get_tOwner():
                 self.isOwner = 'true'
                 log.msg('name == stage owner')
-                self.stage_CB_lock = '<input type="checkbox" id="lockStageCB" name="lockStageCB" %s onclick="if (this.checked) {lockStageChecked()}else{lockStageUnchecked()}"></input>' %(chec)
+                self.stage_CB_lock = '<input type="checkbox" id="lockStageCB" name="lockStageCB" %s onclick="if (this.checked) {lockStageChecked()}else{lockStageUnchecked()}" />' %(chec)
                 log.msg(self.stage_CB_lock)
             else:
                 if self.player.can_unlimited() == True:#(02/05/2013) Craig
@@ -1001,7 +1001,7 @@ class StageEditPage(Workshop):
                 else:
                      self.isOwner = 'false'
                 log.msg('name !!== stage owner')
-                self.stage_CB_lock = '<input type="checkbox" id="lockStageCB" %s disabled="true" name="lockStageCB"></input>' %(chec)
+                self.stage_CB_lock = '<input type="checkbox" id="lockStageCB" %s disabled="true" name="lockStageCB" />' %(chec)
                 log.msg(self.stage_CB_lock)
 
 

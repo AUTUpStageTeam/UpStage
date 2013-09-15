@@ -59,7 +59,7 @@ function toUser()
         {
             divMsg = document.getElementById("divPopup");
             divShad = document.getElementById("divShade");
-            divMsg.innerHTML = "Successfully Confirmed!" + "<input type='button' onclick=\"hideDiv('divPopup'); hideDiv('divShade'); navUserPage()\" value='Close'></input>";;
+            divMsg.innerHTML = "Successfully Confirmed!" + "<input type='button' onclick=\"hideDiv('divPopup'); hideDiv('divShade'); navUserPage()\" value='Close' />";;
             
             divMsg.style.display = 'block';
             divShad.style.display = 'block';
@@ -74,7 +74,7 @@ function toUser()
             
             divMsg = document.getElementById("divPopup");
             divShad = document.getElementById("divShade");
-            divMsg.innerHTML = html + "<input type='button' onclick=\"hideDiv('divPopup'); hideDiv('divShade');\" value='Close'></input>";;
+            divMsg.innerHTML = html + "<input type='button' onclick=\"hideDiv('divPopup'); hideDiv('divShade');\" value='Close' />";;
             
             divMsg.style.display = 'block';
             divShad.style.display = 'block';

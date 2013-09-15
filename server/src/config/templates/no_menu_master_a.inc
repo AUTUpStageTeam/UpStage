@@ -27,9 +27,9 @@
 				<a href="www.upstage.org.nz"><img border="0" src="/image/upstagelogo.jpg" alt="Upstage" /></a>
 			</div>
 			<form name="hidden_form" action="">
-			<input name="user_name" type ="hidden" value="%(username)s"></input>
-			<input name="can_signup" type="hidden" value="%(allow_signup)s"></input>
-			<input name="server_details" type="hidden" value="%(server_details)s"></input>
+			<input name="user_name" type ="hidden" value="%(username)s" />
+			<input name="can_signup" type="hidden" value="%(allow_signup)s"/ >
+			<input name="server_details" type="hidden" value="%(server_details)s" />
 			</form>
 				<div id="signup">
 					<form name="rupert" action="/admin/perspective-init"> 
