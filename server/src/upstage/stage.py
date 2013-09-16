@@ -1112,10 +1112,6 @@ class _Stage(object):
         if avid is None:
             log.msg('Avatar ID cannot be None type')
         else:
-            if avid in self.draw_avatar_stacks:
-                self.draw_avatar_stacks[avid].append(('TOGGLE_STREAM_AUDIO', avid, isMuted))
-            else:
-                self.draw_avatar_stacks[avid] = [('TOGGLE_STREAM_AUDIO', avid, isMuted)]
             # log.msg("in stage.py, ready to broadcast, mute=" + isMuted);
             self.broadcast('TOGGLE_STREAM_AUDIO', AV=avid, MUTED=isMuted);
 

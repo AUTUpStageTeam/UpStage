@@ -31,6 +31,7 @@ Modified by: Heath Behrens (17/06/2011) - Added a helper method to check if the 
 Modified by: Heath Behrens 16/08/2011 - Added functions remove_media and remove_mediafile which are called
                                         to remove media from the stage.
              Karena, Corey, Heath 24/08/2011 - Added tag variable to Thing class to store tags for a given thing.          
+Modified by: Nitkalya Wiriyanuparb  16/09/2013  - Remembered streaming avatar mute state
 Notes: 
 """
 
@@ -117,6 +118,7 @@ class Avatar(Thing):
         self.show_name = show_name
         self.prop = None
         self.frame = 1
+        self.streamIsMuted = False
 
     def set_frame(self, frame):
         self.frame = frame;

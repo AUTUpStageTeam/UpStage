@@ -29,6 +29,7 @@ Modified by:    Daniel Han  13/09/2012  -   on handle_DRAW... it checks if it is
 Modified by:    Daniel Han  14/09/2012      on handle_loaded, added self.stage.draw_avatar_replay(self) so it draws avatar drawing "AFTER" it is fully loaded
 Modified by:    Nitkalya Wiriyanuparb  29/08/2013  - add handle_TOGGLE_STREAM_AUDIO to mute/unmute streaming avatar 
 Modified by:    Nitkalya Wiriyanuparb  10/09/2013  - Added swfwidth and swfheight when loading avatars and props
+Modified by:    Nitkalya Wiriyanuparb  16/09/2013  - Set up streaming avatar mute state when new user joins a stage
 Notes: 
 """
 
@@ -174,6 +175,9 @@ class _UpstageSocket(LineOnlyReceiver):
                           swfwidth     = av.media.width,
                           swfheight    = av.media.height,
                           )
+                if av.streamIsMuted:
+                    # is currently muted, send MUTED = 1
+                    self.send('TOGGLE_STREAM_AUDIO', AV=av.ID, MUTED=1)
                 
             # AC - 10/06/08 - Seperated backdrop and prop loop as 
             # needed to add more values to backdrops specifically.
@@ -653,7 +657,7 @@ class _UpstageSocket(LineOnlyReceiver):
     def handle_TOGGLE_STREAM_AUDIO(self, isMuted):
         # log.msg('in server.py, isMuted = ' + isMuted)
         self.stage.toggle_stream_audio(isMuted, self.avatar.ID)
-
+        self.avatar.streamIsMuted = (str(isMuted) == '1')
 
 class SocketFactory(Factory):
     """Produces _UpstageSocket instances"""
