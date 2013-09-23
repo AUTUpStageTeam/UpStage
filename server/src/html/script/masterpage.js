@@ -345,9 +345,10 @@ function navUserPage()
  */
 function logout()
 {
-	deleteCookie('username');
-	deleteCookie('password');
-	deleteCookie('usernameUpStage');
+	var cookies = document.cookie.split(";");
+	for (var i = 0; i < cookies.length; i++) {
+		deleteCookie(cookies[i].split("=")[0]);
+	};
 	window.location='/admin/perspective-destroy';
 	document.getElementById('signup').innerHTML = loginLinks;
 	navHomeUser();
