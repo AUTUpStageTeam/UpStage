@@ -10,7 +10,20 @@
  * Daniel, Gavin        24/08/2012 - Removed alert box on toUser so it only gets postback from the server
  * Gavin                29/08/2012 - Made event to close the edit player form 
  * Gavin                13/09/2012 - Added alert for players when they update their password with different inputs 
+ * Nitkalya             24/09/2013 - Added email format validation and make sure username and password are not blank when creating new users
  */
+
+/**
+ * Validate email address against a relatively simple regular expression
+ * @param email - the address to be validate
+ * @return true or false
+ */
+function validateEmailFormat(email)
+{
+	email = email.trim();
+	var re = /[\w-\.\+]+@[a-z0-9-_\.\+]+\.[a-z]{2,}/i;
+	return email.match(re);
+}
 
 /**
  * Generate HTML for allowing the user to update their email.
@@ -19,10 +32,14 @@
  * @return none
  */
 
-function updateEmail(addy, username)
+function updateEmail(email, username)
 {
-	requestPage("POST", '/admin/workshop/user?username='+unescape(username)+'&email='+addy+'&submit=saveemail', toUser);
-    //alert("Email changed successfully.");
+	if (validateEmailFormat(email)) {
+		requestPage("POST", '/admin/workshop/user?username='+unescape(username)+'&email='+email+'&submit=saveemail', toUser);
+    	//alert("Email changed successfully.");
+	} else {
+		alert('Please enter a valid email address');
+	}
 }
 
 /**
@@ -131,15 +148,44 @@ function switchPasswordStuff(on)
 }
 
 /**
+ * Validates user info before sending it the server
+ * @return true or false
+ */
+function validateInfoBeforeSave(username, password, password2, email)
+{
+	if (!username || !password || !password2) {
+		alert('Username and password cannot be blank');
+		return false;
+	}
+
+	if (password !== password2) {
+		alert('Passwords do not match');
+		return false;
+	}
+
+	if (!!email && !validateEmailFormat(email)) {
+		alert('Please enter a valid email address or you can leave it blank');
+		return false;
+	}
+
+	return true;
+}
+
+/**
 	Saves player details according to the given items within the appropriate fields.
 */
 function savePlayer()
 {
 	var date = new Date();
-	var username = document.getElementById('name').value;
-	var password = document.getElementById('password').value;
-	var password2 = document.getElementById('password2').value;
-	var email = document.getElementById('email').value;
+	var username = document.getElementById('name').value.trim();
+	var password = document.getElementById('password').value.trim();
+	var password2 = document.getElementById('password2').value.trim();
+	var email = document.getElementById('email').value.trim();
+
+	if (! validateInfoBeforeSave(username, password, password2, email)) {
+		return false;
+	}
+
 	var act = true;
 	var admin = stringChecked(document.getElementById('admin').checked, 'admin');
 	var su = stringChecked(document.getElementById('su').checked, 'su');
