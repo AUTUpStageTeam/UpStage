@@ -7,7 +7,7 @@
 <link rel="stylesheet" type="text/css" href="/style/main.css" />
 <link rel="shortcut icon" href="/favicon.ico" />
 
-<title>UpStage Edit</title>
+<title>UpStage: Edit Page Content</title>
 
 <style type="text/css">
 .header
@@ -45,6 +45,7 @@
 	border: 1px solid #C1C1C1;
 	border-left: 0;
 	border-right: 0;
+	background: #EFEFEF;
 	background: #EFEFEF -moz-linear-gradient(top, #EFEFEF, gainsboro);
 	background: #EFEFEF -webkit-gradient(linear, 0% 0%, 0% 100%, from(#EFEFEF), to(gainsboro));
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr=#efefef, endColorStr=#dcdcdc);	
@@ -77,7 +78,7 @@
 .header .navigation ul
 {
 	margin: 0;
-	padding: 0 0 0 20px;
+	padding: 0;
 	list-style: none;
 	border: 1px solid white;
 	border-left: 0;
@@ -102,7 +103,7 @@
 	color: #333;
 	font-size: 12px;
 	height: 14px;
-	padding: 8px 18px;
+	padding: 8px 10px;
 	white-space: nowrap;
 	text-decoration: none;
 	text-shadow: 0 1px 0 white;
@@ -112,6 +113,7 @@
 .header .navigation a:hover
 {
 	background: #eee;
+	padding: 8px 9px;
 	border: 1px solid #ccc;
 	text-shadow: 0 1px 3px grey;
 }
@@ -166,6 +168,11 @@ button:hover
 	text-shadow: 0 1px 3px grey;
 }
 
+.header,
+form {
+	min-width: 700px;
+}
+
 </style>
 
 </head>
@@ -173,7 +180,7 @@ button:hover
 <body>
 
 <div class="header">
-		<h1><a href="http://www.upstage.org.nz"> UpStage </a>  Edit </h1>
+		<h1><a href="http://www.upstage.org.nz">UpStage:</a> Edit Page Content</h1>
 		<div class="account">
 			<p>
             	UpStage Editor v1
@@ -182,12 +189,12 @@ button:hover
         
 		<div class="navigation">
 			<ul>
-				<li> <a href="/admin/"> Back to Workshop</a> </li>
-				<li> <a href="/admin/edit/home"> Edit Home Page </a> </li>
-                <li> <a href="/admin/edit/workshop"> Edit Workshop Page</a> </li>
-                <li> <a href="/admin/edit/nonadmin"> Edit Non-Admin(Guest Player) Page </a> </li>
-                <li> <a href="/admin/edit/stages"> Edit Stages Page</a> </li>
-                <li> <a href="/admin/edit/signup"> Edit Sign Up Page</a> </li>
+				<li> <a href="/admin/">&laquo; Back</a> </li>
+				<li> <a href="/admin/edit/home">Home Page</a> </li>
+                <li> <a href="/admin/edit/workshop">Workshop Page</a> </li>
+                <li> <a href="/admin/edit/nonadmin">Non-Admin(Guest Player) Page</a> </li>
+                <li> <a href="/admin/edit/stages">Stages Page</a> </li>
+                <li> <a href="/admin/edit/signup">Sign Up Page</a> </li>
            	</ul>
         </div>
 </div>
