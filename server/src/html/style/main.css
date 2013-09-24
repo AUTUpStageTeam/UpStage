@@ -33,6 +33,7 @@
 2.0			5/10/12	   Craig Farrell	- added padding to stage list table headers		
 2.1			28/08/13	Nikos Phillips	- merged Martin's fork	
 2.2			11/09/13	Nitkalya Wiriyanuparb	- Prefectly centered stage loading box and removed green background
+2.2			16/09/13	Nitkalya Wiriyanuparb	- Fixed preview panel appear at the bottom on small screens
 */
 
 
@@ -1042,6 +1043,7 @@ a.IconButton
 	float:left;
 	margin-left:3%;
 	text-align:center;
+	width: 37%;
 }
 
 .buttonRow {
