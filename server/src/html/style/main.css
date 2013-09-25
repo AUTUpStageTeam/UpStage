@@ -1041,7 +1041,7 @@ a.IconButton
 
 #detailsPanel {
 	float:left;
-	margin-left:3%;
+	margin-left:2%;
 	text-align:center;
 	width: 37%;
 }
@@ -1106,6 +1106,8 @@ input[type=checkbox] {
 #controlButtons {
 	height:55px;
 	display:block;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .controlButton {
@@ -1116,6 +1118,10 @@ input[type=checkbox] {
 	color:#999;
 	border:2px solid #999;
 	border-radius:5px;
+}
+
+.controlButton .icon-2x{
+	font-size: 30px;
 }
 
 .controlButton:hover {
@@ -1139,6 +1145,8 @@ table#tableDetails {
 	margin-top:15px;
 	max-width:350px;
 	overflow:hidden;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 #tableDetails tr:nth-child(even) {

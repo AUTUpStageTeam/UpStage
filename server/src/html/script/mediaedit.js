@@ -343,10 +343,15 @@ function showKnownError(timestamp,status,response) {
 	var date = new Date(timestamp*1000);
 	var title = "An error occurred";
 	var message = "";
-	message += "<p><strong>Date and time:</strong> "+date+"</p>";
-	message += "<p><strong>Status code:</strong> "+status+"</p>";
-	message += "<p><strong>Error:</strong> "+response+"</p>";
-	showErrorPanel(title,message);
+	if(status == 500)
+    {
+        message += "<p><strong>Error:</strong> Name already in use</p>";
+    }else
+    {
+        message += "<p><strong>Date and time:</strong> "+date+"</p>";
+        message += "<p><strong>Status code:</strong> "+status+"</p>";
+        message += "<p><strong>Error:</strong> "+response+"</p>";
+    }
 }
 
 function showUnknownError(status,error) {

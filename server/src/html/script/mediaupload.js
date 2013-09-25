@@ -16,6 +16,8 @@
                 
    				Lisa Helm 21/08/2013       - removed all code relating to old video avatar    
 				Vanessa Henderson 28/08/2013 - Merged Martins fork
+				David Daniels 25/09/2013 - removed multi frame prop option
+										 - renamed form natasha to form_mediaupload
 */
 
 // global variables
@@ -41,7 +43,7 @@ function sendPostAction()
 	/*
     if(shallContinue())
     {
-        requestPageForm("POST", document.natasha.action, document.natasha, popupAlert);
+        requestPageForm("POST", document.form_mediaupload.action, document.natasha, popupAlert);
     }
     return false;
     */
@@ -87,7 +89,7 @@ function setAction(activate)
 		action = "";
 	}
 
-	document.natasha.action = action;
+	document.form_mediaupload.action = action;
 }
 
 /*
@@ -390,6 +392,15 @@ function selectAllStages(selectbox)
 	setAction(true);
 	setContinue(true);
 		
+}
+
+/**
+ * Hides the bottom control panel
+ */
+function hideControls() {
+	log.debug("hideControls()");
+	document.getElementById("muLeftContent").style.display = 'none';
+	document.getElementById("muRightContent").style.display = 'none';
 }
 
 /*

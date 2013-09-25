@@ -5,6 +5,7 @@ Changelog: Vibhu Patel - Aut UpStage 2011
 	Combined 2 forms into one, as a fix for chrome / IE and Opera uploading media.
 	Vibhu Patel 22/07/2011 - Modified layout but adding additonal tables.
 	Heath, Corey, Karena 26/08/2011 - Added tags input so tags can be added to media when uploaded
+	David Daniels 25/09/2013 - renamed form natasha to form_mediaupload
 -->
 <script type ="text/javascript">document.title="UpStage Add Media";</script>
 
@@ -16,7 +17,7 @@ Changelog: Vibhu Patel - Aut UpStage 2011
 </div>
 
 <!-- FIXME naming a form 'natasha' seems not appropriate - better name it for what it actually does, probably something like 'form_mediaupload' ... -->
-<form name="natasha" method="post" enctype="multipart/form-data" action="" onsubmit="disableSubmit()"> <!-- action=req:path so you can decide what to do with it??  method="post" enctype="multipart/form-data"  action="/admin/save_thing" action="%(req:path)s" -->
+<form name="form_mediaupload" method="post" enctype="multipart/form-data" action="" onsubmit="disableSubmit()"> <!-- action=req:path so you can decide what to do with it??  method="post" enctype="multipart/form-data"  action="/admin/save_thing" action="%(req:path)s" -->
 	
 	<!-- meta data for form submit content -->
 	<input type="hidden" name="uploader" size="16" value="%(user)s" />
@@ -182,12 +183,13 @@ Changelog: Vibhu Patel - Aut UpStage 2011
 			
 			<div id="propBits" style="display: none;">
 				
+				<!-- removed drop down box with one option
 				<div class="fieldrow">
 					<label id="numframe">Number of frames:</label>
 					<select name="prframecount" size="1" id="prframecount" onchange="displayFields('prframecount', 'pr', 1);">
 						<option value="1">1</option>
 					</select>
-				</div>
+				</div>-->
 			
 				<div id="prlbl0" class="fileupload"><label for="prcontents0">Filename 1:</label><input type="file" size="50" name="prcontents0" id="prcontents0" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
 				
