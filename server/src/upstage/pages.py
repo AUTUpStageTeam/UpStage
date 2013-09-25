@@ -705,7 +705,7 @@ class HomePage(AdminBase):
         html_list += self.collection.stages.html_list(self.text_username(request),slist)
         html_list += '</table>'
         return html_list
-        
+"""
 Added by Daniel Han (03/07/2012)	- To set the session of player
 									- it checks both username:password combination to be more safe.
 """

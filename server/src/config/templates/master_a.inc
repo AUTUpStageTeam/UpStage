@@ -103,8 +103,9 @@ if (/*@cc_on!@*/false) {
 					</form>
 				</div>
 			<div id="nav">
-                
-	   			<a href="javascript:navHome()">HOME</a>		    	<a href="javascript:navWorkshop()" type = "hidden">WORKSHOP</a>	    	<a href="javascript:navStages()">STAGES</a>
+	   			<a href="javascript:navHome()">HOME</a>
+	   			<a href="javascript:navWorkshop()" id="workshop-link">WORKSHOP</a>
+	   			<a href="javascript:navStages()" id="stage-link">STAGES</a>
             </div>
 		</div>
 		<script type="text/javascript">clearLogin();</script>
