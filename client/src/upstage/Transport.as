@@ -40,6 +40,7 @@ import upstage.model.ModelDrawing;
  * Modified by: Craig Farrell 07/05/2013 - added this.satge.debug(msg) so when something is called it is put on screen if debug is on
  * Modified by: Nitkalya Wiriyanuparb  29/08/2013  - add TOGGLE_STREAM_AUDIO
  * Modified by: Nitkalya Wiriyanuparb  10/09/2013  - Added swf width and height in LOAD_AV and LOAD_PROP for resizing
+ * Modified by: Nitkalya Wiriyanuparb  26/09/2013  - Receive rotating direction to fix inconsistent views for audiences
  */
 
 class upstage.Transport extends XMLSocket
@@ -944,7 +945,8 @@ class upstage.Transport extends XMLSocket
 	function ROTATE_AVATAR(msg:Object)
 	{
 		var AVid:Number = Number(msg.AV);
-		this.modelAvatars.GET_ROTATE_AVATAR(AVid);
+    var clockwise:Boolean = Boolean(Number(msg.clockwise));
+		this.modelAvatars.GET_ROTATE_AVATAR(AVid, clockwise);
 	}
 	
     function DRAW_LINE(msg:Object) {

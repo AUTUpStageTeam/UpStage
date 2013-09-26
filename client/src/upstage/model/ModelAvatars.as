@@ -51,6 +51,8 @@ import flash.external.ExternalInterface;
  * 												  - Add TOGGLE_STREAM_AUDIO() and GET_STREAM_AUDIO()
  *                                                - Support mute/unmute globally and locally
  * Modified by: Nitkalya Wiriyanuparb  10/09/2013  - Added swf width/height in GET_LOADPROP and GET_LOAD_AV for correct prop and avatar resizing
+ * Modified by: Nitkalya Wiriyanuparb  26/09/2013  - Sent rotating direction to clients to fix inconsistent views for audiences
+ *                                                 - Hide rotation options for streaming avatars
  */
 class upstage.model.ModelAvatars implements TransportInterface
 {
@@ -74,8 +76,6 @@ class upstage.model.ModelAvatars implements TransportInterface
     public var avatars    :Array;
     private var userID    :String;
     public var moveFast  :Boolean;
-    public var rotateClockWise  :Boolean;//(11/04/2013) Craig
-    
 
     private var drawing    		:Boolean;
     private var bAudioing  		:Boolean; // PQ: Added
@@ -96,7 +96,6 @@ class upstage.model.ModelAvatars implements TransportInterface
         this.avatar = null;
         this.avatars = new Array();
         this.moveFast = false;
-        this.rotateClockWise = true;//(11/04/2013) Craig
 		this.modelsounds = modelSounds;
         this.avscrollBarColor = Client.UI_BACKGROUND;
     };
@@ -252,20 +251,13 @@ class upstage.model.ModelAvatars implements TransportInterface
 
     /**
      * @Modified Craig Farrell (11/04/2013)
+     * @Modified Nitkalya Wiriyanuparb (26/9/13)
 	 * @param	clockwise:boolean
      * @brief sends a message to server to rotate avatar.
      */
-	function SET_ROTATE_AVATAR(clockwise:Boolean)//(11/04/2013) Craig
+	function SET_ROTATE_AVATAR(clockwise:Boolean)
 	{
-        if (clockwise)//(11/04/2013) Craig
-        {
-            this.rotateClockWise = true;
-        }
-        else
-        {
-            this.rotateClockWise = false;
-        }
-		this.sender.ROTATE_AVATAR();
+		this.sender.ROTATE_AVATAR(Number(clockwise));
 	}
 
 	
@@ -660,9 +652,13 @@ class upstage.model.ModelAvatars implements TransportInterface
             // add it at the top
             rotateAvatarRightMenuItem.separatorBefore = true;
             myMenu.customItems.push(toggleLocalAudioMenuItem, toggleGlobalAudioMenuItem);
+
+        } else {
+            // can only rotate normal avatars
+            myMenu.customItems.push(rotateAvatarRightMenuItem, rotateAvatarLeftMenuItem);
         }
 
-        myMenu.customItems.push(rotateAvatarRightMenuItem,rotateAvatarLeftMenuItem, moveupMenuItem, movedownMenuItem, movefastMenuItem, moveSlowMenuItem, drawAvatarMenuItem, clearDrawingMenuItem, renameMenuItem);
+        myMenu.customItems.push(moveupMenuItem, movedownMenuItem, movefastMenuItem, moveSlowMenuItem, drawAvatarMenuItem, clearDrawingMenuItem, renameMenuItem);
 
         av.menu = myMenu;
     }
@@ -904,12 +900,14 @@ class upstage.model.ModelAvatars implements TransportInterface
 
 	/**
 	 * @modified Craig Farrell (11/04/2013)
-	 * @param	avID
+     * @modified Nitkalya Wiriyanuparb (26/9/13)
+     * @param   avID
+	 * @param	clockwise
 	 * @brief Sets the rotation of avatar clockwise or ani clockwise
 	 */
-	function GET_ROTATE_AVATAR(avID:Number)
+	function GET_ROTATE_AVATAR(avID:Number, clockwise:Boolean)
 	{
-        if (rotateClockWise)
+        if (clockwise)
         {
             avatars[avID].setRotation(90);
         }

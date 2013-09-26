@@ -24,6 +24,7 @@ import upstage.Transport;
  * Modified by: Endre Bernhardt, Phillip Quinlan, Lauren Kilduff
  * Modified by: Wendy, Candy and Aaron 30/10/2008
  * Modified by: Nitkalya Wiriyanuparb  29/08/2013  - add TOGGLE_STREAM_AUDIO
+ * Modified by: Nitkalya Wiriyanuparb  26/09/2013  - Sent rotating direction to clients to fix inconsistent views for audiences
  * Notes: 
  */
 
@@ -406,9 +407,9 @@ class upstage.Sender
         this.send('DRAW_LAYER', 'layer', layer);
     }
 
-	function ROTATE_AVATAR()
+	function ROTATE_AVATAR(clockwise:Number) // Ing - 0 = false, 1 = true
 	{
-		this.send('ROTATE_AVATAR');
+		this.send('ROTATE_AVATAR', 'clockwise', clockwise);
 	}
 
     // Toggle audio of streaming avatar
