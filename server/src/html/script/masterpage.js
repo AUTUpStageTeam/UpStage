@@ -184,7 +184,7 @@ function createWorkshopLink()
 function removeWorkshopLink()
 {
 	var workshopLink = document.getElementById('workshop-link');
-    if (workshopLink)
+    if (workshopLink && document.URL.indexOf('admin/save') < 0)
     	workshopLink.parentNode.removeChild(workshopLink);
 }
 
@@ -214,7 +214,11 @@ function clearLogin()
 				if(!cookieChecked) checkCookie();
 				loginForm = document.getElementById('signup').innerHTML;
 				var html_str;
-				if(document.hidden_form.can_signup.value=='true')
+				if (document.URL.indexOf('admin') >= 0)
+				{	// success and error page doesn't contains player info, but users are logged in
+					html_str = '';
+				}
+				else if(document.hidden_form.can_signup.value=='true')
 				{
 					html_str=signup+loginLinks;
 				}
@@ -279,7 +283,7 @@ function screenSize()
  {
     try
     {
-        return document.hidden_form.user_name.value != "_NO_PLAYER_";
+        return document.hidden_form.user_name.value != "_NO_PLAYER_" || document.URL.indexOf('admin') >= 0;
     }catch(err){ return false; }
  }
  

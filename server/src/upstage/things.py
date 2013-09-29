@@ -176,14 +176,15 @@ class Backdrop(Thing):
 class Audio(Thing):
     """Representation of an audio file"""
     typename= 'audio'
-    playing = False
-    looping = False
-    arrayName = ''
-    startTimestamp = 0
-    elapsedTime = 0 # for pausing
 
     def __init__(self, media, displayName="", position=_nullpos, ID=None):
         Thing.__init__(self, media=media, name=displayName, position=position, ID=ID)
+
+        self.playing = False
+        self.looping = False
+        self.arrayName = ''
+        self.startTimestamp = 0
+        self.elapsedTime = 0 # for pausing
 
     def startPlaying(self, arrayName, autoLoop):
         """Set playing status and remember when the audio was started and array name"""
@@ -191,17 +192,20 @@ class Audio(Thing):
         self.arrayName = arrayName
         if (autoLoop or self.elapsedTime == 0):
             # start fresh
-            self.elapsedTime = 0
-            self.startTimestamp = time.time()
+            self.resetTime()
         else:
             # resume
             self.startTimestamp = time.time() - self.elapsedTime # like it's never been paused
 
     def finishPlaying(self):
-        playing = False
-        looping = False
-        startTimestamp = 0
-        elapsedTime = 0
+        self.playing = False
+        self.looping = False
+        self.startTimestamp = 0
+        self.elapsedTime = 0
+
+    def resetTime(self, delay=0):
+        self.elapsedTime = 0
+        self.startTimestamp = time.time() + delay
 
     def setLooping(self, isLooping):
         self.looping = isLooping
@@ -218,8 +222,7 @@ class Audio(Thing):
 
     def getElapsedTime(self):
         if (self.playing):
-            # playing and looping, not the first round (need to mod with audio length)
-            # playing and not finished (not looping)
+            # playing and not finished
             return time.time() - self.startTimestamp
         else:
             # pause and not finished

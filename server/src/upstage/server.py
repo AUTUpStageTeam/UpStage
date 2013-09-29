@@ -208,6 +208,14 @@ class _UpstageSocket(LineOnlyReceiver):
                           swfheight = x.media.height
                           )
 
+            for au in self.stage.get_audio_list():
+                self.send('LOAD_AUDIO',
+                          ID = au.ID,
+                          name = au.name,
+                          url = au.media.file,
+                          type = au.type
+                          )
+
             chat = '\n'.join(stage.retrieve_chat())
             chat = chat.replace('<', '&lt;')# Vishaal 15/10/09 Changed to ACTUALLY fix < > chatlog problem
             chat = chat.replace('>', '&gt;')# Vishaal 15/10/09 Changed to ACTUALLY fix < > chatlog problem
@@ -597,12 +605,6 @@ class _UpstageSocket(LineOnlyReceiver):
                         prop.holder.drop_prop()
 
             for au in self.stage.get_audio_list():
-                self.send('LOAD_AUDIO',
-                          ID = au.ID,
-                          name = au.name,
-                          url = au.media.file,
-                          type = au.type
-                          )
 
                 if au.getElapsedTime() > 0:
                     self.send('LATE_PLAY_CLIP', array=au.arrayName, url=au.media.url, pos=au.getElapsedTime())
