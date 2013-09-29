@@ -559,6 +559,11 @@ function checkLogin()
 			var html = '<h1>Authentication Failed</h1><p>Login Failed. Please enter correct login details.</p>';
 			html += '<p>You will be redirected to the homepage in 3 seconds...</p>';	//
 			document.getElementById("page").innerHTML = html;				// PR - 9/10/2010
+
+			// delete 'remember me' cookies since we've failed authentication
+			deleteCookie('username');
+			deleteCookie('password');
+
 			window.setTimeout('location.reload(true)', 3000);
 		}
 		else
