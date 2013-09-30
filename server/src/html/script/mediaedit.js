@@ -20,6 +20,7 @@ var dataGrid;
 var dataView;
 
 var clickHandlerEditMedia = null;
+var clickHandlerReplaceMedia = null;
 var clickHandlerDeleteMedia  = null;
 var clickHandlerPreviewMedia = null;
 var clickHandlerAssignMedia = null;
@@ -40,6 +41,10 @@ var clickHandlerExecuteTag = null;
 var clickHandlerExecuteEdit = null;
 var clickHandlerExecuteEditCancel = null;
 var editDefaultTab = null;
+
+// Replace Media
+var clickHandlerExecuteReplaceCancel = null,
+	clickHandlerExecuteReplace = null;
 
 // Preview Media
 var previewType = null;
@@ -413,6 +418,7 @@ function setupDataGrid() {
 			
 			// unbind button controls
 			$("#buttonEditMedia").unbind('click',clickHandlerEditMedia);
+			$("#buttonReplaceMedia").unbind('click',clickHandlerReplaceMedia);
 			$("#buttonAssignMedia").unbind('click',clickHandlerAssignMedia);
 			$("#buttonDeleteMedia").unbind('click',clickHandlerDeleteMedia);
 			$("#buttonDownloadMedia").unbind('click',clickHandlerDownloadMedia);
@@ -624,6 +630,101 @@ function setupDataGrid() {
 				        }
 					});
 					
+				};
+
+				// Ing 14/09/2013  - Added media replacing functionality
+				clickHandlerReplaceMedia = function(e) {
+					console.log(selectedMediaData);
+
+					$('#avatarBits').hide();
+					$('#backdropBits').hide();
+					$('#propBits').hide();
+					$('#audioBits').hide();
+
+					// set media name
+					$('#replaceMediaName').html(selectedMediaData['name']);
+					$('#replaceMediaPanel #stages').val(selectedMediaData['stages']);
+					$('#replaceMediaPanel #name').val(selectedMediaData['name']);
+					$('#replaceMediaPanel #oldfile').val(selectedMediaData['file_original']);
+					$('#replaceMediaPanel #key').val(selectedMediaData['key']);
+
+					var type = selectedMediaData['type'];
+					var medium = selectedMediaData['medium'];
+
+					$('#replaceMediaPanel #type').val(type);
+
+					switch(type) {
+						case 'avatar':
+							if (medium == 'stream') {
+								// Stream Avatar
+								// edit instead
+								break;
+							}
+							$('#avatarBits').show();
+							break;
+						case 'backdrop':
+							$('#backdropBits').show();
+							break;
+						case 'prop':
+							$('#propBits').show();
+							break;
+						case 'audio':
+							$('#replaceMediaPanel #audio_type').val(selectedMediaData['medium']);
+							$('#audioBits').show();
+							break;
+					}
+
+					// unbind previous click handler first
+					$("#buttonExecuteReplace").off('click',clickHandlerExecuteReplace);
+					$('#buttonExecuteReplaceCancel').off('click',clickHandlerExecuteReplaceCancel);
+					
+					clickHandlerExecuteReplaceCancel = function(e) {
+						
+						log.debug("clickHandlerExecuteReplaceCancel: click: #buttonExecuteReplaceCancel, key="+selectedMediaData['key']);
+						displayFields('bkframecount', 'bk', 1);
+						//displayFields('avframecount', 'av');
+						$.fn.colorbox.close();
+					}
+					
+					clickHandlerExecuteReplace = function(e) {
+					
+						log.debug("clickHandlerExecuteReplace: click: #buttonExecuteReplace, key="+selectedMediaData['key']);
+						e.preventDefault();
+						checkFieldsBeforeReplace();
+						if (sendPostAction()) {
+							$('#replaceMediaUploadPanel form').submit();
+						}
+					}
+					
+					// bind click handler for final deletion
+					$("#buttonExecuteReplace").on('click',clickHandlerExecuteReplace);
+					$("#buttonExecuteReplaceCancel").on('click',clickHandlerExecuteReplaceCancel);
+
+					// show assign panel
+					$.colorbox({
+						animation: false,
+						returnFocus: false,
+						transition: 'fade',
+						scrolling: false,
+						opacity: 0.5,
+						open: true,
+						initialWidth: 550,
+						initialHeight: 250,
+						width: 550,
+						height: 250,
+						inline: true,
+						href: "#replaceMediaPanel",
+						
+						// hide loading indicator:
+						onOpen: function(){ $("#colorbox").css("opacity", 0); },
+				        onComplete: function(){
+				        	$("#colorbox").css("opacity", 1);
+				        	// resize colorbox after selected number of frames
+				        	$("#bkframecount").on('change', function() { $.colorbox.resize(); });
+				        	$("#avframecount").on('change', function() { $.colorbox.resize(); });
+				        	$.colorbox.resize();
+				        }
+					});
 				};
 				
 				clickHandlerDeleteMedia = function(e) {
@@ -955,6 +1056,7 @@ function setupDataGrid() {
 				// bind button controls to click event
 				
 				$("#buttonEditMedia").bind('click', clickHandlerEditMedia);
+				$("#buttonReplaceMedia").bind('click', clickHandlerReplaceMedia);
 				$("#buttonAssignMedia").bind('click', clickHandlerAssignMedia);
 				$("#buttonDeleteMedia").bind('click', clickHandlerDeleteMedia);
 				$("#buttonTagMedia").bind('click', clickHandlerTagMedia);
@@ -979,6 +1081,15 @@ function setupDataGrid() {
 					clickHandlerDownloadMedia = null;
 					$("#buttonDownloadMedia").attr("disabled", "disabled");
 				}
+
+				if (selectedMediaData['medium'] == 'stream') {
+					clickHandlerReplaceMedia = null;
+					$("#buttonReplaceMedia").attr("disabled", "disabled");
+				} else {
+					$("#buttonReplaceMedia").bind('click', clickHandlerReplaceMedia);
+					$("#buttonReplaceMedia").removeAttr("disabled");
+				}
+
 				
 			} else if (rows.length >1) {
 				

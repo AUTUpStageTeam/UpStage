@@ -71,8 +71,11 @@ Modified by: Craig Farrell  01/05/2013  - added new tOwner varible
 
 Modified by: Nitkalya Wiriyanuparb  29/08/2013  - add toggle_stream_audio to mute/unmute streaming avatar
 Modified by: Nitkalya Wiriyanuparb  04/09/2013  - clear user access list (access_level_one/two/three) before appending items to them to avoid duplicates
+Modified by: Nitkalya Wiriyanuparb  15/09/2013  - added reloadStagesInList
+Modified by: Nitkalya Wiriyanuparb  24/09/2013  - Used new format of keys for media_dict instead of file names
 Modified by: Nitkalya Wiriyanuparb  26/09/2013  - Received, saved, and sent rotating direction to fix inconsistent views for audiences
 Modified by: Nitkalya Wiriyanuparb  28/09/2013  - Added getAudioByUrl()
+Modified by: Nitkalya Wiriyanuparb  29/09/2013  - reloadStagesInList resets audio timer as well
 """
 
 #std lib
@@ -98,6 +101,17 @@ from twisted.web import  microdom
 
 
 NUL = chr(0)
+
+def reloadStagesInList(stages, stageList, audioUrl=None):
+    """Reload stages according to the names in stages list
+    and optionally reset Audio timer using its url"""
+    log.msg('reloading stages: ', stageList)
+    for s in stageList:
+        stage = stages.getStage(s)
+        if audioUrl:
+            log.msg('reset audio timer: ', audioUrl)
+            stage.getAudioByUrl(audioUrl).resetTime(2)
+        stage.soft_reset()
 
 class _Stage(object):
     """The _Stage class provides an object that mirrors
@@ -256,9 +270,9 @@ class _Stage(object):
             nodes = tree.getElementsByTagName(d.typename)
             log.msg("Loading media for type %s" %(d.typename))
             for node in nodes:
-                mediafile = node.getAttribute('media')
+                key = node.getAttribute('media')
                 try:
-                    thing = d.add_mediafile(mediafile)
+                    thing = d.add_mediafile(key)
                     thing.name = node.getAttribute('name')
                     if d is self.avatars:
                         #NB: previous behaviour was for node voice to
@@ -313,20 +327,20 @@ class _Stage(object):
             lockstage.text(self.lockStage)
         for x in self.get_avatar_list():
             # log.msg("Voices: %s %s " %(x.voice,x.media.voice))
-            tree.add(self.avatars.typename, media=x.media.file, showname=x.show_name,
+            tree.add(self.avatars.typename, media=x.media.key, showname=x.show_name,
                      name=x.name, voice=(x.voice or x.media.voice or '') )
             log.msg("avatar list in save method: %s" % self.avatars.typename)
             # NOTE one day, save player permissions.
         for x in self.get_prop_list():
-            tree.add(self.props.typename, media=x.media.file,
+            tree.add(self.props.typename, media=x.media.key,
                      name=x.name)
         for x in self.get_backdrop_list():
-            tree.add(self.backdrops.typename, media=x.media.file,
+            tree.add(self.backdrops.typename, media=x.media.key,
                      name=x.name)
         log.msg('stage.save() - adding audio to xml')
         for x in self.get_audio_list():
             log.msg('stage.save() - audio item: %s' %(x))
-            tree.add(self.audios.typename, media=x.media.file, name=x.name, type=x.media.medium)
+            tree.add(self.audios.typename, media=x.media.key, name=x.name, type=x.media.medium)
         #Shaun Narayan (02/14/10) - Write all new values to XML.
         access_string = ''
         for x in self.access_level_one:
@@ -534,7 +548,7 @@ class _Stage(object):
                 for v in globalmedia.values():
                     if ((v.uploader == uploader) or 
                         ((uploader == 'unassigned') and (len(v.uploader) == 0))): 
-                        uploaders_collection[v.file] = v.file
+                        uploaders_collection[v.key] = v.key
 
         #try to preserve local modification
 
@@ -571,13 +585,13 @@ class _Stage(object):
         Heath Behrens 16/08/2011 - Function added to remove media from this stage object.
                                     the name parameter is the name of the media file (hashed)
     """
-    def remove_media_from_stage(self, name):
+    def remove_media_from_stage(self, key):
         #loop over the collection
         for collection in (self.avatars, self.props, self.backdrops, self.audios):
             globalmedia = collection.globalmedia
             for k in globalmedia.keys():
-                log.msg(' name: %s vs key: %s' %(name,k))# 16/04/2013 Craig 
-                if k == name:
+                log.msg(' given key: %s vs key: %s' %(key,k))# 16/04/2013 Craig 
+                if k == key:
                     if k in collection.media:
                         collection.remove_mediafile(k)
                         log.msg("removed media file list")
@@ -585,11 +599,11 @@ class _Stage(object):
                 
     # Natasha 10/03/10 compare new media to media in a stages current collection. 
     # save if there are no duplicates
-    def add_mediato_stage(self, name):
+    def add_mediato_stage(self, key):
         for collection in (self.avatars, self.props, self.backdrops, self.audios):
             globalmedia = collection.globalmedia
             for k in globalmedia.keys():
-                if k == name:
+                if k == key:
                     if k not in collection.media:
                         collection.add_mediafile(k)
                         log.msg("created media file list")
@@ -597,10 +611,10 @@ class _Stage(object):
         # Natasha change this later to accept any type of media
         #else:
             #log.msg('List of avatars: %s' % self.get_avatar_list())
-    
-    # 16/04/2013 Craig : gets the mediafile name of a types of media.
-    def get_thing_mediaFile_name(self,mName,num):
-        if mName is not None and num is not None:
+
+    # 24/09/2013 Ing : use key instead
+    def get_media_file_by_key(self, key, num):
+        if key is not None and num is not None:
             wl = dict()
             if num == 1:
                 wl = self.get_avatar_list()
@@ -612,7 +626,7 @@ class _Stage(object):
                 wl = self.get_audio_list()
             if len(wl)>0:
                 for a in wl:
-                    if a.name == mName:
+                    if a.media.key == key:
                         return a.media.file #returns the file name
             else:
                 return ''

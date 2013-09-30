@@ -48,7 +48,8 @@ from cgi import parse_qs, parse_qsl
 
 #siblings
 from upstage import config
-from upstage.misc import id_generator, UpstageError
+from upstage.util import id_generator
+from upstage.misc import UpstageError
 
 #twisted
 from twisted.python import log

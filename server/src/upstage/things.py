@@ -32,6 +32,7 @@ Modified by: Heath Behrens 16/08/2011 - Added functions remove_media and remove_
                                         to remove media from the stage.
              Karena, Corey, Heath 24/08/2011 - Added tag variable to Thing class to store tags for a given thing.          
 Modified by: Nitkalya Wiriyanuparb  16/09/2013  - Remembered streaming avatar mute state
+Modified by: Nitkalya Wiriyanuparb  24/09/2013  - Modified ThingCollection to use new format of keys for media_dict instead of file names
 Modified by: Nitkalya Wiriyanuparb  27/09/2013  - Modified Audio class to remember play/pause/loop states and elapsed time
 Notes: 
 """
@@ -264,12 +265,12 @@ class ThingCollection:
         @param media: a globalmedia.MediaFile instance belonging to the
                       correct global media dictionary.
         """
-        f = media.file
-        if f not in self.globalmedia:
+        key = media.key
+        if key not in self.globalmedia:
             raise ValueError("rejecting %s, not found in globalmedia" % f)
 
-        if f in self.media:   #delete from both dictionaries.
-            oldthing = self.media.pop(f)
+        if key in self.media:   #delete from both dictionaries.
+            oldthing = self.media.pop(key)
             del self.things[oldthing.ID]
 
         ID = self._next_thing_id()
@@ -280,7 +281,7 @@ class ThingCollection:
             thing.type = media.medium
     
         self.things[ID] = thing
-        self.media[f] = thing
+        self.media[key] = thing
         return thing
 
     """
@@ -290,24 +291,26 @@ class ThingCollection:
 
     """    
     def remove_media(self, media):
-        f = media.file #get reference to the media file
-        if f not in self.globalmedia:
+        key = media.key #get reference to the media file
+        if key not in self.globalmedia:
             raise ValueError("rejecting %s, not found in globalmedia" % f)
-        if f in self.media:   #make sure to delete from both dics
-            oldthing = self.media.pop(f)
+        if key in self.media:   #make sure to delete from both dics
+            oldthing = self.media.pop(key)
             del self.things[oldthing.ID]
 
     """
      Function to add a media file to the thing collection
     """
-    def add_mediafile(self, f):
-        """try to find the filename f in self.globalmedia.
+    def add_mediafile(self, key):
+        """try to find the mdia with key in self.globalmedia.
         If successful, add the corresponding media object,
         returning the approriate Thing"""
         try:
-            media = self.globalmedia[f]
+            media = self.globalmedia[key]
         except KeyError:
-            raise UpstageError('no such media as %s in %s thing collection' % (f, self.typename))
+            for k in self.globalmedia:
+                log.msg('in: %s' % (k))
+            raise UpstageError('no such media as %s in %s thing collection' % (key, self.typename))
         return self.add_media(media)
 
     """
@@ -316,9 +319,9 @@ class ThingCollection:
         -Used to remove a media file from the collection, essentially a callback function
 
     """
-    def remove_mediafile(self, f):
+    def remove_mediafile(self, key):
         try:
-            media = self.globalmedia[f]
+            media = self.globalmedia[key]
         except KeyError:
             raise UpstageError('Media file does not exist in thing collection')
         self.remove_media(media)  
@@ -329,14 +332,12 @@ class ThingCollection:
         Returning true if so and false otherwise
     """
     def contains_thing(self, thing):
-        f = thing.file
-        if f in self.media:
-            return True # found in collection
-        return False # not found
+        key = thing.key
+        return key in self.media
                 
-    def drop_mediafile(self, f):
-        """get rid of the thing indicated to by media filename f"""
-        thing = self.media.pop(f, None)
+    def drop_mediafile(self, key):
+        """get rid of the thing indicated to by media's key"""
+        thing = self.media.pop(key, None)
         
         if thing is not None:
             del self.things[thing.ID]
@@ -378,9 +379,9 @@ class ThingCollection:
         """If a thing refers to media not in the globalmedia superset,
         drop it.  Return True if successful, otherwise False"""
         found = False
-        for f in self.media.keys():
-            if f not in self.globalmedia:
-                thing = self.media.pop(f)
+        for key in self.media.keys():
+            if key not in self.globalmedia:
+                thing = self.media.pop(key)
                 del self.things[thing.ID]
                 found = True
         return found

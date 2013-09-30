@@ -18,6 +18,8 @@
 Author: 
 Modified by: Alan Crow
 Notes: 
+
+Modified by: Nitkalya Wiriyanuparb  24/09/2013  - Renamed new_filename to unique_custom_string, so it can be used for other things
 """
 
 """Orphanage for useful functions with no twisted dependencies (except logging)."""
@@ -36,10 +38,9 @@ def id_generator(start=1, wrap=2000000000, prefix='', suffix='', pattern ='%s%s%
         while next_id < wrap:
             yield pattern % (prefix, next_id, suffix) 
             next_id += 1
-            
 
-def new_filename(length=8, suffix='.swf', prefix=''):
-    """Make up a short uniquish file name"""
+def unique_custom_string(length=8, suffix='.swf', prefix=''):
+    """Make up a short uniquish string with custom prefix, suffix, and length"""
     letters = 'abcdefghijklmnopqrstuvwxyz0123456789_ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     return  "%s%s%s" %(prefix, 
                        ''.join([random.choice(letters) for _x in range(length)]), 

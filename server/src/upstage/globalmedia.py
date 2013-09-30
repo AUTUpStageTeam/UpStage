@@ -35,6 +35,8 @@ Modified by: Heath Behrens 16/08/2011 - added code in update_from_form to extrac
                                                         a blank tag when saving name.  
 Modified by: Lisa Helm 21/08/2013       - removed all code relating to old video avatar
 Modified by: Nitkalya Wiriyanuparb  10/09/2013  - Added media width and height in various placess (for avatar and prop resizing issues)
+Modified by: Nitkalya Wiriyanuparb  10/09/2013  - Added new methods (setThumbnail, restoreOldFile, deleteFile) to support media replacing functionality
+Modified by: Nitkalya Wiriyanuparb  24/09/2013  - Added setUrl method and modified the class to use new format of keys instead of file names
 Notes: 
 """
 
@@ -76,31 +78,13 @@ class _MediaFile(object):
 
     def __init__(self, **kwargs):
         """@param kwargs argument list 
-           (name, voice, type, height, width, medium, description, uploader, dateTime)"""
+           (name, voice, type, tags, height, width, medium, description, uploader, dateTime, streamserver, streamname)"""
         self.file = kwargs.pop('file', None)
-        
-        if (self.file[-4:] == '.mp3'):
-            self.url = config.AUDIO_URL + self.file
-        else:
-            library_prefix_length = len(config.LIBRARY_PREFIX)
-            if(self.file[:library_prefix_length] == config.LIBRARY_PREFIX):   # handle library items (included in client.swf)
-                self.url = self.file
-            else:
-                self.url = config.MEDIA_URL + self.file
-        
-        # handle thumbnail images
-        self.thumbnail = kwargs.pop('thumbnail',None)
-        if(self.thumbnail is None):
-            self.thumbnail = ''
-            self.web_thumbnail = config.MEDIA_URL + self.file   # config.MISSING_THUMB_URL    # FIXME hanlde thumbnails (see also #20)
-            tn = kwargs.pop('thumbnail', None)  #or self.file.replace('.swf','.jpg')
-            if tn:
-                if not config.CHECK_THUMB_SANITY or _check_thumb_sanity(tn):
-                    self.web_thumbnail = tn
-                    self.thumbnail = tn
-        else:
-            self.web_thumbnail = self.thumbnail
-                    
+        self.key = kwargs.pop('key')
+
+        self.setUrl(self.file)
+        self.setThumbnail(kwargs.pop('thumbnail', None))
+
         self.name = kwargs.pop('name', 'nameless').strip()
         self.voice = kwargs.pop('voice', None)
         self._type = kwargs.pop('type', None)
@@ -121,6 +105,32 @@ class _MediaFile(object):
         if kwargs:
             log.msg('left over arguments in _MediaFile', kwargs)
 
+    def setUrl(self, filename):
+        """set url using the filename"""
+        if (filename[-4:] == '.mp3'):
+            self.url = config.AUDIO_URL + filename
+        else:
+            library_prefix_length = len(config.LIBRARY_PREFIX)
+            if(filename[:library_prefix_length] == config.LIBRARY_PREFIX):   # handle library items (included in client.swf)
+                self.url = filename
+            else:
+                self.url = config.MEDIA_URL + filename
+
+    def setThumbnail(self, thumbnail):
+        """set thumbnail images"""
+        self.thumbnail = thumbnail
+        if(self.thumbnail is None or self.thumbnail == ''):
+            self.thumbnail = ''
+            self.web_thumbnail = config.MEDIA_URL + self.file   # config.MISSING_THUMB_URL    # FIXME hanlde thumbnails (see also #20)
+            tn = thumbnail  #or self.file.replace('.swf','.jpg')
+            if tn:
+                if not config.CHECK_THUMB_SANITY or _check_thumb_sanity(tn):
+                    self.web_thumbnail = tn
+                    self.thumbnail = tn
+        else:
+            self.web_thumbnail = self.thumbnail
+                    
+
 
 class MediaDict(Xml2Dict):
     """Creates dictionary of avatars or other media from stored
@@ -139,22 +149,22 @@ class MediaDict(Xml2Dict):
     
     # Natasha - created set media stage to enable assignment of media to stage from
     # upload media
-    def set_media_stage(self, stagename, medianame):
+    def set_media_stage(self, stagename, mediakey):
         log.msg('In set media stage/global media. Stages are: %s' % self.stages)
         if self.stages is not None:
             for x in self.stages:
                 if x == stagename:
                     stage = self.stages.get(x) # was only a string not object
                     #stage.add_avatar(medianame)
-                    stage.add_mediato_stage(medianame)
+                    stage.add_mediato_stage(mediakey)
                     # add method in stage to accept a new media then save to xml
             
     
     def parse_element(self, node):
         """Add XML values to the dictionary
         @param node node to parse"""
-        f = node.getAttribute('file')
-        av = _MediaFile(file=f,
+        key = node.getAttribute('key')
+        av = _MediaFile(file=node.getAttribute('file'),
                         name=node.getAttribute('name') or 'untitled',
                         voice=node.getAttribute('voice') or '',
                         height=node.getAttribute('height') or '',
@@ -166,8 +176,9 @@ class MediaDict(Xml2Dict):
                         tags=node.getAttribute('tags') or '', # Heath, Corey, Karena 24/08/2011 - added tags to mediafile
                         streamname=node.getAttribute('streamname') or '',
                         streamserver=node.getAttribute('streamserver') or '',
-                        )           
-        dict.__setitem__(self, f, av)
+                        key=key
+                        )
+        dict.__setitem__(self, key, av)
 
     def write_element(self, root, av, mf):
         """Add a new element to the XML dictionary
@@ -178,9 +189,19 @@ class MediaDict(Xml2Dict):
         #attr['file']=av
         
         # AC (29.09.07) - Added uploader and datetime fields in XML media item files.
-        node = root.add(self.element, file=mf.file, url=mf.url, name=mf.name,
-                        thumbnail=mf.thumbnail, uploader=mf.uploader, dateTime=mf.dateTime, tags=mf.tags,
-                        streamserver=mf.streamserver, streamname=mf.streamname, width=mf.width, height=mf.height)
+        node = root.add(self.element,
+                        file=mf.file,
+                        url=mf.url,
+                        name=mf.name,
+                        thumbnail=mf.thumbnail,
+                        uploader=mf.uploader,
+                        dateTime=mf.dateTime,
+                        tags=mf.tags,
+                        streamserver=mf.streamserver,
+                        streamname=mf.streamname,
+                        width=mf.width,
+                        height=mf.height,
+                        key=mf.key)
         
         #for attr in ('voice', 'medium'):
         for attr in ('voice', 'medium', 'streamserver', 'streamname'):
@@ -206,51 +227,75 @@ class MediaDict(Xml2Dict):
 
     def add(self, **kwargs):
         """Put a new item in, and save it (implicitly, through __setitem__)"""
-        f = kwargs.get('file', None)
-        log.msg("add(): file = %s" % f)
-        if f is not None:
-            self[f] = _MediaFile(**kwargs)
-            return self[f]
+        key = kwargs.get('key', None)
+        log.msg("add(): key = %s" % key)
+        log.msg("add(): file = %s" % kwargs.get('file', None))
+        if key is not None:
+            self[key] = _MediaFile(**kwargs)
+            return self[key]
+        else:
+            raise AttributeError("key cannot be None")
 
+    # Ing - looks like it's unused?
     # Natasha - attempt to add an item via the form
-    def addItem(self, form): 
-        self.form = form
-        f = form.get('file', None)
-        log.msg("addItem(): file = %s" % f)
-        log.msg("addItem(): form = %s" % form)
-        if f is not None:
-            self[f] = _MediaFile(form)
-            return self[f]
-        log.msg('tried to add file with no file attribute! %s' % form)
+    # def addItem(self, form): 
+    #     self.form = form
+    #     f = form.get('file', None)
+    #     log.msg("addItem(): file = %s" % f)
+    #     log.msg("addItem(): form = %s" % form)
+    #     if f is not None:
+    #         self[f] = _MediaFile(form)
+    #         return self[f]
+    #     log.msg('tried to add file with no file attribute! %s' % form)
 
-        
-    def __delitem__(self, f):
-        """Deletes an item from XML dictionary and from the file system
+    def restoreOldFile(self, filename):
+        """Restores old file from the old media folder if it has been replaced earlier.
+        It doesn't not update the xml file, just move the file on system"""
+        inMediaFolder = self.path(filename)
+        inOldMediaFolder = os.path.join(config.OLD_MEDIA_DIR, filename)
+        if ( os.path.exists( inOldMediaFolder ) and
+            not os.path.exists(inMediaFolder) ):
+            os.rename(inOldMediaFolder, inMediaFolder)
+
+    def deleteFile(self, f):
+        """Deletes from the file system only
         Won't work if f is a directory name not a file
         @param f file name"""
         try:
             if config.SAVE_DELETED_MEDIA:
                 if not os.path.exists(config.OLD_MEDIA_DIR):
                     os.makedirs(config.OLD_MEDIA_DIR, 0755)
-                os.rename(self.path(f), os.path.join(config.OLD_MEDIA_DIR, f))
+                toOldMedia = os.path.join(config.OLD_MEDIA_DIR, f)
+                if os.path.exists(toOldMedia): # if file name exists (been replaced multiple times)
+                    # ensure that the old one is deleted (for now)
+                    os.remove(toOldMedia)
+                os.rename(self.path(f), toOldMedia) # on UNIX this will overwrite the file silently anyway
             else:
                 os.remove(self.path(f))
+
+            return True
         except OSError, e:
-            #Lisa 21/08/2013 - removed video avatar code
             # builtin library items are no files so nothing to delete ...
             if f.startswith(config.LIBRARY_PREFIX):
-                pass
-            
+                return True
+
             # all other errors are probably real errors
             else:
                 raise KeyError("%s: %s" %(self.path(f), e))
+
+
+    def __delitem__(self, f):
+        """Deletes an item from XML dictionary and from the file system
+        Won't work if f is a directory name not a file
+        @param f file name"""
+        self.deleteFile(f)
 
         return Xml2Dict.__delitem__(self, f)
 
 
     def _get_stage_collections(self):
-        """make a list of (ThingDict, _Stage) pairs, with the
-        ThingDict being the relevant collection for this type of
+        """make a list of (ThingCollection, _Stage) pairs, with the
+        ThingCollection being the relevant collection for this type of
         media, for the corresponding stage.
         """
         #more direct ways possible -- using a ThingDict 'element'
@@ -260,10 +305,10 @@ class MediaDict(Xml2Dict):
         stages = self.stages.items() 
         stages.sort()
     
-        for k, s in stages: # Alan (28.01.08) - Added k for key as a set is return from items().
-            for c in s.avatars, s.props, s.backdrops, s.audios: # PQ: Added s.audios 13.10.07
-                if c.globalmedia is self:
-                    collections.append((c, s))
+        for key, stageObject in stages: # Alan (28.01.08) - Added k for key as a set is return from items().
+            for aCollection in stageObject.avatars, stageObject.props, stageObject.backdrops, stageObject.audios: # PQ: Added s.audios 13.10.07
+                if aCollection.globalmedia is self:
+                    collections.append((aCollection, stageObject))
         
         return collections
 
@@ -584,7 +629,7 @@ class MediaDict(Xml2Dict):
             if(datakey == 'name'):
                 log.msg("MediaDict: update_data(): prepare data: all_media_names=%s" % pprint.saferepr(all_media_names))
                 reserved_media_names_dict = all_media_names
-                reserved_media_names_dict.pop(media.file)
+                reserved_media_names_dict.pop(media.key)
                 reserved_media_names = [x for x in reserved_media_names_dict.values()]
                 log.msg("MediaDict: update_data(): prepare data: reserved_media_names=%s" % pprint.saferepr(reserved_media_names))
                 if newvalue in reserved_media_names:
@@ -744,9 +789,10 @@ class MediaDict(Xml2Dict):
         
     """Shaun Narayan (02/14/10) - List media, and assign stage names before returning"""
     def get_media_list(self ,prefix=DELETE_PREFIX):
-        things = [(v.name.lower(), {'name': v.name,
+        # a list of tuples
+        things = [(v.key, {'name': v.name,
                             'type':v.medium,
-                            'media': k,
+                            'key': k,
                             'checked': '',
                             'thumb': v.web_thumbnail,
                             'typename': self.element,
@@ -759,6 +805,7 @@ class MediaDict(Xml2Dict):
                             'tags':v.tags, # Vibhu and Heath (01/09/2011) - Added tags attribute to return associated tags for a media.
                             'width':v.width,
                             'height':v.height,
+                            'file': v.file,
 
                             # add stream parameters:
                             'streamname':v.streamname,
@@ -769,11 +816,13 @@ class MediaDict(Xml2Dict):
             things.sort()
             
         collections = self._get_stage_collections() 
-        for n, d in things:
-            hits = [s.ID for c, s in collections if d['media'] in c.media]
+        for name, dataDict in things:
+            hits = [stageObject.ID \
+                    for aCol, stageObject in collections \
+                    if dataDict['key'] in aCol.media]
             if hits:
                 links = ', '.join(['%s' % (ID) for ID in hits])
-                d['stages'] = links
+                dataDict['stages'] = links
                 
         return things
     
@@ -825,7 +874,7 @@ class MediaDict(Xml2Dict):
                     
                     for n, d in things:                        
                         for i in c.things.values():
-                            if d['name'] == i.name and d['media'] in c.media: table.extend(inc % d)
+                            if d['name'] == i.name and d['key'] in c.media: table.extend(inc % d)
                                     
                     table.extend(end_stage_group)
             

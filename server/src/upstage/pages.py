@@ -98,8 +98,11 @@ Modified by: Craig Farrell  05/05/2013  - added new redirect to the errorpage
 Modified by: Lisa Helm 21/08/2013       - removed all code relating to old video avatar
 Modified by: Lisa Helm 04/09/2013       - called a correct method when clearing a stage
 Modified by: Lisa Helm 05/09/2013       - added Sign Up page edit mode 
-Modified by: Nitkalya Wiriyanuparb  14/09/2013  - Fixed player/audience stat info bug in workshop. AdminBase needs data.stages collection (from web.py) to calculate the stat
 Modified by: Lisa Helm 13/09/2013  - altered errorpage calls to provide source page identifying string
+Modified by: Nitkalya Wiriyanuparb  14/09/2013  - Fixed player/audience stat info bug in workshop. AdminBase needs data.stages collection (from web.py) to calculate the stat
+Modified by: Nitkalya Wiriyanuparb  15/09/2013  - Made success redirection target more flexible
+Modified by: Nitkalya Wiriyanuparb  16/09/2013  - Removed unused AudioThing class
+Modified by: Nitkalya Wiriyanuparb  24/09/2013  - Modified StageEditPage and MediaEditPage to use new format of keys for media_dict instead of file names
 """
 
 #standard lib
@@ -118,8 +121,8 @@ except ImportError:
 
 #upstage
 from upstage import config
-from upstage.misc import new_filename, no_cache, UpstageError  
-from upstage.util import save_tempfile, get_template, new_filename, validSizes, getFileSizes, createHTMLOptionTags, convertLibraryItemToImageFilePath, convertLibraryItemToImageName
+from upstage.misc import no_cache, UpstageError  
+from upstage.util import save_tempfile, get_template, validSizes, getFileSizes, createHTMLOptionTags, convertLibraryItemToImageFilePath, convertLibraryItemToImageName
 from upstage.voices import VOICES
 from upstage.globalmedia import MediaDict
 from upstage.player import PlayerDict
@@ -360,12 +363,13 @@ class AdminSuccess(AdminBase):
     log_message = 'Reporting Success: %s'
     code = 200
 
-    def __init__(self, msg, code=None):
+    def __init__(self, msg, code=None, redirect='mediaupload'):
         log.msg(self.log_message % msg)
         #Template.__init__(self)
         self.msg = str(msg)
         if code is not None:
             self.code = code
+        self.page = str(redirect)
 
     def render(self, request):
         """render from the template, and set the http response code."""
@@ -637,12 +641,12 @@ def errorpage(request, message='bad posture', page='admin', code=500):
     r = p.render(request)
     return r
 
-def successpage(request, message='success', code=200):
+def successpage(request, message='success', code=200, redirect='mediaupload'):
     """Convenience success writer
     Makes an success page, and returns a rendering thereof.
     @param request request that is being handled
     @param message message to send to AdminSuccess"""
-    p = AdminSuccess(message, code)
+    p = AdminSuccess(message, code, redirect)
     r = p.render(request)
     return r    
 
@@ -705,6 +709,7 @@ class HomePage(AdminBase):
         html_list += self.collection.stages.html_list(self.text_username(request),slist)
         html_list += '</table>'
         return html_list
+ 
 """
 Added by Daniel Han (03/07/2012)	- To set the session of player
 									- it checks both username:password combination to be more safe.
@@ -840,7 +845,7 @@ class StageEditPage(Workshop):
                 avatars.sort()
             if len(avatars) != 0:
                 for a in avatars:
-                    table.extend('<option value="%s">%s</option>' %(a.name, a.name))
+                    table.extend('<option value="%s">%s</option>' %(a.media.key, a.name))
             else:
                 table.extend('<option value="No Avatars">No Avatars</option>')
             return ''.join(table)
@@ -858,7 +863,7 @@ class StageEditPage(Workshop):
                props.sort()
             if len(props) != 0:
                 for p in props:
-                    table.extend('<option value="%s">%s</option>' %(p.name, p.name))
+                    table.extend('<option value="%s">%s</option>' %(p.media.key, p.name))
             else:
                 table.extend('<option value="No Props">No Props</option>')
             return ''.join(table)
@@ -875,7 +880,7 @@ class StageEditPage(Workshop):
                backdrops.sort()
             if len(backdrops) != 0:
                 for b in backdrops:
-                    table.extend('<option value="%s">%s</option>' %(b.name, b.name))
+                    table.extend('<option value="%s">%s</option>' %(b.media.key, b.name))
             else:
                 table.extend('<option value="No Backdrops">No Backdrops</option>')
             return ''.join(table)
@@ -892,7 +897,7 @@ class StageEditPage(Workshop):
                audios.sort()
             if len(audios) != 0:
                 for au in audios:
-                    table.extend('<option value="%s">%s</option>' %(au.name, au.name))
+                    table.extend('<option value="%s">%s</option>' %(au.media.key, au.name))
             else:
                 table.extend('<option value="No Audios">No Audios</option>')
             return ''.join(table)
@@ -963,33 +968,33 @@ class StageEditPage(Workshop):
             return 'true'
 
     def esUnAssignMedia(self,request,iType):#(16/04/2013) Craig
-        mName =''
+        mKey =''
         if iType == 1:
-            mName = ((request.args.get('AvatarList',['']))[0])
+            mKey = ((request.args.get('AvatarList',['']))[0])
         elif iType ==2:
-            mName = ((request.args.get('PropList',['']))[0])
+            mKey = ((request.args.get('PropList',['']))[0])
         elif iType ==3:
-            mName = ((request.args.get('BackdropList',['']))[0])
+            mKey = ((request.args.get('BackdropList',['']))[0])
         elif iType == 4:
-            mName = ((request.args.get('AudioList',['']))[0])
-        mName = ('%s'%(mName))
-        mName = self.stage.get_thing_mediaFile_name(mName,iType)
-        self.stage.remove_media_from_stage(mName)
+            mKey = ((request.args.get('AudioList',['']))[0])
+        mKey = ('%s'%(mKey))
+        key = mKey #self.stage.get_media_file_by_name(mKey,iType,True)
+        self.stage.remove_media_from_stage(key)
 
     def esViewMedia(self,request,iType):#(22/04/2013) Craig
         self.stage_ViewImg = ''
         imgThumbUrl = ''
         if iType == 1:
-            mName = ((request.args.get('AvatarList',['']))[0])
+            mKey = ((request.args.get('AvatarList',['']))[0])
         elif iType == 2:
-            mName = ((request.args.get('PropList',['']))[0])
+            mKey = ((request.args.get('PropList',['']))[0])
         elif iType == 3:
-            mName = ((request.args.get('BackdropList',['']))[0])
-        #mName = ('%s'%(mName))
-        mName = self.stage.get_thing_mediaFile_name(mName,iType)
-        if mName != '':
-            imgThumbUrl = config.MEDIA_URL + mName
-            self.stage_ViewImg = '<object><param id="esMediaPreview" name="esMediaPreview" value="%s"><embed src="%s"></embed></object>' %(mName,imgThumbUrl)
+            mKey = ((request.args.get('BackdropList',['']))[0])
+        #mKey = ('%s'%(mKey))
+        filename = self.stage.get_media_file_by_key(mKey,iType)
+        if filename != '':
+            imgThumbUrl = config.MEDIA_URL + filename
+            self.stage_ViewImg = '<object><param id="esMediaPreview" name="esMediaPreview" value="%s"><embed src="%s"></embed></object>' %(filename,imgThumbUrl)
 
     def setupStageLock(self, request):#(01/05/2013) Craig
         chec = ''
@@ -1022,7 +1027,6 @@ class StageEditPage(Workshop):
         action = request.args.get('action',[''])[0]
         self.stage_link= ''
         self.stage_saved= ''
-        
         try:
             self.stagename = request.args.get('shortName',[''])[0]
             self.stage = self.collection.stages.get(self.stagename)
@@ -1311,6 +1315,7 @@ class MediaEditPage(Workshop):
                 
                 # process all list elements
                 for media_item in media:
+                    # media_tiem is tuple (key, dataDict)
                     log.msg("MediaEditPage: render_POST(): key=%s, media_item=%s" % (pprint.saferepr(media_item[0]),pprint.saferepr(media_item)))
                     # check if key exists in media
                     if self.select_key == media_item[0]:
@@ -1319,7 +1324,7 @@ class MediaEditPage(Workshop):
                         # TODO check if media_item[1] exists ...
                         
                         # get the selected_media_key
-                        self.selected_media_key = media_item[1].get('media')
+                        self.selected_media_key = self.select_key # media_item[1].get('key')
                         break
                 
                 log.msg("MediaEditPage: render_POST(): selected_media_key=%s" % self.selected_media_key)            
@@ -1463,7 +1468,7 @@ class MediaEditPage(Workshop):
             # prepare data (like resolve thumbnail and file paths, etc.)
             
             typename=value['typename']
-            file_path = value['media']
+            file_path = value['file']
             if config.LIBRARY_PREFIX in file_path:
                 file_path = convertLibraryItemToImageFilePath(file_path)
             elif (len(file_path) > 0):
@@ -1491,13 +1496,13 @@ class MediaEditPage(Workshop):
             
             # determine file size (in bytes)
             size = 0    # default
-            relative_file_path = self.collection.avatars.path(value['media'])   # TODO better use utility function?
+            relative_file_path = self.collection.avatars.path(value['file'])   # TODO better use utility function?
             log.msg('MediaEditPage: relative_file_path=%s' % relative_file_path)
             if(relative_file_path != ""):
                 size = os.path.getsize(relative_file_path)
                 
             # determine a safe save_filename for downloading the media as file
-            save_filename = value['media']
+            save_filename = value['file']
             if config.LIBRARY_PREFIX in save_filename:
                 save_filename = ''
             else:
@@ -1523,7 +1528,7 @@ class MediaEditPage(Workshop):
                            thumbnail=thumbnail,
                            thumbnail_icon=thumbnail_icon,
                            stages=value['stages'],
-                           file_original=value['media'],
+                           file_original=value['file'],
                            file=file_path,
                            save_filename=save_filename,
                            size=size,
@@ -1668,7 +1673,7 @@ class MediaEditPage(Workshop):
         media.extend(self.collection.audios.get_media_list())
         all_media_names = dict()
         for _key, value in media:
-            mediakey = value['media']
+            mediakey = value['key']
             name = value['name']
             all_media_names[mediakey] = name
                 
@@ -2203,10 +2208,10 @@ class StageLog(Resource):
         request.setHeader('Content-length', len(s))
         return s
 
-
+#---- OLD CODE ------
 #------------------------------------------------
 """ PQ & EB - 12/10/07 - Adds audio from the workshop """
-class AudioThing(Template):
+"""class AudioThing(Template):
     filename = "audio.xhtml"
     def __init__(self, mediatypes, player):
         self.mediatypes = mediatypes
@@ -2279,368 +2284,6 @@ class AudioThing(Template):
     
     def getChild(self, path, request):
         return self
+"""
 
 #Lisa 21/08/2013 - removed video avatar code
-
-
-
-#---- OLD CODE ------
-
-""" Shaun Narayan (02/16/10) - Handles medrequest.argsia editing.
-    Should probably move media list HTML into a template."""
-"""class MediaEditPage(Workshop):
-    
-    filename="mediaedit.xhtml"
-    media = None
-    selectedMedia=None
-    assigned_stages = []
-    unassigned_stages = []
-    medianame = ''
-    mediatype = ''
-    url=''
-    message = ''
-    no_media = 'No media selected'
-    stage = ''
-    media = ''
-    postback = ''
-    mediaDisplay = 'block'
-    
-    def __init__(self, player, collection):
-        AdminBase.__init__(self, player, collection)
-        self.player = player
-        self.collection = collection
-        
-    def text_list_media(self, request):
-        media = self.collection.avatars.get_media_list()
-        media.extend(self.collection.props.get_media_list())
-        media.extend(self.collection.backdrops.get_media_list())
-        media.extend(self.collection.audios.get_media_list())
-        num = 0
-        msg = ''
-        tag = ''
-        for k,v in media:
-            
-            log.msg("MediaEditPage: text_list_media(): key=%s, value=%s" % (_k,v))
-            
-            if(v['thumb'] == config.MISSING_THUMB_URL):
-                tag = '<object width="70" height="80" scale="showAll" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0" ><param name="allowScriptAccess" value="sameDomain"/><param name="movie" value="/media/%s?playSound=var_stop"/><param name="quality" value="high"/><param name="bgcolor" value="#ffffff"/><embed src="/media/%s?playSound=var_stop" width="70" height="80" scale="showAll" type="application/x-shockwave-flash"/></object>' %(v['media'], v['media'])
-            else:   
-                tag = '<img src="%s" alt="" width="70" height="80"/>' %(v['thumb'])
-                #Vibhu Patel (18/08/2011) Added links to media
-                #Vibhu Patel (31/08/2011) Added one more parameter to the getmedia function call that tells wabout the type of audio (music/sfx) and blank in other cases
-                #Vibhu and Heath (01/09/2011) Added tags to the media list, that will be used during the search.
-            add = '<table id="%s_%s_%s_%s"><tr><td width="20px"></td><td><a href="javascript:getMedia(\'%s\',\'%s\',\'%s\')">' %(v['media'], v['typename'], v['uploader'], v['stages'], v['media'], v['typename'], v['type'])+tag+'</a></td><td width="20px"></td></tr><tr><td width="20px"></td><td class="disableLink"><a href="javascript:getMedia(\'%s\',\'%s\',\'%s\')"><b>Name:&nbsp;</b>%s</a></td><td width="20px"></td></tr><tr><td width="20px"></td><td class="disableLink"><a href="javascript:getMedia(\'%s\',\'%s\',\'%s\')"><b>Uploader:&nbsp;</b>%s</a></td><td width="20px"></td></tr><tr><td width="20px"></td><td class="disableLink"><a href="javascript:getMedia(\'%s\',\'%s\',\'%s\')"><b>Type:&nbsp;</b>%s</a></td><td width="20px"><input name="hidden%s" type="hidden" value="%s" /></td></tr></table>' % (v['media'], v['typename'], v['type'], v['name'], v['media'], v['typename'], v['type'], v['uploader'], v['media'], v['typename'], v['type'], v['typename'], v['media'], v['tags'])
-            msg += add
-            num += 1
-        
-        log.msg("MediaEditPage: text_list_media(): msg=%s" % msg);
-        return msg
-    
-    def text_list_stages(self, request):
-        keys = self.collection.stages.getKeys()
-        table = [] 
-        for k in keys:
-            stage = self.collection.stages.get(k)
-            if self.player.can_su() or stage.contains_al_one(self.player.name) or stage.contains_al_two(self.player.name):
-                table.extend('%s,' %k)
-        return ''.join(table)
-    
-    def text_list_users(self, request):
-        keys = self.collection.stages.getKeys()
-        table = [] 
-        for k in keys:
-            stage = self.collection.stages.get(k)
-            if (self.player.name is not None):
-                if self.player.can_su() or stage.contains_al_one(self.player.name) or stage.contains_al_two(self.player.name):
-                    for i in stage.get_uploader_list():
-                        if i+',' not in table:
-                            table.append(i+',')         
-        return ''.join(table)
-    
-    def typelist(self):
-        radio buttons with the audio type options
-        
-        out = []
-        for x in 'music', 'sfx':
-            out.append('<label>')
-            if x == self.media.medium:
-                out.append('<input type="radio" name="audio_type" value="%s" checked />' %x)
-            else:
-                out.append('<input type="radio" name="audio_type" value="%s" />' %x)
-            out.append(' %s</label><br />' %x)
-        return ''.join(out)
-    
-    def voicelist(self):
-        dropdown list of available voices
-        out = []
-        vk = VOICES.keys()
-        vk.sort()
-        for x in vk:
-            if x == self.selectedMedia.voice:
-                out.append('<option value="%s" selected="selected">%s</option>' % (x, x))
-            else:
-                out.append('<option value="%s">%s</option>' % (x, x))
-        return ''.join(out)
-    
-    
-
-    Heath Behrens 12/08/2011
-    Function added to check if a collection of things contains
-    a given thing name.
-
-    
-    def contains_media(self,collection,name):
-        #loop over the collections of things values
-        for thing in collection.things.values():
-            if thing.name == name: #Compare the 2 names
-                return True
-        return False
-    
-    
-    
-    Modified By Heath Behrens 12/08/2011
-        -Rewrote the function as it was not returning unassigned stages, instead all stages where returned as
-         assigned if the media was not assigned to the stage.
-        -The function now obtains the collection of media then calls the contains_media function to
-         determine whether the media is on the current stage or not.                                
-    Modified by Vibhu, Nessa, Craig 24/08/2011 
-        - Added code to align elements correctly in mediaedit.xhtml      
-    
-    def get_stage_info(self, meditype, medianame):
-        selectList_html = '' #Natasha Pullan
-        selectList_htmlA = ''
-        selectList_htmlB = ''
-        self.assigned_stages = ''
-        self.unassigned_stages = ''
-        keys = ''
-        self.media = ''
-        
-        keys = self.collection.stages.getKeys()
-        for k in keys:
-            #obtain a reference to the current stage object
-            self.stage = self.collection.stages.get(k)
-            
-            if self.mediatype == 'avatar':
-                collection = self.stage.avatars
-                #store the collection of media based on the above collection 
-                self.media = collection.globalmedia
-                string = "<option value=""%s"">%s</option>" % (k, k)
-                if self.media.get(medianame) is not None: #Heath Behrens 12/08/2011 - check if not none       
-                    # messy way of doing it but obtains the plain-text name based on the hashname
-                    m = self.media.get(medianame)
-                    medianame = m.name
-                if self.contains_media(collection, medianame):
-                    self.assigned_stages += string
-                else:
-                    self.unassigned_stages += string 
-            elif self.mediatype == 'prop':
-                collection = self.stage.props
-                #store the collection of media based on the above collection
-                self.media = collection.globalmedia
-                string = "<option value=""%s"">%s</option>" % (k, k)
-                
-                if self.media.get(medianame) is not None:
-                    # messy way of doing it but obtains the plain-text name based on the hashname
-                    m = self.media.get(medianame)
-                    medianame = m.name
-                if self.contains_media(collection, medianame):
-                    self.assigned_stages += string
-                else:
-                    self.unassigned_stages += string 
-            elif self.mediatype == 'backdrop':
-                collection = self.stage.backdrops
-                #store the collection of media based on the above collection
-                self.media = collection.globalmedia
-                string = "<option value=""%s"">%s</option>" % (k, k)
-                if self.media.get(medianame) is not None:
-                    # messy way of doing it but obtains the plain-text name based on the hashname
-                    m = self.media.get(medianame)
-                    medianame = m.name
-                if self.contains_media(collection, medianame):
-                    self.assigned_stages += string
-                else:
-                    self.unassigned_stages += string
-            elif self.mediatype == 'audio':
-                # Heath Behrens - renamed audio to audios to correct the page load error.
-                collection = self.stage.audios
-                self.media = collection.globalmedia
-                string = "<option value=""%s"">%s</option>" % (k, k)
-                if self.media.get(medianame) is not None:       
-                    m = self.media.get(medianame)
-                    medianame = m.name 
-                    
-                if self.contains_media(collection, medianame):
-                    self.assigned_stages += string
-                else:
-                    self.unassigned_stages += string 
-            
-
-        #Vibhu, Nessa, Craig 24/08/2011 - to align elements correctly in mediaedit.xhtml      
-        #Daniel Han			 10/07/2012	- edited html to have it "aligned" properly! Still needs some more clean ups though.    
-        selectList_htmlA = '<tr><th colspan="3">Select stages to assign the media to:</td></tr><tr><td><b>Assigned:</b></td><td></td><td> <b> Unassigned: </b> </td></tr>\
-            <tr> <td> <select size="10" style="width:200px;" multiple="multiple" name="assigned" id="assigned">%s</select></td><td><button onclick="switchSelection(assigned, unassigned); return false;" >>></button><br /><button onclick= \
-            "switchSelection(unassigned, assigned); return false;"><<</button></td><td>' % self.assigned_stages
-            
-        selectList_htmlB = '<select size="10" style="width:200px;" name="unassigned" id="unassigned" multiple="multiple">%s</select></td></tr>' % self.unassigned_stages
-            
-        selectList_html = selectList_htmlA + selectList_htmlB
-        return selectList_html
-    
-    
-        Added by Heath / Vibhu 24/08/2011 - Function called to add tags to the mediaedit page given a request.
-                                            Extracts the tags for a media file from self.collection of _MediaFile
-        Modified by: Heath / Vibhu / Nessa 26/08/2011 - Added minus sympol to remove tags from the page along with sorting the tags 
-                                                        alphabetically.  
-        Modified by: Vibhu / Heath 31/08/2011 - Fixed html as it was breaking tagging on main server.                                  
-    
-    def text_list_tags(self,request):
-        self.tags = ''
-        tag_info = ''
-        if not self.medianame == '':
-            tag_info = '<div id="tagDiv" style="color:blue"><b>Tags:</b><br />'
-            if self.collection.avatars.get(self.medianame) is not None:
-                self.tags = self.collection.avatars.get(self.medianame).tags
-            elif self.collection.props.get(self.medianame) is not None:
-                self.tags = self.collection.props.get(self.medianame).tags
-            elif self.collection.audios.get(self.medianame) is not None:
-                self.tags = self.collection.audios.get(self.medianame).tags
-            elif self.collection.backdrops.get(self.medianame) is not None:
-                self.tags = self.collection.backdrops.get(self.medianame).tags
-            else:
-                self.tags = ''
-            if self.tags.startswith(','):    
-                self.tags = self.tags.lstrip(',').lstrip('')
-            count = 0
-            
-            if self.tags is not None:
-                self.tags = self.tags.split(',') # Split the comma separated tags.
-                self.tags.sort(key=lambda x: x.lower()) # sort the list of tags.
-                # Loop over the tags for this media 
-                for t in self.tags:
-                    t = t.strip('') # strip whitespace
-                    if len(t) > 0:
-                        tag_info += '<a id="%s" href="javascript:removeTag(%s)" title="%s" class="disableLink"><img alt="" src="/style/image/remove_symbol.png" width="10px" height="10px" style="border:0px solid #000000;">%s</a>&nbsp;' % (count, count, t, t)
-                        count += 1
-            tag_info += '</div>'
-            
-        return tag_info
-     
-    
-        Modified by: Vibhu, Nessa, Craig 24/08/2011 - Added to Displays tags within mediaedit.xhtml
-                   : Heath / Corey / Karena 26/08/2011 - Added code to display selectedMedia names on the webpage.
-           
-    def text_editable_info(self, request):        
-        html_editable_info = ''
-        selectList_html = '' #Natasha Pullan
-        log.msg("media name is : %s" %self.medianame)
-
-        colspan = 1 # Daniel Han - for cleaning up
-        if not self.medianame == '':
-            if self.mediatype == 'avatar':
-                self.selectedMedia = self.collection.avatars.get(self.medianame)
-                selectList_html = self.get_stage_info(self.mediatype, self.medianame)
-                html_editable_info = '<tr><td><b>Name:</b></td>' 
-                html_editable_info += '<td><input name="name" type="text" value="%s" class="mediafield" id = "name"/></td></tr>' % self.selectedMedia.name
-                html_editable_info += '<tr><td><b>Voice:</b></td><td><select name="voice" class="mediafield" id="voice"><option value="">--select one--</option> %s </select></td></tr> \
-                 <tr><td><input type="button" name="test" value="Test Voice"onclick="redirect_submit(\'/admin/test.mp3\'); return false" /></td>\
-                 <td><input type="text" name="text" value="This is what i will say if you ask for a test" class="mediafield" /></td> \
-                 </tr>' % self.voicelist()
-                html_editable_info += '<tr> <td colspan="2"> <div id="speech"></div> </td> </tr>'
-                html_editable_info += '<tr> \
-                 <td colspan="2"> \
-                   <table> %s </table> \
-                 </td> </tr>' % selectList_html
-
-                log.msg("Avatar editable info")
-            elif self.mediatype =='prop':
-                self.selectedMedia = self.collection.props.get(self.medianame)
-                selectList_html = self.get_stage_info(self.mediatype, self.medianame)
-                html_editable_info = '<tr><td><b>Name:</b></td><td><input name="name" type="text" value="%s" class="mediafield" id = "name" /></td></tr>' % self.selectedMedia.name
-                html_editable_info += '<tr> \
-                 <td colspan="2"> \
-                   <table> %s </table> \
-                 </td> </tr>' % selectList_html
-                log.msg("Prop editable info")
-
-            elif self.mediatype =='audio':
-                self.selectedMedia = self.collection.audios.get(self.medianame)
-                selectList_html = self.get_stage_info(self.mediatype, self.medianame)
-                #Modified by: Heath Behrens - switched the values in %( , ) because the first one should be type.
-                html_editable_info = '<tr><td><b>Name:</b></td> <td colspan="2"><input name="name" type="text" value="%s" class="mediafield" id = "name"/></td></tr>' % self.selectedMedia.name
-                # Heath / Vibhu (01/09/2011)  - Added code to embedd a media player within the media edit page
-                html_editable_info += '<tr><td><b>Audio Type:</b></td><td><input id="audio_type" name="audio_type" type="hidden" readonly="readonly" value="%s" /></td><td><select id="audioTypeSelect" onclick="javascript:changeAudioType();" onchange="javascript:changeAudioType();" onkeypress="javascript:changeAudioType();" class="mediafield"><option value="music">Music</option><option value="sfx">Sound Effects</option><select></td></tr><tr><td><input type="button" value="Test Audio" onclick="playmp3(\'/media/audio/%s\', \'audioplayer\');"/></td></tr>\
-                        <tr><td colspan="3"><div id="audioplayer"></div> </td></tr>'  %(self.selectedMedia.medium, self.medianame)
-                html_editable_info += '<tr> \
-                 <td colspan="3"> \
-                   <table> %s </table> \
-                 </td> </tr>' % selectList_html
-                colspan=2
-                log.msg("audio editable info")
-            elif self.mediatype =='backdrop':
-
-                self.selectedMedia = self.collection.backdrops.get(self.medianame)
-                selectList_html = self.get_stage_info(self.mediatype, self.medianame)
-                html_editable_info = '<tr><td><b>Name:</b></td><td><input type="text" name="name" value="%s" class="mediafield" id = "name"/></td></tr>' % self.selectedMedia.name
-                html_editable_info += '<tr> \
-                 <td colspan="2"> \
-                   <table> %s </table> \
-                 </td> </tr>' % selectList_html
-                log.msg("backdrop editable info")
-        else:
-            html_editable_info += ''.join('<tr><td>%s</td></tr>' % self.no_media)
-
-        #Added by Vibhu, Nessa, Craig 24/08/2011 - Displays tags within mediaedit.xhtml
-        mediaTags_html = '<tr><td><b>Add Tags:</b></td><td colspan="%s"><input type="text" name="tags" class="mediafield" id="tagName" /></td></tr>' % colspan
-        html_editable_info += mediaTags_html
-        return html_editable_info
-        
-    def text_static_info(self, request):
-        html_static_info = ''
-        log.msg("returning static info to media edit page")
-        if not self.medianame == '':
-            d = self.selectedMedia.__dict__
-            html_static_info += ''.join(['<tr><td>%-10s:</td><td>%20s</td></tr> \n' % x for x in d.items()])
-        else:
-            html_static_info += ''.join('<tr><td>%s</td></tr>' % self.no_media)
-        return html_static_info
-    
-    def render(self, request):
-        action = request.args.get('action',[''])[0]
-        form = request.args
-
-        try:
-            self.medianame = request.args.get('mediaName',[''])[0]
-            self.mediatype = request.args.get('mediaType',[''])[0]
-            self.url = '/media/' + self.medianame
-            if self.mediatype == 'audio':
-                #Vibhu 31/08/2011 - check what type of audio is it and assign appropiate thumbnail.
-                self.audio_type = request.args.get('audio_type',[''])[0]
-                if self.audio_type == 'music':
-                    self.url = config.MUSIC_ICON_IMAGE_URL
-                    self.mediaDisplay = 'none'
-                elif self.audio_type == 'sfx':
-                    self.url = config.SFX_ICON_IMAGE_URL
-                    self.mediaDisplay = 'none'
-                self.audio_type = ''
-            log.msg("URL = %s" % self.url)
-        except:
-            self.message = self.no_media
-        if action == 'save' or action == 'delete':
-            #Save media
-            if self.mediatype == 'avatar':
-                self.collection.avatars.update_from_form(form, self.player)
-                self.postback = 'Avatar Saved'
-            elif self.mediatype == 'prop':
-                self.collection.props.update_from_form(form, self.player)
-                self.postback = "Prop Saved"
-            elif self.mediatype == 'backdrop':
-                self.collection.backdrops.update_from_form(form, self.player)
-                self.postback = "Backdrop Saved"
-            elif self.mediatype == 'audio':
-                self.collection.audios.update_from_form(form, self.player)
-                self.postback = "Audio Saved"
-            if action =='delete':
-                self.medianame = ''
-                self.mediatype = ''
-                self.postback = "Media Deleted"
-        return AdminBase.render(self, request)"""
