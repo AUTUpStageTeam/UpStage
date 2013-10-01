@@ -1,4 +1,6 @@
 <players>
+<player name="name" rights="act,admin" last_login="Unset" date="Tue Oct 01 2013 10:16:31 GMT 1300 (New Zealand Daylight Time)" password="b068931cc450442b63f5b3d276ea4297" email="Unset!">
+</player>
 <player name="Martin" rights="act,admin,su,unlimited" last_login="Unset" date="Fri Aug 30 2013 17:42:22 GMT 1200 (New Zealand Standard Time)" password="925d7518fc597af0e43f5606f9a51512" email="Unset!">
 </player>
 <player name="Vanessa" rights="act,admin,su,unlimited" last_login="Unset" date="Mon Sep 09 2013 09:51:00 GMT 1200 (New Zealand Standard Time)" password="ab86a1e1ef70dff97959067b723c5c24" email="Unset!">
@@ -9,7 +11,7 @@
 </player>
 <player name="David" rights="act,admin,su,unlimited" last_login="Unset" date="Mon Sep 09 2013 09:50:18 GMT 1200 (New Zealand Standard Time)" password="172522ec1028ab781d9dfd17eaca4427" email="Unset!">
 </player>
-<player name="admin" rights="act,admin,su,unlimited" last_login="Wednesday, 25. September 2013 04:21PM" date="Mon Nov 08 2010 23:40:41 GMT 1300 (NZDT)" password="0cc175b9c0f1b6a831c399e269772661" email="reset@gmail.com">
+<player name="admin" rights="act,admin,su,unlimited" last_login="Tuesday, 01. October 2013 03:39PM" date="Mon Nov 08 2010 23:40:41 GMT 1300 (NZDT)" password="0cc175b9c0f1b6a831c399e269772661" email="reset@gmail.com">
 </player>
 <player name="Helen" rights="act,admin,su,unlimited" last_login="Unset" date="Fri Aug 30 2013 17:42:10 GMT 1200 (New Zealand Standard Time)" password="7a2eb41a38a8f4e39c1586649da21e5f" email="Unset!">
 </player>

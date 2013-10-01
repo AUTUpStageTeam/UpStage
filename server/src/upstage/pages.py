@@ -773,6 +773,7 @@ class StageEditPage(Workshop):
     stage_ViewImg = ''#(30/04/2013) Craig
     stage_CB_lock = ''#(01/05/2013) Craig
     isOwner = 'false'#(02/05/2013) Craig
+    unassigned = []
     
     def __init__(self, player, collection):
         AdminBase.__init__(self, player, collection)
@@ -829,9 +830,48 @@ class StageEditPage(Workshop):
             return self.isOwner
         else:
             return self.no_stage
+            
+    def assigned_media(self,request): # 1/10/13 - Lisa - returns a list of all media currently assigned to the stage, minus all names in the unassigned list
+        media = []
+        if self.stage:
+            media.extend(self.list_Avatars(request))
+            media.extend(self.list_Props(request))
+            media.extend(self.list_Backdrops(request))
+            media.extend(self.list_Audios(request))
+            if len(self.unassigned) !=0:
+                for m in self.unassigned:
+                    if m != '':
+                        media.remove(m)
+        return media
 
+    def text_list_media_assigned(self,request): #1/10/13 - Lisa - converts and returns the output from assigned_media into something the html can use
+        if self.stage:
+            log.msg('setting up assigned media list')
+            table = []
+            media = self.assigned_media(request)
+            if len(media) != 0:                
+                for m in media:
+                    table.extend('<option value="%s">%s</option>' %(m, m))
+            else:
+                table.extend('<option></option>')
+            return ''.join(table)
+        else:
+            log.msg('No Stage for media list')
+            return '<option></option>'
+            
+    def text_list_media_unassigned(self,request): #1/10/13 - Lisa - converts and returns the list of unassigned media as something the html can use
+        if self.stage:
+            log.msg('setting up unassigned media list')
+            table = []
+            if len(self.unassigned) != 0:                
+                for m in self.unassigned:
+                    table.extend('<option value="%s">%s</option>' %(m, m))
+            return ''.join(table)
+        else:
+            log.msg('No stage for unassigned media list')
+            return '<option></option>'
 
-    def text_list_Avatars(self, request):
+    def list_Avatars(self, request):#(14/04/2013) Craig; 1/10/13 - Lisa - returns list of names rather than html string
         if self.stage:
             log.msg('Getting alist')
             table =[]
@@ -840,16 +880,10 @@ class StageEditPage(Workshop):
                 avatars.sort()
             if len(avatars) != 0:
                 for a in avatars:
-                    table.extend('<option value="%s">%s</option>' %(a.name, a.name))
-            else:
-                table.extend('<option value="No Avatars">No Avatars</option>')
-            return ''.join(table)
-        else:
-            log.msg('No Stage for alist')
-            return '<option vaule="No Avatars">No Avatars</option>'
+                    table.append(a.name)
+            return table
 
-
-    def text_list_Props(self, request):#(14/04/2013) Craig
+    def list_Props(self, request):#(14/04/2013) Craig; 1/10/13 - Lisa - returns list of names rather than html string
         if self.stage:
             log.msg('Getting plist')
             table = []
@@ -858,15 +892,10 @@ class StageEditPage(Workshop):
                props.sort()
             if len(props) != 0:
                 for p in props:
-                    table.extend('<option value="%s">%s</option>' %(p.name, p.name))
-            else:
-                table.extend('<option value="No Props">No Props</option>')
-            return ''.join(table)
-        else:
-            log.msg('No Stage for plist')
-            return '<option value="No Props">No Props</option>'
+                    table.append(p.name)
+            return table
 
-    def text_list_Backdrops(self, request):#(14/04/2013) Craig
+    def list_Backdrops(self, request):#(14/04/2013) Craig; 1/10/13 - Lisa - returns list of names rather than html string
         if self.stage:
             log.msg('Getting blist')
             table = []
@@ -875,15 +904,10 @@ class StageEditPage(Workshop):
                backdrops.sort()
             if len(backdrops) != 0:
                 for b in backdrops:
-                    table.extend('<option value="%s">%s</option>' %(b.name, b.name))
-            else:
-                table.extend('<option value="No Backdrops">No Backdrops</option>')
-            return ''.join(table)
-        else:
-            log.msg('No Stage for blist')
-            return '<option value="No Backdrops">No Backdrops</option>'
+                    table.append(b.name)
+            return table
 
-    def text_list_Audios(self, request):#(14/04/2013) Craig
+    def list_Audios(self, request):#(14/04/2013) Craig; 1/10/13 - Lisa - returns list of names rather than html string
         if self.stage:
             log.msg('Getting aulist')
             table = []
@@ -892,13 +916,8 @@ class StageEditPage(Workshop):
                audios.sort()
             if len(audios) != 0:
                 for au in audios:
-                    table.extend('<option value="%s">%s</option>' %(au.name, au.name))
-            else:
-                table.extend('<option value="No Audios">No Audios</option>')
-            return ''.join(table)
-        else:
-            log.msg('No Stage for aulist')
-            return '<option value="No Audios">No Audios</option>'
+                    table.append(au.name)
+            return table
 
     def text_list_stages(self, request):
         keys = self.collection.stages.getKeys()
@@ -1032,6 +1051,7 @@ class StageEditPage(Workshop):
         if 'ID' in form:
             name = request.args.get('name',[''])[0]
             ID = request.args.get('ID',[''])[0]
+            self.unassigned=[]
             if name or ID:
                 #Form has been submitted
                 try:
@@ -1079,8 +1099,26 @@ class StageEditPage(Workshop):
             
         elif action=='cancel':
             ###For now dont actually need to do anything.
-            self.message+='Cancelled selections. '
-
+            self.message+='Discarded changes.'
+            
+            #Lisa - takes selected media out of the 'unassigned' list
+        elif action=='assign_media':
+            log.msg('assign the thing')
+            items = request.args.get('munassigned',[''])
+            for i in range(0, len(items)):
+                mname = items[i]
+                if self.stagename and mname:
+                    self.unassigned.remove(mname)
+            
+            #Lisa - puts selected media into the 'unassigned' list
+        elif action=='unassign_media':
+            log.msg('unassign the thing!')
+            items = request.args.get('massigned',[''])
+            for i in range(0, len(items)):
+                mname = items[i]
+                if self.stagename and mname:
+                    self.unassigned.append(mname)
+            
         elif action=='unAssign_Avatar':#(16/04/2013) Craig
             log.msg('In UnAssign_avatar fuction start')
             self.esUnAssignMedia(request,1)
@@ -1123,6 +1161,9 @@ class StageEditPage(Workshop):
 	    ##one to two
         elif action=='one_to_two':
             items = request.args.get('cantaccess',[''])
+            log.msg('heree')
+            log.msg(request.args)
+            log.msg(items)
             for i in range(0, len(items)):
                 pname = items[i]
                 if self.stagename and pname:

@@ -450,7 +450,7 @@ function checkCookie()
 function setPassword(name,pass)
 {
 	var md5val = hex_md5(pass);
-	if(document.rupert.remember.checked)
+	if(document.login.remember.checked)
 	{
 		setCookie('username',name,30,0);
 		setCookie('password',md5val,30,0);
@@ -930,7 +930,7 @@ function warn(type)
         // Gavin (6/3/13): Changed actions[type] to actions[5] to also delete the media 
 		document.getElementById("status").innerHTML = 'Sending to server, please wait...';
 		document.getElementById("status").style.display = "inline";
-		document.rupert.action.value = actions[type];// 09/04/2013 Craig - changed back to type so all the stageEdit buttens work again
+		document.stageedit.action.value = actions[type];// 09/04/2013 Craig - changed back to type so all the stageEdit buttens work again
 		requestPage("POST", buildRequest(2),fillPage);
 		//18/05/2011 Navigates back to stage workshop page (Vibhu Patel)
         /*
@@ -947,7 +947,7 @@ function seSaveOnly() //09/04/2013 Craig - changed embedmessage method name so i
     doIt=confirm(warningMessages[6]);
         if(doIt)
         {
-            document.rupert.action.value = actions[6];
+            document.stageedit.action.value = actions[6];
             requestPage("POST", buildRequest(2),fillPage);
         }
 }

@@ -94,7 +94,7 @@ if (/*@cc_on!@*/false) {
 			<input name="server_details" type="hidden" value="%(server_details)s" />
 			</form>
 				<div id="signup">
-					<form name="rupert" action="/perspective-init"> 
+					<form name="login" action="/perspective-init"> 
 					  Login: <input name="username" size="13" />
 					  Password: <input type="password" name="password" size="13" /><br />
 					  Remember me? <input type="checkbox" name="remember" />

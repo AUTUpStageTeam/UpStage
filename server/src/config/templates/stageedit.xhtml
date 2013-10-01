@@ -61,7 +61,7 @@ window.onresize = resizePage;
 </div>
 
 <div id="divForm">
-<form name="rupert" action="">
+<form name="stageedit" action="">
 	<div id="stagename">
 		<h1>Stage name</h1>
 		<table>
@@ -128,46 +128,35 @@ window.onresize = resizePage;
             <br/>
             <div id="editStageMedia"><!-- Craig Farrell 14/04/2013 -->
                 <h1>Media on stage</h1>
-                <p>Warning: clicking any 'Unassign' button will instantly unassign the selected media item from this stage.</p>
-                <div id="editStageMediaInfo">
-                    <table id="editStageMediaList" style="border-bottom: #690 1px dashed;">
-                        <tr>
-                            <td><h4>Avatars</h4></td>
-                            <td><h4>Props</h4></td>
-                            
-                        </tr>
-                        <tr>
-                            <td><select name="AvatarList"   id="AvatarList"   class="esTypeList">%(list_Avatars)s</select></td>
-                            <td><select name="PropList"     id="PropList"     class="esTypeList">%(list_Props)s</select></td>
-                            
-                        </tr>
-                        <tr><!-- Craig Farrell 16/04/2013 -->
-                            <td><input type="button" id="AvatarUnAssign"   class="esUnAssignBut" onclick="unAssignMedia(1);" value="Unassign" /></td>
-                            <td><input type="button" id="PropUnAssign"     class="esUnAssignBut" onclick="unAssignMedia(2);" value="Unassign" /></td>
-                            
-                        </tr>
-                        <tr><!-- Craig Farrell 25/04/2013 -->
-                            <td><input type="button" id="AvatarView"   class="esViewBut" onclick="viewMediaImage(1);" value="View" /></td>
-                            <td><input type="button" id="PropView"     class="esViewBut" onclick="viewMediaImage(2);" value="View" /></td>
-                            
-                        </tr>
-                        <tr>
-                            <td><h4>Backdrops</h4></td>
-                            <td><h4>Audios</h4></td>
-                        </tr>
-                        <tr><!-- Craig Farrell 24/04/2013 -->
-                            <td><select name="BackdropList" id="BackdropList" class="esTypeList">%(list_Backdrops)s</select></td>
-                            <td><select name="AudioList"    id="AudioList"    class="esTypeList">%(list_Audios)s</select></td>
-                        </tr>
-                        <tr>
-                            <td><input type="button" id="BackdropUnAssign" class="esUnAssignBut" onclick="unAssignMedia(3);" value="Unassign" /></td>
-                            <td><input type="button" id="AudioUnAssign"    class="esUnAssignBut" onclick="unAssignMedia(4);" value="Unassign" /></td>
-                        </tr>
-                        <tr>
-                            <td><input type="button" id="BackdropView" class="esViewBut" onclick="viewMediaImage(3);" value="View" /></td>
-                        </tr>
-                    </table>
-                </div>
+                <p>Any media in the 'Unassigned' column will be unassigned when the stage is saved.</p>
+                <table>
+					<tr>
+						<td>
+							<table>
+								<tr>
+									<td>Assigned</td>
+									<td></td>
+									<td>Unassigned</td>
+								</tr>
+								<tr>
+									<td>
+										<select size="4" id="massigned" name="massigned" style="height: 160px; width:140px;" multiple="multiple">
+											%(list_media_assigned)s
+										</select>
+									</td>
+									<td><a class="IconButton" href='javascript:setMediaUnassigned();'><img src="/image/right.png" alt="&#60;" width="20" height="20" /></a><br />
+										<a class="IconButton" href='javascript:setMediaAssigned();'><img src="/image/left.png" alt="&#62;" width="20" height="20" /></a></td>
+									<td>
+										<select size="4" id="munassigned" name="munassigned" style="height: 160px; width:140px;" multiple="multiple">
+											%(list_media_unassigned)s
+										</select>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+                
                 <div id="editStageMediaPreview"><!-- Craig Farrell 25/04/2013 -->
                     %(attr:stage_ViewImg)s
                 </div>
