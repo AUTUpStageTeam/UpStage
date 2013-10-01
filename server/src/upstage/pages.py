@@ -103,6 +103,7 @@ Modified by: Nitkalya Wiriyanuparb  14/09/2013  - Fixed player/audience stat inf
 Modified by: Nitkalya Wiriyanuparb  15/09/2013  - Made success redirection target more flexible
 Modified by: Nitkalya Wiriyanuparb  16/09/2013  - Removed unused AudioThing class
 Modified by: Nitkalya Wiriyanuparb  24/09/2013  - Modified StageEditPage and MediaEditPage to use new format of keys for media_dict instead of file names
+Modified by: Nitkalya & Lisa        30/09/2013  - Fixed redirection on error pages
 """
 
 #standard lib
@@ -319,33 +320,29 @@ class AdminBase(Template):
         except:
             return '&nbsp;'
 
-
-
 class AdminError(AdminBase):
     """error page, in same clothes as AdminBase"""
     filename = 'error.xhtml'
     log_message = 'Reporting Error: %s'
     code = 500
-    errorMsg = 'Something went wrong'
-    errorRedirect = '<META HTTP-EQUIV="refresh" CONTENT="2;URL=/admin"/>'#(05-05-2013) Craig
     
     def __init__(self, error, page='', code=None):
         log.msg(self.log_message % error)
         #Template.__init__(self)
+        self.errorMsg = 'Something went wrong'
         self.error = str(error)
         if code is not None:
             self.code = code        
         if page == 'stage':
-            self.errorRedirect = '<META HTTP-EQUIV="refresh" CONTENT="2;URL=/admin/workshop/stage"/>'
-            errorMsg = 'ffuuuuu'
+            self.errorRedirect = 'workshop/stage'
         elif page == 'mediaedit':
-            self.errorRedirect = '<META HTTP-EQUIV="refresh" CONTENT="2;URL=/admin/workshop/mediaedit"/>'
+            self.errorRedirect = 'workshop/mediaedit'
         elif page == 'mediaupload':
-            self.errorRedirect = '<META HTTP-EQUIV="refresh" CONTENT="2;URL=/admin/workshop/mediaupload"/>'
+            self.errorRedirect = 'workshop/mediaupload'
         elif page == 'user':
-            self.errorRedirect = '<META HTTP-EQUIV="refresh" CONTENT="2;URL=/admin/workshop/user"/>'
+            self.errorRedirect = 'workshop/user'
         else:
-            self.errorRedirect = '<META HTTP-EQUIV="refresh" CONTENT="2;URL=/admin"/>'
+            self.errorRedirect = ''
 
     def render(self, request):
         """render from the template, and set the http response code."""

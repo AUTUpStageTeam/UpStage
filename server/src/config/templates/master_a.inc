@@ -47,7 +47,6 @@
 <script language="javascript" type="text/javascript" src="/script/user.js"></script>
 <script language="javascript" type="text/javascript" src="/script/md5.js" ></script>
 <script language="javascript" type="text/javascript" src="/script/jwplayer.js"></script>
-%(attr:errorRedirect)s <!--Craig Farrell 05/05/2013-->
 
 <!-- logging -->
 <script type="text/javascript" src="/script/log4javascript/log4javascript.js"></script>
