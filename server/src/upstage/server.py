@@ -162,6 +162,7 @@ class _UpstageSocket(LineOnlyReceiver):
                       avatars = len(avatars),
                       props = len(props),
                       backdrops = len(backdrops),
+                      audios = len(audios), # Ing 2/10/13 - take number of audios to load into account as well
                       msg = self.stage.splash_message)
 
             # send the avatars, props and backgrounds for preloading

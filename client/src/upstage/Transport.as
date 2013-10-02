@@ -659,7 +659,7 @@ class upstage.Transport extends XMLSocket
      */
     private function SPLASH_DETAILS(x :Object) :Void
     {
-        this.modelSplashScreen.GET_SPLASH_DETAILS(x.avatars, x.props, x.backdrops, x.msg);
+        this.modelSplashScreen.GET_SPLASH_DETAILS(x.avatars, x.props, x.backdrops, x.audios, x.msg);
     };
 
 

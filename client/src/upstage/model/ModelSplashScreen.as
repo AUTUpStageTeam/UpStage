@@ -29,6 +29,7 @@ import flash.external.ExternalInterface;
  *
  * Interface between server, SplashScreen, and LoadTracker.
  *
+ * Modified by: Nitkalya Wiriyanuparb  02/10/2013  - Took number of audios to load into account
  */
 class upstage.model.ModelSplashScreen implements TransportInterface
 {
@@ -61,9 +62,9 @@ class upstage.model.ModelSplashScreen implements TransportInterface
      */
 
     function GET_SPLASH_DETAILS(avatars:Number, props:Number,
-                                backdrops:Number, msg:String) :Void
+                                backdrops:Number, audios:Number, msg:String) :Void
     {
-        LoadTracker.setExpected(avatars, props, backdrops);
+        LoadTracker.setExpected(avatars, props, backdrops, audios);
         this.splashScreen.displayStartupMsg(msg);
     }
 

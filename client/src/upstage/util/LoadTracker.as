@@ -26,6 +26,9 @@
  * things are going.  
  * 
  * Modified by David Daniels & Lisa Helm 27/08/2013 - Merged Martins fork
+ * Modified by: Nitkalya Wiriyanuparb  02/10/2013   - Took number of audios to load into account,
+ *                                                    otherwise the avatar can get loaded too late,
+ *                                                    and its position on stage will be incorrect
  */
  
 import upstage.Client;
@@ -67,11 +70,12 @@ class upstage.util.LoadTracker
      * different kinds of things to be loaded.  Each kind of thing
      * might load a different number of images.
      */
-    static function setExpected(avatars:Number, props:Number, backdrops:Number) : Void
+    static function setExpected(avatars:Number, props:Number, backdrops:Number, audios:Number) : Void
     {        
         LoadTracker.expected = (avatars * Client.LOADS_PER_AVATAR + 
                                 props * Client.LOADS_PER_PROP + 
-                                backdrops * Client.LOADS_PER_BACKDROP);
+                                backdrops * Client.LOADS_PER_BACKDROP +
+                                audios * Client.LOADS_PER_AUDIO);
         if (LoadTracker.expected == 0){
             //need to finish straight away.  There will be no load
             //events to do it for us
