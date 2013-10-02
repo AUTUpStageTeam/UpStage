@@ -127,6 +127,7 @@ window.onresize = resizePage;
 				<textarea name="splash_message" class="splash" id="splash_message">%(splash)s</textarea>
 			</div>
             <br/>
+            <br/>
             <div id="editStageMedia"><!-- Craig Farrell 14/04/2013 -->
                 <h1>Media on stage</h1>
                 <p>Any media in the 'To be unassigned' column will be unassigned when the stage is saved.</p>
@@ -152,15 +153,16 @@ window.onresize = resizePage;
 											%(list_media_unassigned)s
 										</select>
 									</td>
+                                    <td style="width:0%;"><input type="button" id="seViewMedia" onclick="javascript:viewMediaImage();" value="Preview" /></td>
+                                    <td><div id="editStageMediaPreview"><!-- Craig Farrell 25/04/2013 -->
+                                        %(attr:stage_ViewImg)s
+                                    </div></td>
 								</tr>
 							</table>
 						</td>
 					</tr>
 				</table>
                 
-                <div id="editStageMediaPreview"><!-- Craig Farrell 25/04/2013 -->
-                    %(attr:stage_ViewImg)s
-                </div>
             </div>
 			<div id="editStageAccess">
                 <br/>

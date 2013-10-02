@@ -35,6 +35,7 @@
  *                                           - added call for lockDisableAll in stageEdit
  *  Modified By Vanessa Henderson - 28/08/2013 - Merged Martins fork with current working code
  *  Modified By Lisa Helm - 02/10/2013 - Removed old methods for unassigning media, added the new ones
+ *                                     - made changes necessary for discarding access changes
 */
 
 //Instance based variables
@@ -259,23 +260,10 @@ function setMediaAssigned()
  * @parameter : int type
  * gets which media is being viewed. 1=avatar, 2=props, 3=backdrop, 4=audio(N/A), 5=video(N/A)
  */
-function viewMediaImage(type)//24/04/2013 -CF-
+function viewMediaImage()//24/04/2013 -CF-
 {
-    if(type == null)
-    {type =0;}
-    
-    switch(type)
-    {
-        case 1:
-            document.stageedit.action.value = 'view_Avatar';
-        break;
-        case 2:
-            document.stageedit.action.value = 'view_Prop';
-        break;
-        case 3:
-            document.stageedit.action.value = 'view_Backdrop';
-        break;
-    }
+
+    document.stageedit.action.value = 'view_media';
     requestPage("POST", buildRequest(2),fillPage);
 }
 
@@ -299,7 +287,7 @@ function stageChooseSubmit()
     {}
 	document.getElementById("status").innerHTML = 'Sending to server, please wait...';
 	document.getElementById("status").style.display = "inline";
-    document.stageedit.action.value = 'reload'
+
 	requestPage("POST", buildRequest(1), fillPage);//'/admin/workshop/stage?shortName='+document.selectstage.shortName.value, fillPage);
 }
 
@@ -380,11 +368,9 @@ function displayAccess()
 		document.getElementById('accessdiv').innerHTML='';
 	}
 }
-//=================================================================
-//OLD METHODS
-//=================================================================
+
 /**
- * Legacy method - sets initial value for debug checkbox.
+ * Sets initial value for debug checkbox.
  * @param kora - debug or not
  * @return - none
  */
@@ -396,7 +382,7 @@ function debugToBeChecked(kora)
 	}
 }
 /**
- * Legacy method - set the value to be posted to server.
+ * Set the value to be posted to server.
  * @return - none
  */
 function debugChecked()

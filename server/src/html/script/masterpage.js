@@ -681,7 +681,7 @@ function fillPage()
 					document.forms[2].elements[1].value = temp13[0];
 					document.getElementById("submit").innerHTML = '<!--mediaedit_break_3-->' + temp15[0] + '<!--mediaedit_break_4-->';
 					//Vibhu and Heath (01/08/2011) - sets appropiate audio type in drop drown combo box.
-					pumpkin();
+					//pumpkin();
 				}
 
                 //console.log("divMessage: "  + document.getElementById("divMessage").innerHTML)

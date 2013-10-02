@@ -101,6 +101,7 @@ Modified by: Lisa Helm 05/09/2013       - added Sign Up page edit mode
 Modified by: Nitkalya Wiriyanuparb  14/09/2013  - Fixed player/audience stat info bug in workshop. AdminBase needs data.stages collection (from web.py) to calculate the stat
 Modified by: Lisa Helm 13/09/2013  - altered errorpage calls to provide source page identifying string
 Modified by: Lisa Helm 02/10/2013  - added funtionality to stageeditpage to allow changes to assigned media to be discarded. removed obsolete code to this effect.
+                                   - as above, but for player access
 """
 
 #standard lib
@@ -983,21 +984,35 @@ class StageEditPage(Workshop):
         else:
             return 'true'
 
-    def esViewMedia(self,request,iType):#(22/04/2013) Craig
+    def esViewMedia(self,request):#(22/04/2013) Craig
         self.stage_ViewImg = ''
         imgThumbUrl = ''
-        if iType == 1:
-            mName = ((request.args.get('AvatarList',['']))[0])
-        elif iType == 2:
-            mName = ((request.args.get('PropList',['']))[0])
-        elif iType == 3:
-            mName = ((request.args.get('BackdropList',['']))[0])
-        #mName = ('%s'%(mName))
-        mName = self.stage.get_thing_mediaFile_name(mName,iType)
-        if mName != '':
-            imgThumbUrl = config.MEDIA_URL + mName
-            self.stage_ViewImg = '<object><param id="esMediaPreview" name="esMediaPreview" value="%s"><embed src="%s"></embed></object>' %(mName,imgThumbUrl)
-
+        mNames = request.args.get('massigned',[''])
+        mNames.extend(request.args.get('munassigned',['']))
+        if len(mNames) >= 3:
+            self.stage_ViewImg = '<p>You can only view one media item at a time.</p>' 
+        else:
+            aName = self.stage.get_thing_mediaFile_name(mNames[0])
+            unName = self.stage.get_thing_mediaFile_name(mNames[1])
+            if aName is not None and unName is None:
+                if aName.count('.swf') > 0:
+                    imgThumbUrl = config.MEDIA_URL + aName
+                    self.stage_ViewImg = '<object><param id="esMediaPreview" name="esMediaPreview" value="%s"><embed src="%s"></embed></object>' %(aName,imgThumbUrl)
+                else:
+                    self.stage_ViewImg = '<p>That media item cannot be previewed.</p>' 
+            elif aName is None and unName is not None:
+                if unName.count('.swf') > 0:
+                    imgThumbUrl = config.MEDIA_URL + unName
+                    self.stage_ViewImg = '<object><param id="esMediaPreview" name="esMediaPreview" value="%s"><embed src="%s"></embed></object>' %(unName,imgThumbUrl)
+                else:
+                    self.stage_ViewImg = '<p>That media item cannot be previewed.</p>' 
+            elif aName is not None and unName is not None:
+                self.stage_ViewImg = '<p>You can only view one media item at a time.</p>' 
+            else:
+                self.stage_ViewImg = '<p>Please select a media item to view.</p>' 
+            log.msg(imgThumbUrl)
+            log.msg(aName)
+            
     def setupStageLock(self, request):#(01/05/2013) Craig
         chec = ''
         if self.stage:
@@ -1086,8 +1101,10 @@ class StageEditPage(Workshop):
             
         elif action=='cancel':
             self.stage.unassigned = []
+            self.stage.temp_access_level_one = self.stage.access_level_one
+            self.stage.temp_access_level_two = self.stage.access_level_two
             self.message+='Discarded changes.'
-            
+        
             #Lisa - takes selected media out of the 'unassigned' list
         elif action=='assign_media':
             log.msg('assign the thing')
@@ -1107,20 +1124,10 @@ class StageEditPage(Workshop):
                     self.stage.unassigned.append(mname)
                     log.msg(self.stage.unassigned)
 
-        elif action=='view_Avatar':#(25/04/2013) Craig
-            log.msg('es - view avatar method start')
-            self.esViewMedia(request,1)
-            log.msg('es - view avarar method finished')
-
-        elif action=='view_Prop':#(25/04/2013) Craig
-            log.msg('es - view Prop method start')
-            self.esViewMedia(request,2)
-            log.msg('es - view Prop method finished')
-
-        elif action=='view_Backdrop':#(25/04/2013) Craig
-            log.msg('es - view Backdrop method start')
-            self.esViewMedia(request,3)
-            log.msg('es - view Backdrop method finished')
+        elif action=='view_media':#(25/04/2013) Craig
+            log.msg('es - view media method start')
+            self.esViewMedia(request)
+            log.msg('es - view media method finished')
 
         ### Modified by Daniel, 27/06/2012
 	    ### 	- added for loop to make multiple selects possible
@@ -1129,16 +1136,10 @@ class StageEditPage(Workshop):
 	    ##one to two
         elif action=='one_to_two':
             items = request.args.get('cantaccess',[''])
-            log.msg('heree')
-            log.msg(request.args)
-            log.msg(items)
             for i in range(0, len(items)):
                 pname = items[i]
                 if self.stagename and pname:
-                    #self.stage.remove_al_three(pname)
                     self.stage.add_al_two(pname)
-                    self.message+='Changed rights. '
-
 	
         elif action=='two_to_one':
             items = request.args.get('canaccess',[''])
