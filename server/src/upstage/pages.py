@@ -100,6 +100,7 @@ Modified by: Lisa Helm 04/09/2013       - called a correct method when clearing 
 Modified by: Lisa Helm 05/09/2013       - added Sign Up page edit mode 
 Modified by: Nitkalya Wiriyanuparb  14/09/2013  - Fixed player/audience stat info bug in workshop. AdminBase needs data.stages collection (from web.py) to calculate the stat
 Modified by: Lisa Helm 13/09/2013  - altered errorpage calls to provide source page identifying string
+Modified by: Lisa Helm 02/10/2013  - added funtionality to stageeditpage to allow changes to assigned media to be discarded. removed obsolete code to this effect.
 """
 
 #standard lib
@@ -773,7 +774,7 @@ class StageEditPage(Workshop):
     stage_ViewImg = ''#(30/04/2013) Craig
     stage_CB_lock = ''#(01/05/2013) Craig
     isOwner = 'false'#(02/05/2013) Craig
-    unassigned = []
+    
     
     def __init__(self, player, collection):
         AdminBase.__init__(self, player, collection)
@@ -838,8 +839,8 @@ class StageEditPage(Workshop):
             media.extend(self.list_Props(request))
             media.extend(self.list_Backdrops(request))
             media.extend(self.list_Audios(request))
-            if len(self.unassigned) !=0:
-                for m in self.unassigned:
+            if len(self.stage.unassigned) !=0:
+                for m in self.stage.unassigned:
                     if m != '':
                         media.remove(m)
         return media
@@ -863,8 +864,9 @@ class StageEditPage(Workshop):
         if self.stage:
             log.msg('setting up unassigned media list')
             table = []
-            if len(self.unassigned) != 0:                
-                for m in self.unassigned:
+            log.msg(self.stage.unassigned)
+            if len(self.stage.unassigned) != 0:                
+                for m in self.stage.unassigned:
                     table.extend('<option value="%s">%s</option>' %(m, m))
             return ''.join(table)
         else:
@@ -981,20 +983,6 @@ class StageEditPage(Workshop):
         else:
             return 'true'
 
-    def esUnAssignMedia(self,request,iType):#(16/04/2013) Craig
-        mName =''
-        if iType == 1:
-            mName = ((request.args.get('AvatarList',['']))[0])
-        elif iType ==2:
-            mName = ((request.args.get('PropList',['']))[0])
-        elif iType ==3:
-            mName = ((request.args.get('BackdropList',['']))[0])
-        elif iType == 4:
-            mName = ((request.args.get('AudioList',['']))[0])
-        mName = ('%s'%(mName))
-        mName = self.stage.get_thing_mediaFile_name(mName,iType)
-        self.stage.remove_media_from_stage(mName)
-
     def esViewMedia(self,request,iType):#(22/04/2013) Craig
         self.stage_ViewImg = ''
         imgThumbUrl = ''
@@ -1040,10 +1028,10 @@ class StageEditPage(Workshop):
         self.message = ''
         action = request.args.get('action',[''])[0]
         self.stage_link= ''
-        self.stage_saved= ''
+        self.stage_saved= ''        
         
         try:
-            self.stagename = request.args.get('shortName',[''])[0]
+            self.stagename = request.args.get('shortName',[''])[0]            
             self.stage = self.collection.stages.get(self.stagename)
             self.stage_link="<a href=\"../../../stages/%s\">Go directly to stage. </a>" %self.stage.ID
         except:
@@ -1051,7 +1039,6 @@ class StageEditPage(Workshop):
         if 'ID' in form:
             name = request.args.get('name',[''])[0]
             ID = request.args.get('ID',[''])[0]
-            self.unassigned=[]
             if name or ID:
                 #Form has been submitted
                 try:
@@ -1090,7 +1077,7 @@ class StageEditPage(Workshop):
                 # self.stage.set_default()  # Is this needed? It doesn't do anything.
                 self.stage.reset() # Correct method to use
                 self.message+='Stage has been cleared!'
-            
+        
         elif action=='delete':
             log.msg('In Deleted Function');
             self.collection.stages.delete_stage(self.stagename, self.player);
@@ -1098,7 +1085,7 @@ class StageEditPage(Workshop):
             request.redirect("/admin")#(09/04/2013) Craig
             
         elif action=='cancel':
-            ###For now dont actually need to do anything.
+            self.stage.unassigned = []
             self.message+='Discarded changes.'
             
             #Lisa - takes selected media out of the 'unassigned' list
@@ -1108,36 +1095,17 @@ class StageEditPage(Workshop):
             for i in range(0, len(items)):
                 mname = items[i]
                 if self.stagename and mname:
-                    self.unassigned.remove(mname)
+                    self.stage.unassigned.remove(mname)
             
             #Lisa - puts selected media into the 'unassigned' list
         elif action=='unassign_media':
-            log.msg('unassign the thing!')
+            log.msg('unassign the thing!')            
             items = request.args.get('massigned',[''])
             for i in range(0, len(items)):
                 mname = items[i]
                 if self.stagename and mname:
-                    self.unassigned.append(mname)
-            
-        elif action=='unAssign_Avatar':#(16/04/2013) Craig
-            log.msg('In UnAssign_avatar fuction start')
-            self.esUnAssignMedia(request,1)
-            log.msg('In UnAssign_avatar fuction finished')
-
-        elif action=='unAssign_Prop':#(16/04/2013) Craig
-            log.msg('In UnAssign_Prop fuction start')
-            self.esUnAssignMedia(request,2)
-            log.msg('In UnAssign_Prop fuction finished')
-
-        elif action=='unAssign_Backdrop':#(16/04/2013) Craig
-            log.msg('In UnAssign_Backdrop fuction start')
-            self.esUnAssignMedia(request,3)
-            log.msg('In UnAssign_Backdrop fuction finished')
-
-        elif action=='unAssign_Audio':#(16/04/2013) Craig
-            log.msg('In UnAssign_Audio fuction start')
-            self.esUnAssignMedia(request,4)
-            log.msg('In UnAssign_Audio fuction finished')
+                    self.stage.unassigned.append(mname)
+                    log.msg(self.stage.unassigned)
 
         elif action=='view_Avatar':#(25/04/2013) Craig
             log.msg('es - view avatar method start')

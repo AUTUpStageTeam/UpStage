@@ -71,6 +71,7 @@ Modified by: Craig Farrell  01/05/2013  - added new tOwner varible
 
 Modified by: Nitkalya Wiriyanuparb  29/08/2013  - add toggle_stream_audio to mute/unmute streaming avatar
 Modified by: Nitkalya Wiriyanuparb  04/09/2013  - clear user access list (access_level_one/two/three) before appending items to them to avoid duplicates
+Modified by: Lisa Helm 02/10/2013 - added the unassigned media list + functionality and made it so that the xml of a stage is reloaded after it is saved
 """
 
 #std lib
@@ -117,7 +118,7 @@ class _Stage(object):
     onStageList = 'on'#(08/04/2013)Craig added to displays onStageList or not : 'on' or 'off'
     lockStage = 'false'#(30/04/2013)Craig added to displays LockStage or not : 'true' or 'false'
     tOwner = 'admin'
-
+    unassigned = []
 
 
     def __init__(self, ID, name=None, owner=None):
@@ -148,6 +149,7 @@ class _Stage(object):
         self.avatars = ThingCollection(Avatar, self.owner.mediatypes['avatar']) # avatar objects here.
         # PQ & EB: 17.9.07
         self.audios = ThingCollection(Audio, self.owner.mediatypes['audio']) # audio objects here.
+        self.unassigned = []
     
     def set_default(self):
         self.wake()
@@ -159,6 +161,7 @@ class _Stage(object):
         self.debugMessages = 'normal'#(12/11/08)Aaron added to displays debug messages or not 'Normal' or 'DEBUG'
         self.onStageList = 'on'#(08/04/2013)Craig added to displays onStageList or not : 'on' or 'off'
         self.lockStage = 'false'#(30/04/2013)Craig added to displays LockStage or not : 'true' or 'false'
+        self.unassigned = []
 
     def reset(self):        
         """[re-]initialises the stage """
@@ -170,6 +173,7 @@ class _Stage(object):
         self.chat = []    # chat strings build up here.
         self.broadcast('RELOAD') #so no-one is left with the old version.
         self.current_bg = None
+        self.unassigned = []
         
         if not os.path.exists(self.config_file):
             self.setup()
@@ -215,6 +219,7 @@ class _Stage(object):
         debugScreenNodes = tree.getElementsByTagName('showDebugScreen')
         onStageListNodes = tree.getElementsByTagName('onstageList')#(08/04/2013)Craig
         isLockStageNodes = tree.getElementsByTagName('lockstage')#(30/04/2013)Craig
+        
 
         try:
             #Heath Behrens 10/08/2011 - changed the if statements so they now check for none and process each
@@ -249,7 +254,7 @@ class _Stage(object):
                 self.lockStage = isLockStageNodes[0].firstChild().toxml()
 
         except Exception, e:
-			print "Couldn't set splash message for '%s', because '%s'" % (self, e)
+            print "Couldn't set splash message for '%s', because '%s'" % (self, e)
         for d in (self.props, self.avatars, self.backdrops, self.audios):
             nodes = tree.getElementsByTagName(d.typename)
             log.msg("Loading media for type %s" %(d.typename))
@@ -311,20 +316,25 @@ class _Stage(object):
             lockstage.text(self.lockStage)
         for x in self.get_avatar_list():
             # log.msg("Voices: %s %s " %(x.voice,x.media.voice))
-            tree.add(self.avatars.typename, media=x.media.file, showname=x.show_name,
-                     name=x.name, voice=(x.voice or x.media.voice or '') )
+            if self.unassigned.count(x.name) == 0:
+                tree.add(self.avatars.typename, media=x.media.file, showname=x.show_name,
+                         name=x.name, voice=(x.voice or x.media.voice or '') )
             log.msg("avatar list in save method: %s" % self.avatars.typename)
             # NOTE one day, save player permissions.
         for x in self.get_prop_list():
-            tree.add(self.props.typename, media=x.media.file,
-                     name=x.name)
+            if self.unassigned.count(x.name) == 0:
+                tree.add(self.props.typename, media=x.media.file,
+                        name=x.name)
         for x in self.get_backdrop_list():
-            tree.add(self.backdrops.typename, media=x.media.file,
-                     name=x.name)
+            if self.unassigned.count(x.name) == 0:
+                tree.add(self.backdrops.typename, media=x.media.file,
+                        name=x.name)
         log.msg('stage.save() - adding audio to xml')
         for x in self.get_audio_list():
             log.msg('stage.save() - audio item: %s' %(x))
-            tree.add(self.audios.typename, media=x.media.file, name=x.name, type=x.media.medium)
+            if self.unassigned.count(x.name) == 0:
+                tree.add(self.audios.typename, media=x.media.file, name=x.name, type=x.media.medium)
+        self.unassigned = []
         #Shaun Narayan (02/14/10) - Write all new values to XML.
         access_string = ''
         for x in self.access_level_one:
@@ -359,6 +369,7 @@ class _Stage(object):
         nodetOwner.text(self.tOwner)
         save_xml(tree.node, config_file)
         del tree
+        self.load()
 
     def wake(self):
         """Set stage to active"""
@@ -538,7 +549,7 @@ class _Stage(object):
 
         #try to preserve local modification
 
-        # HALLO, ANNE!! PQ & EB ADED 'self.audios' 2 THIS LIEN ON 13/10/07 !!! ^_^
+        # PQ & EB added 'self.audios' to this line on 13/10/07 
         # This is for updating the stage xml file from the workshop
         for collection in (self.avatars, self.props, self.backdrops, self.audios):
             globalmedia = collection.globalmedia

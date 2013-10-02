@@ -34,6 +34,7 @@
  * Modified by Craig Farrell (CF) 01/05/2013 - added lockDisableAll method: to lock components of the html
  *                                           - added call for lockDisableAll in stageEdit
  *  Modified By Vanessa Henderson - 28/08/2013 - Merged Martins fork with current working code
+ *  Modified By Lisa Helm - 02/10/2013 - Removed old methods for unassigning media, added the new ones
 */
 
 //Instance based variables
@@ -227,38 +228,9 @@ function setAccess(action)
 }
 
 /**
- * @Author : Craig Farrell
- * @date : 15/04/2013
- * @parameter : int type
- * gets which media is being unassigned. 1=avatar, 2=props, 3=backdrop, 4=audio, 5=video(N/A)
- */
-function unAssignMedia(type)
-{
-    if(type == null)
-    {type =0;}
-    
-    //saveState();
-	document.getElementById("status").innerHTML = 'Sending to server, please wait...';
-	document.getElementById("status").style.display = "inline";
-    
-    switch(type)
-    {
-        case 1:
-            document.stageedit.action.value = 'unAssign_Avatar';
-        break;
-        case 2:
-            document.stageedit.action.value = 'unAssign_Prop';
-        break;
-        case 3:
-            document.stageedit.action.value = 'unAssign_Backdrop';
-        break;
-        case 4:
-            document.stageedit.action.value = 'unAssign_Audio';
-        break;
-    }
-    requestPage("POST", buildRequest(2),fillPage);
-}
-
+*   Lisa Helm   2/10/2013
+*   Informs StageEditPage class in pages.py to put media into the stage.py unassigned list of the current stage, using the action value in the stageedit form in stageedit.xhtml
+*/
 function setMediaUnassigned()
 {
     saveState();
@@ -268,6 +240,10 @@ function setMediaUnassigned()
     requestPage("POST", buildRequest(2),fillPage);
 }
 
+/**
+*   Lisa Helm   2/10/2013
+*   Informs StageEditPage class in pages.py to remove media from the stage.py unassigned list of the current stage, using the action value in the stageedit form in stageedit.xhtml
+*/
 function setMediaAssigned()
 {
     saveState();
@@ -323,6 +299,7 @@ function stageChooseSubmit()
     {}
 	document.getElementById("status").innerHTML = 'Sending to server, please wait...';
 	document.getElementById("status").style.display = "inline";
+    document.stageedit.action.value = 'reload'
 	requestPage("POST", buildRequest(1), fillPage);//'/admin/workshop/stage?shortName='+document.selectstage.shortName.value, fillPage);
 }
 
