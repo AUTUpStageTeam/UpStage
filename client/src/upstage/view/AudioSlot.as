@@ -37,6 +37,8 @@ import upstage.model.ModelSounds;
  * 		Type of slot (sfx/music) 
  * 		url of currently assigned audio clip, 
  * Modified by: Vibhu 31/08/2011 - Changed create function to take one more parameter for the color value.
+ *
+ * Modified by: Nitkalya Wiriyanuparb  28/09/2013  - Supported unlooping audio and updated looping button text
  */
 class upstage.view.AudioSlot extends MovieClip
 {
@@ -125,8 +127,7 @@ class upstage.view.AudioSlot extends MovieClip
                                        			'loop', 0.8, Client.AU_SLIDER_W + 2.5, Client.AU_CONTROL_HEIGHT - 1 * Client.UI_BUTTON_SPACE_H - 4.3);
  
         out.loopBtn.onPress = function() {
-			this.grey();
-			out.modelSounds.loopClip(out.assignedType, out.assignedURL);
+          var looping:Boolean = out.modelSounds.toggleLoopClip(out.assignedType, out.assignedURL);
         };
     
 		// Default volume is 50, this sets the slider to match
@@ -194,6 +195,13 @@ class upstage.view.AudioSlot extends MovieClip
 		this.playBtn.ungrey();
 		this.stopBtn.ungrey();
 	}
+
+  public function updateLoopButton(looping: Boolean)
+  {
+    var loopText:String = looping ? 'unloop' : 'loop';
+    trace('Updating loop button label: ' + loopText);
+    this.loopBtn.setText(loopText);
+  }
 	
     /**
      * @brief load the mirror image, and size it.

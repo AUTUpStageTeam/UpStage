@@ -184,7 +184,7 @@ function createWorkshopLink()
 function removeWorkshopLink()
 {
 	var workshopLink = document.getElementById('workshop-link');
-    if (workshopLink)
+    if (workshopLink && document.URL.indexOf('admin/save') < 0)
     	workshopLink.parentNode.removeChild(workshopLink);
 }
 
@@ -214,7 +214,11 @@ function clearLogin()
 				if(!cookieChecked) checkCookie();
 				loginForm = document.getElementById('signup').innerHTML;
 				var html_str;
-				if(document.hidden_form.can_signup.value=='true')
+				if (document.URL.indexOf('admin') >= 0)
+				{	// success and error page doesn't contains player info, but users are logged in
+					html_str = '';
+				}
+				else if(document.hidden_form.can_signup.value=='true')
 				{
 					html_str=signup+loginLinks;
 				}
@@ -279,7 +283,7 @@ function screenSize()
  {
     try
     {
-        return document.hidden_form.user_name.value != "_NO_PLAYER_";
+        return document.hidden_form.user_name.value != "_NO_PLAYER_" || document.URL.indexOf('admin') >= 0;
     }catch(err){ return false; }
  }
  
@@ -450,7 +454,7 @@ function checkCookie()
 function setPassword(name,pass)
 {
 	var md5val = hex_md5(pass);
-	if(document.login.remember.checked)
+	if(document.rupert.remember.checked)
 	{
 		setCookie('username',name,30,0);
 		setCookie('password',md5val,30,0);
@@ -559,6 +563,11 @@ function checkLogin()
 			var html = '<h1>Authentication Failed</h1><p>Login Failed. Please enter correct login details.</p>';
 			html += '<p>You will be redirected to the homepage in 3 seconds...</p>';	//
 			document.getElementById("page").innerHTML = html;				// PR - 9/10/2010
+
+			// delete 'remember me' cookies since we've failed authentication
+			deleteCookie('username');
+			deleteCookie('password');
+
 			window.setTimeout('location.reload(true)', 3000);
 		}
 		else
@@ -681,7 +690,7 @@ function fillPage()
 					document.forms[2].elements[1].value = temp13[0];
 					document.getElementById("submit").innerHTML = '<!--mediaedit_break_3-->' + temp15[0] + '<!--mediaedit_break_4-->';
 					//Vibhu and Heath (01/08/2011) - sets appropiate audio type in drop drown combo box.
-					//pumpkin();
+					pumpkin();
 				}
 
                 //console.log("divMessage: "  + document.getElementById("divMessage").innerHTML)
@@ -930,7 +939,7 @@ function warn(type)
         // Gavin (6/3/13): Changed actions[type] to actions[5] to also delete the media 
 		document.getElementById("status").innerHTML = 'Sending to server, please wait...';
 		document.getElementById("status").style.display = "inline";
-		document.stageedit.action.value = actions[type];// 09/04/2013 Craig - changed back to type so all the stageEdit buttens work again
+		document.rupert.action.value = actions[type];// 09/04/2013 Craig - changed back to type so all the stageEdit buttens work again
 		requestPage("POST", buildRequest(2),fillPage);
 		//18/05/2011 Navigates back to stage workshop page (Vibhu Patel)
         /*
@@ -947,7 +956,7 @@ function seSaveOnly() //09/04/2013 Craig - changed embedmessage method name so i
     doIt=confirm(warningMessages[6]);
         if(doIt)
         {
-            document.stageedit.action.value = actions[6];
+            document.rupert.action.value = actions[6];
             requestPage("POST", buildRequest(2),fillPage);
         }
 }

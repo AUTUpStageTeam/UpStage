@@ -16,12 +16,17 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
+import upstage.model.ModelSounds;
+
 /**
  * Module: NewSound.as
  * Created: 20.05.08
  * Author: Alan Crow - 2007/2008 AUT UpStage Team
  * Purpose: To allow from much better control over the audio files.
  * Notes:
+ *
+ * Modified by: Nitkalya Wiriyanuparb  28/09/2013  - Stored modelSounds so it can send messages to server
+ *                                                 - Can set and play audio from a custom position
  */
 
 class upstage.util.NewSound extends Sound
@@ -31,6 +36,8 @@ class upstage.util.NewSound extends Sound
 	private var bLooping	:Boolean;
 	public var type			:String;
 	public var url			:String;
+	private var startAt		:Number;
+	private var model		:ModelSounds;
 	
 	/**********************************************************
 	*	Constructor
@@ -40,6 +47,7 @@ class upstage.util.NewSound extends Sound
 		super();
 		this.updateState(false, true);
 		this.setLooping(false);
+		this.startAt = 0;
 	}
 	
 	/**********************************************************
@@ -77,6 +85,10 @@ class upstage.util.NewSound extends Sound
 	function setLooping(bLooping: Boolean) {
 		this.bLooping = bLooping;
 	}
+
+	function setModel(model:ModelSounds) {
+		this.model = model;
+	}
 	
 	function isPlaying(): Boolean {
 		return this.bPlaying;
@@ -94,22 +106,38 @@ class upstage.util.NewSound extends Sound
 		this.bPlaying = bPlay;
 		this.bStopped = bStop;
 	}
+
+	function setStartPosition(pos: Number) {
+		trace("Set start position at " + pos);
+		this.startAt = pos;
+	}
+
+	function clearStartPosition() {
+		trace("Clear start position");
+		this.startAt = 0;
+	}
 	
 	/**********************************************************
 	*	Event Methods
 	**********************************************************/
 	
-	function onLoad() {
-		_level0.app.audioScrollBar.getAudioSlot(this.type, this.url).setPlaying();
-		this.updateState(true,false);
-		trace("New Sound Playing");
+	function onLoad(success:Boolean) {
+		if (success) {
+			this.start(this.startAt);
+			_level0.app.audioScrollBar.getAudioSlot(this.type, this.url).setPlaying();
+			this.updateState(true,false);
+			trace("New Sound Playing at: " + this.startAt);
+		}
 	}
 	
 	function onSoundComplete() 
 	{
+		this.clearStartPosition();
 		trace("IS LOOPING :::::::> " +this.isLooping());
 		if (this.isLooping()) {
-			this.start();
+			// send a message to server instead of start it locally
+			// so the server can store information about the playing audio
+			this.model.playClip('sounds', this.url, true);
 		}
 		else {
 			var au :Object = _level0.app.audioScrollBar;

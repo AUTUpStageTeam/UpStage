@@ -16,8 +16,9 @@
                 
    				Lisa Helm 21/08/2013       - removed all code relating to old video avatar    
 				Vanessa Henderson 28/08/2013 - Merged Martins fork
+				Nitkalya Wiriyanuparb 14/09/2013 - Cleanup some methods and make them reusable
 				David Daniels 25/09/2013 - removed multi frame prop option
-										 - renamed form natasha to form_mediaupload
+										 - renamed form natasha to mediauploadform
 */
 
 // global variables
@@ -39,15 +40,7 @@ allDivs[3]="audioBits";
 function sendPostAction()
 {
 	log.debug("sendPostAction()");
-	
-	/*
-    if(shallContinue())
-    {
-        requestPageForm("POST", document.form_mediaupload.action, document.natasha, popupAlert);
-    }
-    return false;
-    */
-    
+
     return shallContinue();
 }
 
@@ -66,11 +59,10 @@ function enableSubmit() {
 * Author: Natasha Pullan
 * Sets the action of the webpage when a media type is selected
 */
-function setAction(activate)
+function setActionForMedia(activate, mediatype)
 {
-	log.debug("setAction(): activate="+activate);
-	
-	var mediatype = getSelectedMediaType();
+	log.debug("setActionForMedia(): activate="+activate);
+
 	var action = '';
 	if(activate)
 	{
@@ -89,7 +81,13 @@ function setAction(activate)
 		action = "";
 	}
 
-	document.form_mediaupload.action = action;
+	document.mediauploadform.action = action;
+}
+
+function setAction(activate)
+{
+	log.debug("setAction(): activate="+activate);
+	setActionForMedia(activate, getSelectedMediaType());
 }
 
 /*
@@ -488,7 +486,7 @@ function checkAllFields()
 		
 		// check file extensions for upload images
 		if(imageType == 'upload') {
-			if(checkExtensions()) { postcheck = true; }
+			if(checkExtensions(type)) { postcheck = true; }
 		} else {
 			postcheck = true;
 		}
@@ -505,6 +503,19 @@ function checkAllFields()
 	}
 }
 
+function checkFieldsBeforeReplace()
+{
+	log.debug("checkFieldsBeforeReplace()");
+
+	var filled = false;
+	var type = _getElementById('type').value;
+	var name = _getElementById('name').value;
+
+	shall = checkExtensions(type);
+	setActionForMedia(shall, type);
+	setContinue(shall);
+}
+
 /*
  * Author: Natasha Pullan
  * Sets the continue field, which will be returned by shallContinue()
@@ -512,7 +523,7 @@ function checkAllFields()
 function setContinue(cont)
 {
 	navigate = cont;
-
+	log.debug('setContinue(): ' + navigate)
 }
 
 /*
@@ -530,51 +541,34 @@ function shallContinue()
  * Author: Natasha Pullan
  * Method to check each file field for the correct file extensions
  */
-function checkExtensions()
+function checkExtensions(type)
 {
 	log.debug("checkExtensions()");
-	
-	//var type = getRadioValue();
-	var type = getSelectedMediaType();
-	var filename = '';
-	var fileID = '';
-	//var shallcontinue = "";
-	var shallcontinue = false;
+
+	var filename = '',
+		fileID = '',
+		shallcontinue = false;
+
 	if(type == "avatar")
 	{
 		var frameNo = parseInt(document.getElementById('avframecount').value);
 		var prefix = 'av';
 
-		for(var count = 0; count < frameNo; count++)
-		{
-			fileID = prefix + "contents" + count;
-
-			filename = document.getElementById(fileID).value;
-			shallcontinue = checkMediaType(filename, type);
-		}
+		shallcontinue = checkAllMedia(type, prefix, frameNo);
 	}
 	else if(type == "backdrop")
 	{
 		var frameNo = parseInt(document.getElementById('bkframecount').value);
 		var prefix = 'bk';
 
-		for(var count = 0; count < frameNo; count++)
-		{
-			fileID = prefix + "contents" + count;
-			filename = document.getElementById(fileID).value;
-			shallcontinue = checkMediaType(filename, type);
-		}
+		shallcontinue = checkAllMedia(type, prefix, frameNo);
 	}
 	else if(type == "prop")
 	{
-		var frameNo = parseInt(document.getElementById('prframecount').value);
+		var frameNo = 1; // parseInt(document.getElementById('prframecount').value);
 		var prefix = 'pr';
-		for(var count = 0; count < frameNo; count++)
-		{
-			fileID = prefix + "contents" + count;
-			filename = document.getElementById(fileID).value;
-			shallcontinue = checkMediaType(filename, type);
-		}
+
+		shallcontinue = checkAllMedia(type, prefix, frameNo);
 	}
 	else if(type == "audio")
 	{
@@ -582,10 +576,25 @@ function checkExtensions()
 		fileID = prefix + "contents0";
 		filename = document.getElementById(fileID).value;
 		shallcontinue = checkMediaType(filename, type);
-		
+
 	}
     //Lisa 21/08/2013 - removed video avatar code
-	
+
+	return shallcontinue;
+}
+
+function checkAllMedia(type, prefix, frameNo)
+{
+	var filename = '',
+		fileID = '',
+		shallcontinue = true;
+	for(var count = 0; count < frameNo && shallcontinue; count++)
+	{
+		fileID = prefix + "contents" + count;
+		filename = document.getElementById(fileID).value;
+		shallcontinue = checkMediaType(filename, type);
+	}
+
 	return shallcontinue;
 }
 
@@ -807,7 +816,7 @@ function voiceTesting()
 	var action = "/admin/test.mp3";
 	voiceForm.action = action;
 	window.open(voiceForm.submit(), 'name','height=100,width=200');
-	//document.natasha.action = action;
+	//document.mediauploadform.action = action;
 }
 */
 

@@ -40,6 +40,9 @@ import upstage.model.ModelDrawing;
  * Modified by: Craig Farrell 07/05/2013 - added this.satge.debug(msg) so when something is called it is put on screen if debug is on
  * Modified by: Nitkalya Wiriyanuparb  29/08/2013  - add TOGGLE_STREAM_AUDIO
  * Modified by: Nitkalya Wiriyanuparb  10/09/2013  - Added swf width and height in LOAD_AV and LOAD_PROP for resizing
+ * Modified by: Nitkalya Wiriyanuparb  26/09/2013  - Receive rotating direction to fix inconsistent views for audiences
+ * Modified by: Nitkalya Wiriyanuparb  28/09/2013  - Supported unlooping audio
+ *                                                 - Fixed audio not heard by late audiences
  */
 
 class upstage.Transport extends XMLSocket
@@ -494,6 +497,11 @@ class upstage.Transport extends XMLSocket
 	{
 		this.modelSounds.remotePlayClip(x.array, x.url);
 	}
+
+  private function LATE_PLAY_CLIP(x :Object): Void
+  {
+    this.modelSounds.remoteSetPlayPosition(x.array, x.url, x.pos);
+  }
 	
 	private function PAUSE_CLIP(x :Object): Void
 	{
@@ -502,8 +510,13 @@ class upstage.Transport extends XMLSocket
 	
 	private function LOOP_CLIP(x :Object): Void
 	{
-		this.modelSounds.remoteLoopClip(x.array, x.url);
+		this.modelSounds.remoteToggleLoopClip(x.array, x.url);
 	}
+
+  private function UNLOOP_CLIP(x :Object): Void
+  {
+    this.modelSounds.remoteToggleLoopClip(x.array, x.url);
+  }
 	
 	// PQ & LK: Added 31.10.07 - Play the applause sound
 	private function APPLAUSE_PLAY(x :Object): Void
@@ -646,7 +659,7 @@ class upstage.Transport extends XMLSocket
      */
     private function SPLASH_DETAILS(x :Object) :Void
     {
-        this.modelSplashScreen.GET_SPLASH_DETAILS(x.avatars, x.props, x.backdrops, x.msg);
+        this.modelSplashScreen.GET_SPLASH_DETAILS(x.avatars, x.props, x.backdrops, x.audios, x.msg);
     };
 
 
@@ -944,7 +957,8 @@ class upstage.Transport extends XMLSocket
 	function ROTATE_AVATAR(msg:Object)
 	{
 		var AVid:Number = Number(msg.AV);
-		this.modelAvatars.GET_ROTATE_AVATAR(AVid);
+    var clockwise:Boolean = Boolean(Number(msg.clockwise));
+		this.modelAvatars.GET_ROTATE_AVATAR(AVid, clockwise);
 	}
 	
     function DRAW_LINE(msg:Object) {

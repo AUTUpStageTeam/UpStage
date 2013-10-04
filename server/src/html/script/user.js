@@ -11,6 +11,7 @@
  * Gavin                29/08/2012 - Made event to close the edit player form 
  * Gavin                13/09/2012 - Added alert for players when they update their password with different inputs 
  * Nitkalya             24/09/2013 - Added email format validation and make sure username and password are not blank when creating new users
+ * Nitkalya             02/10/2013 - Added validation to make sure username are alphanumerics only, and changed that weird confirmation message
  */
 
 /**
@@ -76,7 +77,7 @@ function toUser()
         {
             divMsg = document.getElementById("divPopup");
             divShad = document.getElementById("divShade");
-            divMsg.innerHTML = "Successfully Confirmed!" + "<input type='button' onclick=\"hideDiv('divPopup'); hideDiv('divShade'); navUserPage()\" value='Close' />";;
+            divMsg.innerHTML = "The action was successful!" + "<input type='button' onclick=\"hideDiv('divPopup'); hideDiv('divShade'); navUserPage()\" value='Close' />";;
             
             divMsg.style.display = 'block';
             divShad.style.display = 'block';
@@ -158,6 +159,12 @@ function validateInfoBeforeSave(username, password, password2, email)
 		return false;
 	}
 
+	var alphanum = /^[a-z0-9]+$/i;
+	if (!username.match(alphanum)) {
+		alert('Username must be alphanumeric characters');
+		return false;
+	}
+
 	if (password !== password2) {
 		alert('Passwords do not match');
 		return false;
@@ -215,43 +222,53 @@ function savePlayer()
 
 function deletePlayer()
 {
-	var username = document.getElementById('editplayername').value;
+	var username = document.getElementById('editplayername').value.trim();
 	requestPage("POST", '/admin/workshop/editplayers?username=' + unescape(username) +
 			'&submit=deleteplayer', toUser);
 }
 
 function updatePlayer()
 {
-	var username = document.getElementById('editplayername').value;
+	var username = document.getElementById('editplayername').value.trim();
 	var act = true;
 	var admin = stringChecked(document.getElementById('editadmin').checked, 'admin');
 	var su = stringChecked(document.getElementById('editsu').checked, 'su');
 	var unlimited = stringChecked(document.getElementById('editunlimited').checked, 'unlimited');
-	var email = document.getElementById('email').value;	
-
-	if(email == ""){
-			email = "Unset!";
-		}
+	var email = document.getElementById('email').value.trim();
 
 	var request = '/admin/workshop/editplayers?username='+unescape(username) + '&act='+act+
-		'&admin='+admin+'&su='+su+'&unlimited='+unlimited+'&email='+email;
+		'&admin='+admin+'&su='+su+'&unlimited='+unlimited;
 	
 	// Vibhu Patel (31/08/2011) Check the password fields only if the checkbox is ticked.
 	if(document.getElementById('changepassword').checked)
 	{
-		var password = document.getElementById('password').value;
-		var password2 = document.getElementById('password2').value;
+		var password = document.getElementById('password').value.trim();
+		var password2 = document.getElementById('password2').value.trim();
 		
 		if (password != '' && password2 != ''){		
 			var hex1 = hex_md5(password);
 			var hex2 = hex_md5(password2);
+
+			if (hex1 != hex2) {
+				alert("Passwords do not match");
+				return false;
+			}
 			
-			request += '&password='+hex1+'&password2='+hex2
+			request += '&password='+hex1+'&password2='+hex2;
 		} else {
 			alert("Password cannot be empty");
             return false;
 		}
 	}
+
+	if (email == "") {
+		email = "Unset!";
+	} else if (!validateEmailFormat(email)) {
+		alert('Please enter a valid email address or you can leave it blank');
+		return false;
+	}
+
+	request += '&email='+email;
 	
 	requestPage("POST", request + '&submit=updateplayer', toUser);
 }
@@ -312,7 +329,7 @@ function renderPlayer()
 			document.getElementById("edit_player").style.visibility = "visible";
 			document.getElementById("userdetails").style.display = "inline";
 			document.getElementById("dispplayername").style.display = "inline";
-			document.getElementById("email").value = email;
+			document.getElementById("email").value = (email.match(/unset/i)) ? "" : email;
 		}
 		else
 		{

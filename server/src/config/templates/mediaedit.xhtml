@@ -75,6 +75,14 @@
 				<option value="sfx">Sound-Effect</option>
 			</select>
 		</div>
+        
+        <div class="filterBlock">
+			<label for="filterTags">Tags:</label>
+			<select id="filterTags" name="filterTags" style="width:150px;">
+				<option value=""></option>
+				%(list_tags_as_html_option_tag)s
+			</select>
+		</div>
 	
 		<div class="filterBlock">
 		    <input id="buttonUpdateView" type="button" class="button-standard" value="Apply Filter" />
@@ -83,7 +91,17 @@
 	 
 	</div>
     
+    <div id = "searchDiv">
+    <div class = "searchBlock">
+            <input id="searchText" name="searchText" type="text" onblur="if(this.value=='') this.value=defaultValue" onclick="if(this.defaultValue==this.value) this.value=''" value="Search">
+            <input id="buttonSearch" type="button" style="width:60px;" onclick="javascript:searchByString()" value="Search" />
+    </div>
 </div>
+</div>
+
+</div>
+
+
 
 <hr />
 
@@ -138,6 +156,7 @@
 		<div id="controlButtons" class="buttonRow">
 			<button id="buttonPreviewMedia" type="button" title="Preview" class="controlButton"><i class="icon-eye-open icon-2x"></i></button>
 			<button id="buttonEditMedia" type="button" title="Edit" class="controlButton"><i class="icon-pencil icon-2x"></i></button>
+			<button id="buttonReplaceMedia" type="button" title="Replace" class="controlButton"><i class="icon-refresh icon-2x"></i></button>
 			<button id="buttonAssignMedia" type="button" title="Assign" class="controlButton"><i class="icon-link icon-2x"></i></button>
 			<button id="buttonTagMedia" type="button" title="Tag" class="controlButton"><i class="icon-tag icon-2x"></i></button>
 			<button id="buttonDownloadMedia" type="button" title="Download" class="controlButton"><i class="icon-download-alt icon-2x"></i></button>
@@ -452,6 +471,117 @@
 				</div>
 			
 			</div>
+		
+		</div>
+		
+	</div>
+
+	<!-- Ing 14/09/2013  - Added media replacing functionality -->
+	<div id="replaceMediaPanel" class="colorboxPanel">
+	
+		<div class="dialogContent">
+			<h1>Replace &quot;<span id="replaceMediaName"></span>&quot;</h1>
+			
+			<div id="replaceMediaUploadPanel">
+
+			<form name="mediauploadform" method="post" enctype="multipart/form-data" action="">
+
+				<!-- meta data for form submit content -->
+				<input type="hidden" name="mode" size="16" value="replace" />
+				<input type="hidden" name="name" id="name" size="16" value="" />
+				<input type="hidden" name="stages" id="stages" size="16" value="" />
+				<input type="hidden" name="type" id="type" size="16" value="" />
+				<input type="hidden" name="imagetype" id="imagetype" value="upload" />
+				<input type="hidden" name="audio_type" id="audio_type" value="" />
+				<input type="hidden" name="oldfile" id="oldfile" value="" />
+				<input type="hidden" name="key" id="key" value="" />
+
+				<div id="avatarBits" style="display: none;">
+			
+					<div id="avimageselection" style="display:inherit">
+						
+						<div class="fieldrow">
+							<label id="numframe">Number of frames:</label>
+							<select name="avframecount" size="1" id="avframecount" onchange="displayFields('avframecount', 'av');">
+								<option value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5">5</option>
+								<option value="6">6</option>
+								<option value="7">7</option>
+								<option value="8">8</option>
+								<option value="9">9</option>
+								<option value="10">10</option>
+							</select>
+						</div>
+						
+						<div id="avlbl0" class="fileupload"><label for="avcontents0">Filename 1:</label><input type="file" size="50" name="avcontents0" id="avcontents0" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+						<div id="avlbl1" class="fileupload" style="display: none"><label for="avcontents1">Filename 2:</label><input type="file" size="50" name="avcontents1" id="avcontents1" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+						<div id="avlbl2" class="fileupload" style="display: none"><label for="avcontents2">Filename 3:</label><input type="file" size="50" name="avcontents2" id="avcontents2" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+						<div id="avlbl3" class="fileupload" style="display: none"><label for="avcontents3">Filename 4:</label><input type="file" size="50" name="avcontents3" id="avcontents3" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+						<div id="avlbl4" class="fileupload" style="display: none"><label for="avcontents4">Filename 5:</label><input type="file" size="50" name="avcontents4" id="avcontents4" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+						<div id="avlbl5" class="fileupload" style="display: none"><label for="avcontents5">Filename 6:</label><input type="file" size="50" name="avcontents5" id="avcontents5" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+						<div id="avlbl6" class="fileupload" style="display: none"><label for="avcontents6">Filename 7:</label><input type="file" size="50" name="avcontents6" id="avcontents6" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+						<div id="avlbl7" class="fileupload" style="display: none"><label for="avcontents7">Filename 8:</label><input type="file" size="50" name="avcontents7" id="avcontents7" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+						<div id="avlbl8" class="fileupload" style="display: none"><label for="avcontents8">Filename 9:</label><input type="file" size="50" name="avcontents8" id="avcontents8" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+						<div id="avlbl9" class="fileupload" style="display: none"><label for="avcontents9">Filename 10:</label><input type="file" size="50" name="avcontents9" id="avcontents9" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+					
+					</div>
+	       			
+				</div><!-- end avatarBits -->
+
+				<div id="propBits" style="display: none;">
+				
+					<div id="prlbl0" class="fileupload"><label for="prcontents0">Filename:</label><input type="file" size="50" name="prcontents0" id="prcontents0" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+					
+				</div><!-- end propBits -->
+				
+				<div id="backdropBits" style="display: none;">
+					
+					<div class="fieldrow">
+						<label id="numframe">Number of frames:</label>
+						<select name="bkframecount" size="1" id="bkframecount" onchange="displayFields('bkframecount', 'bk');">
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+							<option value="6">6</option>
+							<option value="7">7</option>
+							<option value="8">8</option>
+							<option value="9">9</option>
+							<option value="10">10</option>
+						</select>
+					</div>
+				
+					<div id="bklbl0" class="fileupload"><label for="bkcontents0">Filename 1:</label><input type="file" size="50" name="bkcontents0" id="bkcontents0" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+					<div id="bklbl1" class="fileupload" style="display: none"><label for="bkcontents1">Filename 2:</label><input type="file" size="50" name="bkcontents1" id="bkcontents1" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+					<div id="bklbl2" class="fileupload" style="display: none"><label for="bkcontents2">Filename 3:</label><input type="file" size="50" name="bkcontents2" id="bkcontents2" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+					<div id="bklbl3" class="fileupload" style="display: none"><label for="bkcontents3">Filename 4:</label><input type="file" size="50" name="bkcontents3" id="bkcontents3" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+					<div id="bklbl4" class="fileupload" style="display: none"><label for="bkcontents4">Filename 5:</label><input type="file" size="50" name="bkcontents4" id="bkcontents4" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+					<div id="bklbl5" class="fileupload" style="display: none"><label for="bkcontents5">Filename 6:</label><input type="file" size="50" name="bkcontents5" id="bkcontents5" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+					<div id="bklbl6" class="fileupload" style="display: none"><label for="bkcontents6">Filename 7:</label><input type="file" size="50" name="bkcontents6" id="bkcontents6" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+					<div id="bklbl7" class="fileupload" style="display: none"><label for="bkcontents7">Filename 8:</label><input type="file" size="50" name="bkcontents7" id="bkcontents7" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+					<div id="bklbl8" class="fileupload" style="display: none"><label for="bkcontents8">Filename 9:</label><input type="file" size="50" name="bkcontents8" id="bkcontents8" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+					<div id="bklbl9" class="fileupload" style="display: none"><label for="bkcontents9">Filename 10:</label><input type="file" size="50" name="bkcontents9" id="bkcontents9" accept="application/x-shockwave-flash, image/gif, image/jpeg, image/png" /></div>
+				
+				</div><!-- end backdroupBits -->
+				
+				<div id="audioBits" style="display: none">
+					<div id="aulbl0" class="fileupload"><label for="aucontents0">Filename:</label><input type="file" size="50" name="aucontents0" id="aucontents0" /></div>
+				</div><!-- end audioBits -->
+
+			</div><!-- end replaceMediaPanel -->
+
+			<p class="dialogNote"><hr><strong>Note:</strong> Changes will force a reload of all assigned stages</p>
+			
+			<div class="dialogButtonRow">
+				<input type="button" class="buttonClose button-standard" id="buttonExecuteReplaceCancel" value="Cancel" />
+				<input type="button" class="button-standard" id="buttonExecuteReplace" value="Replace"/>
+			</div>
+
+			</form>
 		
 		</div>
 		

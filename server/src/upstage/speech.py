@@ -28,7 +28,7 @@ import os, datetime
 from time import strftime, mktime
 
 from upstage import config
-from upstage.misc import id_generator
+from upstage.util import id_generator
 from upstage.voices import VOICES
 
 from twisted.python import log

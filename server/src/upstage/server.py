@@ -30,6 +30,10 @@ Modified by:    Daniel Han  14/09/2012      on handle_loaded, added self.stage.d
 Modified by:    Nitkalya Wiriyanuparb  29/08/2013  - add handle_TOGGLE_STREAM_AUDIO to mute/unmute streaming avatar 
 Modified by:    Nitkalya Wiriyanuparb  10/09/2013  - Added swfwidth and swfheight when loading avatars and props
 Modified by:    Nitkalya Wiriyanuparb  16/09/2013  - Set up streaming avatar mute state when new user joins a stage
+Modified by:    Nitkalya Wiriyanuparb  26/09/2013  - Received rotating direction to fix inconsistent views for audiences
+Modified by:    Nitkalya Wiriyanuparb  28/09/2013  - Supported unlooping audio
+                                                   - Stored details about playing audio (playing, looping, start time, and elapsed time)
+                                                   - Loaded currently playing audio and played from the currently playing position for late audiences
 Notes: 
 """
 
@@ -44,7 +48,8 @@ from cgi import parse_qs, parse_qsl
 
 #siblings
 from upstage import config
-from upstage.misc import id_generator, UpstageError
+from upstage.util import id_generator
+from upstage.misc import UpstageError
 
 #twisted
 from twisted.python import log
@@ -157,6 +162,7 @@ class _UpstageSocket(LineOnlyReceiver):
                       avatars = len(avatars),
                       props = len(props),
                       backdrops = len(backdrops),
+                      audios = len(audios), # Ing 2/10/13 - take number of audios to load into account as well
                       msg = self.stage.splash_message)
 
             # send the avatars, props and backgrounds for preloading
@@ -204,22 +210,14 @@ class _UpstageSocket(LineOnlyReceiver):
                           swfheight = x.media.height
                           )
 
-            for au in audios:
-                #Shaun Narayan (01/29/10) - Get position of track, and if its playing send the position to client.
-                auX,auY,auZ = au.get_pos()
-                audio_position = 0
-                if auX is not None and auX > 0:
-                    audio_position = time.mktime((datetime.datetime.now()).timetuple()) - auX
-                
+            for au in self.stage.get_audio_list():
                 self.send('LOAD_AUDIO',
                           ID = au.ID,
                           name = au.name,
                           url = au.media.file,
-                          type = au.type,
-                          position = audio_position
+                          type = au.type
                           )
 
-            
             chat = '\n'.join(stage.retrieve_chat())
             chat = chat.replace('<', '&lt;')# Vishaal 15/10/09 Changed to ACTUALLY fix < > chatlog problem
             chat = chat.replace('>', '&gt;')# Vishaal 15/10/09 Changed to ACTUALLY fix < > chatlog problem
@@ -355,27 +353,39 @@ class _UpstageSocket(LineOnlyReceiver):
     def handle_LOAD_EFFECT(self, file):
         self.stage.play_effect(file);
     
-    def handle_PLAY_CLIP(self, array, url):
-        #Shaun Narayan (01/28/10)- Loop through audio and find the started track, timestamp it.
-        for au in self.stage.get_audio_list():
-            if url.endswith(au.media.file):
-                au.move((time.mktime((datetime.datetime.now()).timetuple())),0,0)
+    def handle_PLAY_CLIP(self, array, url, autoLoop):
+        autoLoop = (str(autoLoop) == '1')
+        audio = self.stage.getAudioByUrl(url)
+        audio.startPlaying(array, autoLoop)
         self.stage.broadcast('PLAY_CLIP', array=array, url=url)
     
     def handle_PAUSE_CLIP(self, array, url):
+        audio = self.stage.getAudioByUrl(url)
+        audio.pauseAndRememberPosition()
         self.stage.broadcast('PAUSE_CLIP', array=array, url=url)
         
     def handle_LOOP_CLIP(self, array, url):
+        audio = self.stage.getAudioByUrl(url)
+        audio.setLooping(True)
         self.stage.broadcast('LOOP_CLIP', array=array, url=url)
+
+    def handle_UNLOOP_CLIP(self, array, url):
+        audio = self.stage.getAudioByUrl(url)
+        audio.setLooping(False)
+        self.stage.broadcast('UNLOOP_CLIP', array=array, url=url)
         
     def handle_ADJUST_VOLUME(self, url, type, volume):
         self.stage.broadcast('VOLUME', url=url, type=type, volume=volume)
         
     """ PQ: Added 29.10.07 - Stop ONE audio on all clients """
     def handle_STOP_AUDIO(self, url, type):
+        audio = self.stage.getAudioByUrl(url)
+        audio.finishPlaying()
         self.stage.broadcast('STOPAUDIO', url=url, type=type)
     
     def handle_CLEAR_AUDIOSLOT(self, type, url):
+        audio = self.stage.getAudioByUrl(url)
+        audio.finishPlaying()
         self.stage.broadcast('CLEAR_AUDIOSLOT', type=type, url=url)
     
     """ Endre: Handle message from a client who has moved their avatar up or down a layer
@@ -459,7 +469,6 @@ class _UpstageSocket(LineOnlyReceiver):
             recipients.remove('*')
             names = [x.player.name for x in self.stage.player_sockets.values()]
             recipients.extend([x for x in names if x not in recipients])
-
         for stage in self.factory.stages.values():
             if not recipients:
                 break
@@ -467,10 +476,12 @@ class _UpstageSocket(LineOnlyReceiver):
                 p = sock.player.name
                 if p in recipients:
                     sock.send('WHISPER', text=body, senderID=self.player.name)
-                    recipients.remove(p)
-                    sent.append(p)
+                    if not(p in sent):
+                        sent.append(p)
                     if not recipients: #done them all
                         break
+        for recp in sent:
+            recipients.remove(recp)
 
         self.send('MSG', message='whispered to %s: "%s"' % (', '.join(sent) or '[nobody]', body))
         if recipients:
@@ -591,7 +602,19 @@ class _UpstageSocket(LineOnlyReceiver):
                         self.send('BINDPROP', ID=prop.holder.ID, prop=prop.ID)
                     else:
                         prop.holder.drop_prop()
-                        
+
+            for au in self.stage.get_audio_list():
+
+                if au.getElapsedTime() > 0:
+                    self.send('LATE_PLAY_CLIP', array=au.arrayName, url=au.media.url, pos=au.getElapsedTime())
+
+                if au.isLooping():
+                    self.send('LOOP_CLIP', array=au.arrayName, url=au.media.url)
+
+                if au.isPlaying():
+                    self.send('PLAY_CLIP', array=au.arrayName, url=au.media.url)
+
+
             # Tell the client we got the LOADED message
             self.send('CONFIRM_LOADED')
         else:
@@ -651,8 +674,8 @@ class _UpstageSocket(LineOnlyReceiver):
 
         self.stage.draw_pick_layer(self, layer)
 	
-    def handle_ROTATE_AVATAR(self):
-        self.stage.rotate_avatar(self.avatar.ID)
+    def handle_ROTATE_AVATAR(self, clockwise):
+        self.stage.rotate_avatar(clockwise, self.avatar.ID)
 
     def handle_TOGGLE_STREAM_AUDIO(self, isMuted):
         # log.msg('in server.py, isMuted = ' + isMuted)

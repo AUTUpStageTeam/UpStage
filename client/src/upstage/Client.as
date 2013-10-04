@@ -30,6 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * Modified by: Craig Farrell (CF) 08/04/2013 -  changed prop max height and width to 50 because props aren't meant to be big.
  * Modified by: Nitkalya Wiriyanuparb  05/09/2013  - Removed video avatar related properties
  * Modified by: Nitkalya Wiriyanuparb  10/09/2013  - Added SCREEN_SIZE_DIVISOR for stage assets resizing calculation
+ * Modified by: Nitkalya Wiriyanuparb  02/10/2013  - Added LOADS_PER_AUDIO
  */
 class upstage.Client
 {
@@ -320,7 +321,7 @@ class upstage.Client
                                                            
     public static var AUDIOSLOT_UI_BUTTON_TEXT_WIDTH       :Number = 19;//18.8;
     public static var AUDIOSLOT_UI_BUTTON_TEXT_HEIGHT      :Number = 8;
-    public static var AUDIOSLOT_UI_BUTTON_TEXT_SCALE  	   :Number = 0.9;
+    public static var AUDIOSLOT_UI_BUTTON_TEXT_SCALE  	   :Number = 0.8;
                                                       
                                                       
                                                       
@@ -642,6 +643,7 @@ class upstage.Client
     public static var LOADS_PER_AVATAR      :Number = 3;
     public static var LOADS_PER_PROP        :Number = 2;
     public static var LOADS_PER_BACKDROP    :Number = 2;
+    public static var LOADS_PER_AUDIO       :Number = 2;
 
 
     public static var PROGRESS_BAR_W       :Number = 120;

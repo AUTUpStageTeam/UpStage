@@ -27,6 +27,7 @@ Modified by: Daniel Han (29-06-2012) - added last_login date
 Modified by: Daniel Han (03-07-2012) - Enabled Searching for Players
 
 Modified by: Daniel Han (24/08/2012) - Check if username is available and if not, throws exception
+Modified by: Nitkalya Wiriyanuparb  02/10/2013  - Throw an error when username is blank or not alphanumeric (creating new users)
 """
 
 import md5, os
@@ -307,6 +308,8 @@ class PlayerDict(Xml2Dict):
         log.msg('user: %s, password: %s/%s' %(user, newpass, newpass2))
         if newpass2 != newpass:
             raise UpstageError("Passwords did not match")
+        if not user.isalnum():
+            raise UpstageError("Username must be alphanumeric characters")
 
         log.msg('passwords match')
 
@@ -330,7 +333,7 @@ class PlayerDict(Xml2Dict):
                 if (changepw):
                     self[user].set_password(newpass)
                 
-            elif user and user.isalnum():
+            elif user:
                 # Create player
                 newplayer = _Player(user, None, rights, newdate, newemail)
                 newplayer.set_password(newpass)

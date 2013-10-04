@@ -55,9 +55,9 @@ function stageEdit()
 	document.getElementById("colProp").bgColor='#FFFFFF';
 	genColorTable("colorpicker");
 	displayAccess();
-	debugToBeChecked(document.stageedit.debugTextMsg.value);
+	debugToBeChecked(document.rupert.debugTextMsg.value);
 		
-	var cols = document.stageedit.colorvals.value;
+	var cols = document.rupert.colorvals.value;
 	if(cols!='No stage selected')
 	{
 		var temp = cols.split(",");
@@ -65,7 +65,7 @@ function stageEdit()
 		resizePage();
 		//document.getElementById("debugp").style.position="absolute";
 		//document.getElementById("debugp").style.left="40%";
-        onStagelistToBeChecked(document.stageedit.onstagelistMsg.value);// 8/04/2013 -CF-: on load it checks if the stage is on the stagelist.
+        onStagelistToBeChecked(document.rupert.onstagelistMsg.value);// 8/04/2013 -CF-: on load it checks if the stage is on the stagelist.
         lockDisableAll((document.getElementById("lockStageMsg").value),document.getElementById("ownerMsg").value);//01/05/2013 -CF-
 	}
 	else
@@ -224,7 +224,7 @@ function setAccess(action)
 	saveState();
 	document.getElementById("status").innerHTML = 'Sending to server, please wait...';
 	document.getElementById("status").style.display = "inline";
-	document.stageedit.action.value = action;
+	document.rupert.action.value = action;
 	requestPage("POST", buildRequest(2),fillPage);
 }
 
@@ -237,7 +237,7 @@ function setMediaUnassigned()
     saveState();
     document.getElementById("status").innerHTML = 'Sending to server, please wait...';
     document.getElementById("status").style.display = "inline";
-    document.stageedit.action.value = 'unassign_media';
+    document.rupert.action.value = 'unassign_media';
     requestPage("POST", buildRequest(2),fillPage);
 }
 
@@ -250,7 +250,7 @@ function setMediaAssigned()
     saveState();
     document.getElementById("status").innerHTML = 'Sending to server, please wait...';
     document.getElementById("status").style.display = "inline";
-    document.stageedit.action.value = 'assign_media';
+    document.rupert.action.value = 'assign_media';
     requestPage("POST", buildRequest(2),fillPage);
 }
 
@@ -263,7 +263,7 @@ function setMediaAssigned()
 function viewMediaImage()//24/04/2013 -CF-
 {
 
-    document.stageedit.action.value = 'view_media';
+    document.rupert.action.value = 'view_media';
     requestPage("POST", buildRequest(2),fillPage);
 }
 
@@ -363,7 +363,7 @@ function restoreState()
  */
 function displayAccess()
 {
-	if(document.stageedit.displayaccess.value=='false')
+	if(document.rupert.displayaccess.value=='false')
 	{
 		document.getElementById('accessdiv').innerHTML='';
 	}

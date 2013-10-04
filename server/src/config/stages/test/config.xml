@@ -1,9 +1,11 @@
 <stage onstagelist="on" name="test" created="2013-08-30 12:01:32.998378" lockstage="false" active="active" id="test">
+<avatar media="avatar_BMaE83ry" voice="awb_cmu" name="fdfd" showname="show">
+</avatar>
+<backdrop media="backdrop_9dQbJquh" name="sZdxfv">
+</backdrop>
 <access_one>admin</access_one>
 <access_two>
 </access_two>
-<access_three>
-</access_three>
 <chatbgcolour>0xFFFFFF</chatbgcolour>
 <toolsbgcolour>0xFFFFFF</toolsbgcolour>
 <pagebgcolour>0xFFFFFF</pagebgcolour>

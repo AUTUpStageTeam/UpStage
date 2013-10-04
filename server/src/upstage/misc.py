@@ -42,8 +42,6 @@ import socket
 import thread
 import exceptions
 
-from upstage.util import id_generator, new_filename
-
 from twisted.web import microdom
 from twisted.python import log 
 

@@ -24,6 +24,9 @@ import upstage.Transport;
  * Modified by: Endre Bernhardt, Phillip Quinlan, Lauren Kilduff
  * Modified by: Wendy, Candy and Aaron 30/10/2008
  * Modified by: Nitkalya Wiriyanuparb  29/08/2013  - add TOGGLE_STREAM_AUDIO
+ * Modified by: Nitkalya Wiriyanuparb  26/09/2013  - Sent rotating direction to clients to fix inconsistent views for audiences
+ * Modified by: Nitkalya Wiriyanuparb  28/09/2013  - Supported unlooping audio
+ *                                                 - Fixed audio not heard by late audiences
  * Notes: 
  */
 
@@ -337,9 +340,10 @@ class upstage.Sender
 		this.send('LOAD_MUSIC', 'file', fileName);
 	}
 	
-	function PLAY_CLIP(array:String, url:String): Void
+	function PLAY_CLIP(array:String, url:String, autoLoop: Boolean): Void
 	{
-		this.send('PLAY_CLIP', 'array', array, 'url', url);
+        var loop: Number = autoLoop ? 1 : 0; // is this play command triggered automatically by looping ?
+		this.send('PLAY_CLIP', 'array', array, 'url', url, 'autoLoop', loop);
 	}
 	
 	// AC (03.06.08) - Spreads the word to pause a sound.
@@ -353,6 +357,12 @@ class upstage.Sender
 	{
 		this.send('LOOP_CLIP', 'array', array, 'url', url);
 	}
+
+    // Ing (27/9/13) - Unloop clip
+    function UNLOOP_CLIP(array:String, url:String): Void
+    {
+        this.send('UNLOOP_CLIP', 'array', array, 'url', url);
+    }
 
 	// EB 22/10/07: For broadcasting volume changes
 	function ADJUST_VOLUME(url:String, type:String, volume:Number):Void
@@ -406,9 +416,9 @@ class upstage.Sender
         this.send('DRAW_LAYER', 'layer', layer);
     }
 
-	function ROTATE_AVATAR()
+	function ROTATE_AVATAR(clockwise:Number) // Ing - 0 = false, 1 = true
 	{
-		this.send('ROTATE_AVATAR');
+		this.send('ROTATE_AVATAR', 'clockwise', clockwise);
 	}
 
     // Toggle audio of streaming avatar

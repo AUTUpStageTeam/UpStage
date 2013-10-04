@@ -71,6 +71,13 @@ Modified by: Craig Farrell  01/05/2013  - added new tOwner varible
 
 Modified by: Nitkalya Wiriyanuparb  29/08/2013  - add toggle_stream_audio to mute/unmute streaming avatar
 Modified by: Nitkalya Wiriyanuparb  04/09/2013  - clear user access list (access_level_one/two/three) before appending items to them to avoid duplicates
+Modified by: Nitkalya Wiriyanuparb  15/09/2013  - added reloadStagesInList
+Modified by: Nitkalya Wiriyanuparb  24/09/2013  - Used new format of keys for media_dict instead of file names
+Modified by: Nitkalya Wiriyanuparb  26/09/2013  - Received, saved, and sent rotating direction to fix inconsistent views for audiences
+Modified by: Nitkalya Wiriyanuparb  28/09/2013  - Added getAudioByUrl()
+Modified by: Nitkalya Wiriyanuparb  29/09/2013  - reloadStagesInList resets audio timer as well
+Modified by: David Daniels          2/10/2013   - Added get_tags_list() to get all the tags attached to all media types
+                                                - modified get_uploader_list to get all uploaders for all media types instead of just avatars
 Modified by: Lisa Helm  02/10/2013      - added the unassigned media list + functionality and made it so that the xml of a stage is reloaded after it is saved
                                         - removed all unused code relating to access_level_three
                                         - added temp_access_level_one/two to allow for changes to be obviously discarded
@@ -99,6 +106,17 @@ from twisted.web import  microdom
 
 
 NUL = chr(0)
+
+def reloadStagesInList(stages, stageList, audioUrl=None):
+    """Reload stages according to the names in stages list
+    and optionally reset Audio timer using its url"""
+    log.msg('reloading stages: ', stageList)
+    for s in stageList:
+        stage = stages.getStage(s)
+        if audioUrl:
+            log.msg('reset audio timer: ', audioUrl)
+            stage.getAudioByUrl(audioUrl).resetTime(2)
+        stage.soft_reset()
 
 class _Stage(object):
     """The _Stage class provides an object that mirrors
@@ -228,7 +246,6 @@ class _Stage(object):
         debugScreenNodes = tree.getElementsByTagName('showDebugScreen')
         onStageListNodes = tree.getElementsByTagName('onstageList')#(08/04/2013)Craig
         isLockStageNodes = tree.getElementsByTagName('lockstage')#(30/04/2013)Craig
-        
 
         try:
             #Heath Behrens 10/08/2011 - changed the if statements so they now check for none and process each
@@ -268,9 +285,9 @@ class _Stage(object):
             nodes = tree.getElementsByTagName(d.typename)
             log.msg("Loading media for type %s" %(d.typename))
             for node in nodes:
-                mediafile = node.getAttribute('media')
+                key = node.getAttribute('media')
                 try:
-                    thing = d.add_mediafile(mediafile)
+                    thing = d.add_mediafile(key)
                     thing.name = node.getAttribute('name')
                     if d is self.avatars:
                         #NB: previous behaviour was for node voice to
@@ -325,24 +342,24 @@ class _Stage(object):
             lockstage.text(self.lockStage)
         for x in self.get_avatar_list():
             # log.msg("Voices: %s %s " %(x.voice,x.media.voice))
-            if self.unassigned.count(x.name) == 0:
-                tree.add(self.avatars.typename, media=x.media.file, showname=x.show_name,
+            if self.unassigned.count(x) == 0:
+                tree.add(self.avatars.typename, media=x.media.key, showname=x.show_name,
                          name=x.name, voice=(x.voice or x.media.voice or '') )
             log.msg("avatar list in save method: %s" % self.avatars.typename)
             # NOTE one day, save player permissions.
         for x in self.get_prop_list():
-            if self.unassigned.count(x.name) == 0:
-                tree.add(self.props.typename, media=x.media.file,
+            if self.unassigned.count(x) == 0:
+                tree.add(self.props.typename, media=x.media.key,
                         name=x.name)
         for x in self.get_backdrop_list():
-            if self.unassigned.count(x.name) == 0:
-                tree.add(self.backdrops.typename, media=x.media.file,
+            if self.unassigned.count(x) == 0:
+                tree.add(self.backdrops.typename, media=x.media.key,
                         name=x.name)
         log.msg('stage.save() - adding audio to xml')
         for x in self.get_audio_list():
             log.msg('stage.save() - audio item: %s' %(x))
-            if self.unassigned.count(x.name) == 0:
-                tree.add(self.audios.typename, media=x.media.file, name=x.name, type=x.media.medium)
+            if self.unassigned.count(x) == 0:
+                tree.add(self.audios.typename, media=x.media.key, name=x.name, type=x.media.medium)
         self.unassigned = []
         #Shaun Narayan (02/14/10) - Write all new values to XML.
         access_string = ''
@@ -472,8 +489,6 @@ class _Stage(object):
         socket.avatar = av
         self.player_broadcast('AV_CONNECT', client=socket.ID, ID=av.ID)
 
-
-
     def bind_prop(self, av, prop):
         """Puts the prop under the control of an avatar"""
         if prop is None or av is None:
@@ -548,7 +563,7 @@ class _Stage(object):
                 for v in globalmedia.values():
                     if ((v.uploader == uploader) or 
                         ((uploader == 'unassigned') and (len(v.uploader) == 0))): 
-                        uploaders_collection[v.file] = v.file
+                        uploaders_collection[v.key] = v.key
 
         #try to preserve local modification
 
@@ -585,13 +600,13 @@ class _Stage(object):
         Heath Behrens 16/08/2011 - Function added to remove media from this stage object.
                                     the name parameter is the name of the media file (hashed)
     """
-    def remove_media_from_stage(self, name):
+    def remove_media_from_stage(self, key):
         #loop over the collection
         for collection in (self.avatars, self.props, self.backdrops, self.audios):
             globalmedia = collection.globalmedia
             for k in globalmedia.keys():
-                log.msg(' name: %s vs key: %s' %(name,k))# 16/04/2013 Craig 
-                if k == name:
+                log.msg(' given key: %s vs key: %s' %(key,k))# 16/04/2013 Craig 
+                if k == key:
                     if k in collection.media:
                         collection.remove_mediafile(k)
                         log.msg("removed media file list")
@@ -599,11 +614,11 @@ class _Stage(object):
                 
     # Natasha 10/03/10 compare new media to media in a stages current collection. 
     # save if there are no duplicates
-    def add_mediato_stage(self, name):
+    def add_mediato_stage(self, key):
         for collection in (self.avatars, self.props, self.backdrops, self.audios):
             globalmedia = collection.globalmedia
             for k in globalmedia.keys():
-                if k == name:
+                if k == key:
                     if k not in collection.media:
                         collection.add_mediafile(k)
                         log.msg("created media file list")
@@ -613,20 +628,28 @@ class _Stage(object):
             #log.msg('List of avatars: %s' % self.get_avatar_list())
     
     # 16/04/2013 Craig : gets the mediafile name of a types of media.
-    def get_thing_mediaFile_name(self,mName):
-        if mName is not None:
+    # 24/09/2013 Ing : use key instead
+    def get_media_file_by_key(self,key):
+        media = self.get_media_by_key(key)
+        if media is not None:
+            return media.media.file
+        else:
+            return ''
+            
+    def get_media_by_key(self,key):
+        if key is not None:
             mlist = self.get_avatar_list()
             mlist.extend(self.get_prop_list())
             mlist.extend(self.get_backdrop_list())
             mlist.extend(self.get_audio_list())            
             if len(mlist)>0:
                 for a in mlist:
-                    if a.name == mName:
-                        return a.media.file #returns the file name
+                    if a.media.key == key:
+                        return a #returns the file name
             else:
-                return ''
+                return None
         else:
-            return ''
+            return None
 
     #added by Craig (30/04/2013) - to get owner of stage 
     def get_tOwner(self): 
@@ -637,7 +660,36 @@ class _Stage(object):
         self.tOwner = nOwner
 
     def get_uploader_list(self):
-        return self.avatars.get_uploader_list()
+        uploaders = self.avatars.get_uploader_list()
+        tempUpload = self.props.get_uploader_list()
+        for uploader in tempUpload:
+            if uploader not in uploaders:
+                uploaders.append(uploader)
+        tempUpload = self.backdrops.get_uploader_list()
+        for uploader in tempUpload:
+            if uploader not in uploaders:
+                uploaders.append(uploader)
+        tempUpload = self.audios.get_uploader_list()
+        for uploader in tempUpload:
+            if uploader not in uploaders:
+                uploaders.append(uploader)
+        return uploaders
+        
+    def get_tag_list(self):
+        tags = self.avatars.get_tags()
+        tempTags = self.props.get_tags()
+        for tag in tempTags:
+            if tag not in tags:
+                tags.append(tag)
+        tempTags = self.backdrops.get_tags()
+        for tag in tempTags:
+            if tag not in tags:
+                tags.append(tag)
+        tempTags = self.audios.get_tags()
+        for tag in tempTags:
+            if tag not in tags:
+                tags.append(tag)
+        return tags
 
     def get_avatar_list(self):
         """Return a list of avatars on a stage"""
@@ -655,7 +707,13 @@ class _Stage(object):
         """Return a list of all audio entries"""
         return self.audios.things.values()
 
-    """Shaun Narayan (02/06/10) - Following 9 methods provide an
+    def getAudioByUrl(self, url):
+        """Return an audio that has the same url"""
+        for au in self.get_audio_list():
+            if url.endswith(au.media.file):
+                return au
+
+    """Shaun Narayan (02/06/10) - Following 11 methods provide an
         interface to manipulate the stages access rules"""
     def get_al_one(self):
         return self.temp_access_level_one
@@ -971,16 +1029,16 @@ class _Stage(object):
         self.log_chat(log_msg) # save up done chat)
 
     #----------------------------- Drawing Functions. ---------------------
-    def rotate_avatar(self, avid=None):
+    def rotate_avatar(self, clockwise, avid=None):
         if avid is None:
             log.msg('Avatar ID cannot be None type')
         else:
             if avid in self.draw_avatar_stacks:
-                self.draw_avatar_stacks[avid].append(('ROTATE_AVATAR', avid)) 
+                self.draw_avatar_stacks[avid].append(('ROTATE_AVATAR', clockwise, avid)) 
             else:
-                self.draw_avatar_stacks[avid] = [('ROTATE_AVATAR', avid)]
+                self.draw_avatar_stacks[avid] = [('ROTATE_AVATAR', clockwise, avid)]
                 
-            self.broadcast('ROTATE_AVATAR', AV=avid);
+            self.broadcast('ROTATE_AVATAR', clockwise=clockwise, AV=avid);
 		
 	
     def draw_clear_layer(self, layer, avid=None):
@@ -1108,7 +1166,7 @@ class _Stage(object):
                     socket.send('DRAW_STYLE', colour=x[1],
                             thickness=x[2], alpha=x[3], layer=4, AV=k)
                 elif x[0] == 'ROTATE_AVATAR':
-                    socket.send('ROTATE_AVATAR', AV=x[1])
+                    socket.send('ROTATE_AVATAR', clockwise=x[1], AV=x[2])
 
     # Toggle streaming avatar audio
     def toggle_stream_audio(self, isMuted, avid=None):
