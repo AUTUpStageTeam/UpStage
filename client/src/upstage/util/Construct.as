@@ -70,7 +70,8 @@ class upstage.util.Construct
         f.size = scale * Client.BASE_FONT_SIZE;  // Base font size;
         f.color = 0x000000;
         f.bold = bold;
-        f.font = (bold) ? 'Bitstream Vera Bold' :  'Bitstream Vera Sans';
+        // f.font = (bold) ? 'Bitstream Vera Bold' :  'Bitstream Vera Sans';
+        f.font = (bold) ? 'DejaVu Sans Bold' :  'DejaVu Sans';
         return f;
     }
 
