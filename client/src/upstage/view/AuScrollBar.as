@@ -33,6 +33,7 @@ import upstage.view.AudioSlot;
  * Purpose: The audio item scrollbar (list box) in the audio widget
  * Notes: BH, WW (AUT 2006) created AvScrollBar.as, we took that and created this class)
  * Modified by: Vibhu Patel 31/08/2011 - Changed create function to take one more parameter for the color value.
+ * Modified by: Nitkalya Wiriyanuparb  04/10/2013  - Added volume label and got rid of duplicate code in updatePlaying
  */
 class upstage.view.AuScrollBar extends MovieClip
 {
@@ -211,26 +212,23 @@ class upstage.view.AuScrollBar extends MovieClip
 	 * play, 
 	 * 
 	 */
-	public function updatePlaying(type:String, slot:Number, name:String, url:String)
+	public function updatePlaying(type:String, slot:Number, name:String, url:String, duration:Number)
 	{
-		trace("AuScrollBar.updatePlaying - type: " + type + ", slot: " + slot + ", url: "+url + ", name: " + name);
+		trace("AuScrollBar.updatePlaying - type: " + type + ", slot: " + slot + ", url: "+url + ", name: " + name + ", duration: " + duration);
 		if (type == 'sounds') {
 			switch (slot) {
 				case 0:
-					this.audioSlot1.assignAudio(type, url);
-					this.audioSlot1.nametf.text = name;
+					this.audioSlot1.assignAudio(type, url, name, duration);
 					break;
-				
+
 				case 1:
-					this.audioSlot2.assignAudio(type, url);
-					this.audioSlot2.nametf.text = name;
+					this.audioSlot2.assignAudio(type, url, name, duration);
 					break;
-					
-				case 2:	
-					this.audioSlot3.assignAudio(type, url);
-					this.audioSlot3.nametf.text = name;
+
+				case 2:
+					this.audioSlot3.assignAudio(type, url, name, duration);
 					break;
-			}			
+			}
 
 		}
 	}
@@ -245,7 +243,7 @@ class upstage.view.AuScrollBar extends MovieClip
 					break;
 				case 1:
 					this.audioSlot2.clear();
-					break;	
+					break;
 				case 2:
 					this.audioSlot3.clear();
 					break;
@@ -254,25 +252,25 @@ class upstage.view.AuScrollBar extends MovieClip
 	}
 
 
-	// AC 
+	// AC
 	public function getVolume(url:String, type:String):Number 
 	{
-		return this.getAudioSlot(type, url).slider.value;
+		return 100 - this.getAudioSlot(type, url).volumeSlider.value; // Ing - reverse vertical slider
 	}
 
-
-
-	
 	public function updateVolumeFromRemote(type:String, slot:Number, volume:Number) {
 		switch (slot) {
 			case 0:
-				this.audioSlot1.slider.setFromValue(volume)
+                this.audioSlot1.volumeSlider.setFromValue(volume)
+				this.audioSlot1.volLabel.text = 'Vol: ' + volume;
 				break;
 			case 1:
-				this.audioSlot2.slider.setFromValue(volume)
-				break;	
+				this.audioSlot2.volumeSlider.setFromValue(volume)
+                this.audioSlot2.volLabel.text = 'Vol: ' + volume;
+				break;
 			case 2:
-				this.audioSlot3.slider.setFromValue(volume)
+				this.audioSlot3.volumeSlider.setFromValue(volume)
+                this.audioSlot2.volLabel.text = 'Vol: ' + volume;
 				break;
 		}
 	}

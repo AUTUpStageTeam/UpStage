@@ -845,7 +845,8 @@ class StageEditPage(Workshop):
             if len(self.stage.unassigned) !=0:
                 for m in self.stage.unassigned:
                     if m is not None:
-                        media.remove(m)
+						if media.count(m) > 0: 
+							media.remove(m)
         return media
 
     def text_list_media_assigned(self,request): #1/10/13 - Lisa - converts and returns the output from assigned_media into something the html can use
@@ -1111,8 +1112,9 @@ class StageEditPage(Workshop):
             for i in range(0, len(keys)):
                 m = self.stage.get_media_by_key(keys[i])
                 if self.stagename and m:
-                    self.stage.unassigned.append(m)
-                    log.msg(self.stage.unassigned)
+					if self.stage.unassigned.count(m) == 0:
+						self.stage.unassigned.append(m)
+						log.msg(self.stage.unassigned)
 
         elif action=='view_media':#(25/04/2013) Craig
             log.msg('es - view media method start')

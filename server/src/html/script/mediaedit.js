@@ -139,6 +139,21 @@ function setCurrentUserInFilter() {
 	}
 }
 
+function mediumFilter()
+{
+    var html = '<option value=""></option>';
+    if(document.getElementById('filterType').selectedIndex == 1)
+    {
+        html += '<option value="stream">Stream</option>';
+    }
+    else if(document.getElementById('filterType').selectedIndex == 4)
+    {
+        html += '<option value="music">Music</option>';
+        html += '<option value="sfx">Sound-Effect</option>';
+    }
+    document.getElementById('filterMedium').innerHTML = html;
+}
+
 function callAjaxGetData() {
 	
 	log.debug("callAjaxGetData()");
@@ -389,18 +404,10 @@ function setupDataGrid() {
 	       {id: "stages", name: "Stages", field: "stages", width:200},
 	       {id: "voice", name: "Voice", field: "voice", width:100},
 	       {id: "tags", name: "Tags", field: "tags", width:200},
-	       //{id: "file", name: "File", field: "file", width:200},
-	       //{id: "size", name: "Filesize (Bytes)", field: "size", width:200},
-	       //{id: "file_original", name: "File (Original)", field: "file_original", width:200},
-	       //{id: "save_filename", name: "Save Filename", field: "save_filename", width:200},
 	       {id: "date", name: "Date", field: "date", width:200},	       
 	       {id: "medium", name: "Medium", field: "medium", width:100},
-	       {id: "streamserver", name: "Stream Server", field: "streamserver", width:200},
 	       {id: "streamname", name: "Stream Name", field: "streamname", width:200},
-	       //{id: "thumbnail", name: "Thumbnail", field: "thumbnail", width:200},
-	       //{id: "thumbnail_original", name: "Thumbnail (Original)", field: "thumbnail_original", width:200},
-	       //{id: "thumbnail_icon", name: "Thumbnail (Icon)", field: "thumbnail_icon", width:200},
-	       //{id: "key", name: "Key", field: "key", width:200},
+	       {id: "streamserver", name: "Stream Server", field: "streamserver", width:200},
        ];
 
 	var options = {
@@ -598,8 +605,7 @@ function setupDataGrid() {
 						};
 						
 						// pass data via ajax
-						callAjaxUpdateData(selectedMediaData['key'],editData,forceReload);	
-					
+						callAjaxUpdateData(selectedMediaData['key'],editData,forceReload);
 					}
 					
 					// bind click handler for final deletion

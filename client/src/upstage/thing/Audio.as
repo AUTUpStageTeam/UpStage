@@ -28,6 +28,8 @@ import upstage.view.AuScrollBar;
  * Author: Endre Bernhart & Phillip Quinlan
  * Purpose: One Audio item for the Audio Widget
  * Notes: Originally the class for prop images transformed into class for audio.
+ *
+ * Modified by: Nitkalya Wiriyanuparb  05/10/2013  - Saved audio duration
  */
  
 class upstage.thing.Audio
@@ -36,7 +38,8 @@ class upstage.thing.Audio
 	var ID:Number;
 	var name : String;
 	var url : String;
-	var type : String;
+  var type : String;
+	var duration : Number;
 	
 	var icon : AuScrollBarItem;
 	var iconLayer : Number;
@@ -46,7 +49,7 @@ class upstage.thing.Audio
 
     public static var transportSetFunctionName:String = 'SET_AUDIO';
 
-	static function factory(ID:Number, name:String, url:String, type:String, scrollBar: AuScrollBar) : Audio
+	static function factory(ID:Number, name:String, url:String, type:String, duration:Number, scrollBar: AuScrollBar) : Audio
     {
         trace("Audio factory: name is "+name+ " and url is " + url);
 
@@ -59,6 +62,7 @@ class upstage.thing.Audio
         thing.name = name;
         thing.url = url;
         thing.type = type;
+        thing.duration = duration;
         thing.iconLayer = Client.L_AUDIO_ICON -(-ID * Client.AV_ICON_LAYERS); 
         thing.icon = AuScrollBarItem.create(thing, scrollBar);
         

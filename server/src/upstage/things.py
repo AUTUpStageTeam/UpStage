@@ -35,6 +35,7 @@ Modified by: Nitkalya Wiriyanuparb  16/09/2013  - Remembered streaming avatar mu
 Modified by: Nitkalya Wiriyanuparb  24/09/2013  - Modified ThingCollection to use new format of keys for media_dict instead of file names
 Modified by: Nitkalya Wiriyanuparb  27/09/2013  - Modified Audio class to remember play/pause/loop states and elapsed time
 Modified by: David Daniels          2/10/2013   - Added get_tags() to get all the tags attached to a media type
+Modified by: Nitkalya Wiriyanuparb  05/10/2013  - Modified Audio class to support custom start/stop position
 Notes: 
 """
 import time
@@ -175,6 +176,7 @@ class Backdrop(Thing):
 
 
 # PQ & EB: Created Audio - 17.9.07
+# Ing - Added everything for remembering playing state and start/stop position
 class Audio(Thing):
     """Representation of an audio file"""
     typename= 'audio'
@@ -182,28 +184,41 @@ class Audio(Thing):
     def __init__(self, media, displayName="", position=_nullpos, ID=None):
         Thing.__init__(self, media=media, name=displayName, position=position, ID=ID)
 
+        self.volume = 50 # default to the same number (in client)
+        self.startPosition = 0
+        self.stopPosition = None
         self.playing = False
+        self.stopped = True
         self.looping = False
         self.arrayName = ''
         self.startTimestamp = 0
         self.elapsedTime = 0 # for pausing
+        self.startPosWhenPlay = 0 # important for late audiences (take startPos+elapsedTime or just elapsedTime)
+        self.stopPosWhenPlay = None
 
     def startPlaying(self, arrayName, autoLoop):
         """Set playing status and remember when the audio was started and array name"""
         self.playing = True
+        self.stopped = False
         self.arrayName = arrayName
         if (autoLoop or self.elapsedTime == 0):
             # start fresh
+            if not autoLoop:
+                self.startPosWhenPlay = self.startPosition # remember for late audiences
+                self.stopPosWhenPlay = self.stopPosition
             self.resetTime()
         else:
             # resume
             self.startTimestamp = time.time() - self.elapsedTime # like it's never been paused
 
-    def finishPlaying(self):
+    def finishPlaying(self, autoLoop):
         self.playing = False
-        self.looping = False
+        self.stopped = True
         self.startTimestamp = 0
         self.elapsedTime = 0
+        if not autoLoop:
+            self.startPosWhenPlay = 0
+            self.stopPosWhenPlay = None
 
     def resetTime(self, delay=0):
         self.elapsedTime = 0
@@ -212,6 +227,30 @@ class Audio(Thing):
     def setLooping(self, isLooping):
         self.looping = isLooping
 
+    def setStartPosition(self, startPos):
+        startPos = float(startPos)
+        if startPos <= float(self.media.width) and startPos >= 0: # width of audio asset is duration .. I know!
+            self.startPosition = startPos
+            return True
+        return False
+
+    def setStopPosition(self, stopPos, setNoneIfFail):
+        stopPos = float(stopPos)
+        if stopPos <= float(self.media.width) and stopPos >= 1:
+            self.stopPosition = stopPos
+            return True
+        elif setNoneIfFail:
+            self.stopPosition = None
+            return True
+        return False
+
+    def setVolume(self, vol):
+        vol = int(vol)
+        if vol >= 0 and vol <= 100:
+            self.volume = vol
+            return True
+        return False
+
     def pauseAndRememberPosition(self):
         self.playing = False
         self.elapsedTime = time.time() - self.startTimestamp
@@ -219,16 +258,20 @@ class Audio(Thing):
     def isPlaying(self):
         return self.playing
 
+    def isStopped(self):
+        return self.stopped
+
     def isLooping(self):
         return self.looping
 
     def getElapsedTime(self):
-        if (self.playing):
+        # log.msg('start pos when play', self.startPosWhenPlay)
+        if self.playing:
             # playing and not finished
-            return time.time() - self.startTimestamp
+            return (time.time() - self.startTimestamp) + self.startPosWhenPlay
         else:
             # pause and not finished
-            return self.elapsedTime
+            return self.elapsedTime + self.startPosWhenPlay
 
 #
 #~~~~~~~~~~~~~~~~~~~~~~~~~~ ThingCollection ~~~~~~~~~~~~~~~~~~

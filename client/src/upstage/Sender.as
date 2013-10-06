@@ -27,6 +27,7 @@ import upstage.Transport;
  * Modified by: Nitkalya Wiriyanuparb  26/09/2013  - Sent rotating direction to clients to fix inconsistent views for audiences
  * Modified by: Nitkalya Wiriyanuparb  28/09/2013  - Supported unlooping audio
  *                                                 - Fixed audio not heard by late audiences
+ * Modified by: Nitkalya Wiriyanuparb  04/10/2013  - Sent messages about audio start and stop positions
  * Notes: 
  */
 
@@ -369,11 +370,22 @@ class upstage.Sender
 	{
 		this.send('ADJUST_VOLUME', 'url', url, 'type', type, 'volume', volume);
 	}
-	
+
+    function ADJUST_AUDIO_START_POS(url:String, type:String, pos:Number):Void
+    {
+        this.send('ADJUST_AUDIO_START_POS', 'url', url, 'type', type, 'pos', pos);
+    }
+
+    function ADJUST_AUDIO_STOP_POS(url:String, type:String, pos:Number):Void
+    {
+        this.send('ADJUST_AUDIO_STOP_POS', 'url', url, 'type', type, 'pos', pos);
+    }
+
 	// PQ 29/10/07: For broadcasting stopping one certain audio playing on all clients
-	function STOP_AUDIO(url:String, type:String):Void
-	{
-		this.send('STOP_AUDIO', 'url', url, 'type', type);
+	function STOP_AUDIO(url:String, type:String, autoLoop: Boolean): Void
+    {
+        var loop: Number = autoLoop ? 1 : 0;
+		this.send('STOP_AUDIO', 'url', url, 'type', type, 'autoLoop', loop);
 	}
 	
 	// AC 29.05.08 - Clears AudioSlot
