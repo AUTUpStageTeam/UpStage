@@ -34,7 +34,6 @@ Modified by Craig Farrell 01/05/2013 - replaced the checkbox with a attr which i
 Modified by David Daniels 22/05/2013 - fixed captials  
 Modified by Vanessa Henderson 06/09/2013 - Changed the text displayed on the revert changes button
                                            - Swapped position of revert changes button and Delete button
-Modified by Lisa Helm 02/10/2013 - switched unassign/view media drop down boxes to select boxes
 -->
 <!include master_a.inc>
 <!include workshop_nav.inc>
@@ -129,39 +128,49 @@ window.onresize = resizePage;
             <br/>
             <div id="editStageMedia"><!-- Craig Farrell 14/04/2013 -->
                 <h1>Media on stage</h1>
-                <p>Any media in the 'To be unassigned' column will be unassigned when the stage is saved.</p>
-                <table>
-					<tr>
-						<td>
-							<table>
-								<tr>
-									<td>Assigned</td>
-									<td></td>
-									<td>To be unassigned</td>
-								</tr>
-								<tr>
-									<td>
-										<select size="4" id="massigned" name="massigned" style="height: 160px; width:140px;" multiple="multiple">
-											%(list_media_assigned)s
-										</select>
-									</td>
-									<td><a class="IconButton" href='javascript:setMediaUnassigned();'><img src="/image/right.png" alt="&#60;" width="20" height="20" /></a><br />
-										<a class="IconButton" href='javascript:setMediaAssigned();'><img src="/image/left.png" alt="&#62;" width="20" height="20" /></a></td>
-									<td>
-										<select size="4" id="munassigned" name="munassigned" style="height: 160px; width:140px;" multiple="multiple">
-											%(list_media_unassigned)s
-										</select>
-									</td>
-                                    <td style="width:0%;"><input type="button" id="seViewMedia" onclick="javascript:viewMediaImage();" value="Preview" /></td>
-                                    <td><div id="editStageMediaPreview"><!-- Craig Farrell 25/04/2013 -->
-                                        %(attr:stage_ViewImg)s
-                                    </div></td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-				</table>
-                
+                <p>Warning: clicking any 'Unassign' button will instantly unassign the selected media item from this stage.</p>
+                <div id="editStageMediaInfo">
+                    <table id="editStageMediaList" style="border-bottom: #690 1px dashed;">
+                        <tr>
+                            <td><h4>Avatars</h4></td>
+                            <td><h4>Props</h4></td>
+                            
+                        </tr>
+                        <tr>
+                            <td><select name="AvatarList"   id="AvatarList"   class="esTypeList">%(list_Avatars)s</select></td>
+                            <td><select name="PropList"     id="PropList"     class="esTypeList">%(list_Props)s</select></td>
+                            
+                        </tr>
+                        <tr><!-- Craig Farrell 16/04/2013 -->
+                            <td><input type="button" id="AvatarUnAssign"   class="esUnAssignBut" onclick="unAssignMedia(1);" value="Unassign" /></td>
+                            <td><input type="button" id="PropUnAssign"     class="esUnAssignBut" onclick="unAssignMedia(2);" value="Unassign" /></td>
+                            
+                        </tr>
+                        <tr><!-- Craig Farrell 25/04/2013 -->
+                            <td><input type="button" id="AvatarView"   class="esViewBut" onclick="viewMediaImage(1);" value="View" /></td>
+                            <td><input type="button" id="PropView"     class="esViewBut" onclick="viewMediaImage(2);" value="View" /></td>
+                            
+                        </tr>
+                        <tr>
+                            <td><h4>Backdrops</h4></td>
+                            <td><h4>Audios</h4></td>
+                        </tr>
+                        <tr><!-- Craig Farrell 24/04/2013 -->
+                            <td><select name="BackdropList" id="BackdropList" class="esTypeList">%(list_Backdrops)s</select></td>
+                            <td><select name="AudioList"    id="AudioList"    class="esTypeList">%(list_Audios)s</select></td>
+                        </tr>
+                        <tr>
+                            <td><input type="button" id="BackdropUnAssign" class="esUnAssignBut" onclick="unAssignMedia(3);" value="Unassign" /></td>
+                            <td><input type="button" id="AudioUnAssign"    class="esUnAssignBut" onclick="unAssignMedia(4);" value="Unassign" /></td>
+                        </tr>
+                        <tr>
+                            <td><input type="button" id="BackdropView" class="esViewBut" onclick="viewMediaImage(3);" value="View" /></td>
+                        </tr>
+                    </table>
+                </div>
+                <div id="editStageMediaPreview"><!-- Craig Farrell 25/04/2013 -->
+                    %(attr:stage_ViewImg)s
+                </div>
             </div>
 			<div id="editStageAccess">
                 <br/>

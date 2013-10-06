@@ -78,9 +78,6 @@ Modified by: Nitkalya Wiriyanuparb  28/09/2013  - Added getAudioByUrl()
 Modified by: Nitkalya Wiriyanuparb  29/09/2013  - reloadStagesInList resets audio timer as well
 Modified by: David Daniels          2/10/2013   - Added get_tags_list() to get all the tags attached to all media types
                                                 - modified get_uploader_list to get all uploaders for all media types instead of just avatars
-Modified by: Lisa Helm  02/10/2013      - added the unassigned media list + functionality and made it so that the xml of a stage is reloaded after it is saved
-                                        - removed all unused code relating to access_level_three
-                                        - added temp_access_level_one/two to allow for changes to be obviously discarded
 """
 
 #std lib
@@ -138,9 +135,7 @@ class _Stage(object):
     onStageList = 'on'#(08/04/2013)Craig added to displays onStageList or not : 'on' or 'off'
     lockStage = 'false'#(30/04/2013)Craig added to displays LockStage or not : 'true' or 'false'
     tOwner = 'admin'
-    unassigned = []
-    temp_access_level_one = []
-    temp_access_level_two = []
+
 
 
     def __init__(self, ID, name=None, owner=None):
@@ -152,11 +147,13 @@ class _Stage(object):
         self.description = ''   #not used?
         self.owner = owner
         self.tOwner = 'admin'
+        #Shaun Narayan (02/14/10) - init access lists
+        self.access_level_one = []
+        self.access_level_two = []
+        self.access_level_three = []
         self.config_dir = os.path.join(config.STAGE_DIR, self.ID)
         self.config_file = os.path.join(self.config_dir, 'config.xml')
         self.sockets = {}
-        self.access_level_one = []
-        self.access_level_two = []
         self.player_sockets = {}
         self.admin_sockets = {}
         self.clear()
@@ -169,9 +166,6 @@ class _Stage(object):
         self.avatars = ThingCollection(Avatar, self.owner.mediatypes['avatar']) # avatar objects here.
         # PQ & EB: 17.9.07
         self.audios = ThingCollection(Audio, self.owner.mediatypes['audio']) # audio objects here.
-        self.unassigned = []        
-        self.temp_access_level_one = []
-        self.temp_access_level_two = []
     
     def set_default(self):
         self.wake()
@@ -183,12 +177,7 @@ class _Stage(object):
         self.debugMessages = 'normal'#(12/11/08)Aaron added to displays debug messages or not 'Normal' or 'DEBUG'
         self.onStageList = 'on'#(08/04/2013)Craig added to displays onStageList or not : 'on' or 'off'
         self.lockStage = 'false'#(30/04/2013)Craig added to displays LockStage or not : 'true' or 'false'
-        self.unassigned = []
-        self.access_level_one = []
-        self.access_level_two = []
-        self.temp_access_level_one = []
-        self.temp_access_level_two = []
-        
+
     def reset(self):        
         """[re-]initialises the stage """
         self.wake()
@@ -199,9 +188,6 @@ class _Stage(object):
         self.chat = []    # chat strings build up here.
         self.broadcast('RELOAD') #so no-one is left with the old version.
         self.current_bg = None
-        self.unassigned = []
-        self.temp_access_level_one = []
-        self.temp_access_level_two = []
         
         if not os.path.exists(self.config_file):
             self.setup()
@@ -243,6 +229,7 @@ class _Stage(object):
         pageBgColorNodes = tree.getElementsByTagName('pagebgcolour')
         accessOneNodes = tree.getElementsByTagName('access_one')
         accessTwoNodes = tree.getElementsByTagName('access_two')
+        accessThreeNodes = tree.getElementsByTagName('access_three')
         debugScreenNodes = tree.getElementsByTagName('showDebugScreen')
         onStageListNodes = tree.getElementsByTagName('onstageList')#(08/04/2013)Craig
         isLockStageNodes = tree.getElementsByTagName('lockstage')#(30/04/2013)Craig
@@ -262,16 +249,16 @@ class _Stage(object):
                 self.pageBgColour = pageBgColorNodes[0].firstChild().toxml()
             if accessOneNodes and accessOneNodes[0].firstChild() is not None:
                 self.access_level_one = []
-                self.temp_access_level_one = []
                 for x in accessOneNodes[0].firstChild().toxml().split(','):
                     self.access_level_one.append(x)
-                    self.temp_access_level_one.append(x)
             if accessTwoNodes and accessTwoNodes[0].firstChild() is not None:
                 self.access_level_two = []
-                self.temp_access_level_two = []
                 for x in accessTwoNodes[0].firstChild().toxml().split(','):
                     self.access_level_two.append(x)
-                    self.temp_access_level_two.append(x)
+            if accessThreeNodes and accessThreeNodes[0].firstChild() is not None:
+                self.access_level_three = []
+                for x in accessThreeNodes[0].firstChild().toxml().split(','):
+                    self.access_level_three.append(x)
             if debugScreenNodes and debugScreenNodes[0].firstChild() is not None:
                 self.debugMessages = debugScreenNodes[0].firstChild().toxml()
             if onStageListNodes and onStageListNodes[0].firstChild() is not None:#(08/04/2013)Craig
@@ -280,7 +267,7 @@ class _Stage(object):
                 self.lockStage = isLockStageNodes[0].firstChild().toxml()
 
         except Exception, e:
-            print "Couldn't set splash message for '%s', because '%s'" % (self, e)
+			print "Couldn't set splash message for '%s', because '%s'" % (self, e)
         for d in (self.props, self.avatars, self.backdrops, self.audios):
             nodes = tree.getElementsByTagName(d.typename)
             log.msg("Loading media for type %s" %(d.typename))
@@ -342,38 +329,39 @@ class _Stage(object):
             lockstage.text(self.lockStage)
         for x in self.get_avatar_list():
             # log.msg("Voices: %s %s " %(x.voice,x.media.voice))
-            if self.unassigned.count(x) == 0:
-                tree.add(self.avatars.typename, media=x.media.key, showname=x.show_name,
-                         name=x.name, voice=(x.voice or x.media.voice or '') )
+            tree.add(self.avatars.typename, media=x.media.key, showname=x.show_name,
+                     name=x.name, voice=(x.voice or x.media.voice or '') )
             log.msg("avatar list in save method: %s" % self.avatars.typename)
             # NOTE one day, save player permissions.
         for x in self.get_prop_list():
-            if self.unassigned.count(x) == 0:
-                tree.add(self.props.typename, media=x.media.key,
-                        name=x.name)
+            tree.add(self.props.typename, media=x.media.key,
+                     name=x.name)
         for x in self.get_backdrop_list():
-            if self.unassigned.count(x) == 0:
-                tree.add(self.backdrops.typename, media=x.media.key,
-                        name=x.name)
+            tree.add(self.backdrops.typename, media=x.media.key,
+                     name=x.name)
         log.msg('stage.save() - adding audio to xml')
         for x in self.get_audio_list():
             log.msg('stage.save() - audio item: %s' %(x))
-            if self.unassigned.count(x) == 0:
-                tree.add(self.audios.typename, media=x.media.key, name=x.name, type=x.media.medium)
-        self.unassigned = []
+            tree.add(self.audios.typename, media=x.media.key, name=x.name, type=x.media.medium)
         #Shaun Narayan (02/14/10) - Write all new values to XML.
         access_string = ''
-        for x in self.temp_access_level_one:
+        for x in self.access_level_one:
             access_string += x+',' #Heath Behrens 10/08/2011 - Added so that items can be separated and the last , is removed
         access_string = access_string.rstrip(',')
         one = tree.add('access_one')
         one.text(access_string)
         access_string = ''
-        for x in self.temp_access_level_two:
+        for x in self.access_level_two:
             access_string += x+',' #Heath Behrens 10/08/2011 - Added so that items can be separated and the last , is removed
         access_string = access_string.rstrip(',')
         two = tree.add('access_two')
         two.text(access_string)
+        access_string = ''
+        for x in self.access_level_three:
+            access_string += x+',' #Heath Behrens 10/08/2011 - Added so that items can be separated and the last , is removed
+        access_string = access_string.rstrip(',')
+        three = tree.add('access_three')
+        three.text(access_string)
         
         nodeChatBgColour = tree.add('chatBgColour')
         nodeChatBgColour.text(self.chatBgColour)
@@ -389,7 +377,6 @@ class _Stage(object):
         nodetOwner.text(self.tOwner)
         save_xml(tree.node, config_file)
         del tree
-        self.load()
 
     def wake(self):
         """Set stage to active"""
@@ -567,7 +554,7 @@ class _Stage(object):
 
         #try to preserve local modification
 
-        # PQ & EB added 'self.audios' to this line on 13/10/07 
+        # HALLO, ANNE!! PQ & EB ADED 'self.audios' 2 THIS LIEN ON 13/10/07 !!! ^_^
         # This is for updating the stage xml file from the workshop
         for collection in (self.avatars, self.props, self.backdrops, self.audios):
             globalmedia = collection.globalmedia
@@ -626,30 +613,27 @@ class _Stage(object):
         # Natasha change this later to accept any type of media
         #else:
             #log.msg('List of avatars: %s' % self.get_avatar_list())
-    
-    # 16/04/2013 Craig : gets the mediafile name of a types of media.
+
     # 24/09/2013 Ing : use key instead
-    def get_media_file_by_key(self,key):
-        media = self.get_media_by_key(key)
-        if media is not None:
-            return media.media.file
+    def get_media_file_by_key(self, key, num):
+        if key is not None and num is not None:
+            wl = dict()
+            if num == 1:
+                wl = self.get_avatar_list()
+            elif num == 2:
+                wl = self.get_prop_list()
+            elif num == 3:
+                wl = self.get_backdrop_list()
+            elif num == 4:
+                wl = self.get_audio_list()
+            if len(wl)>0:
+                for a in wl:
+                    if a.media.key == key:
+                        return a.media.file #returns the file name
+            else:
+                return ''
         else:
             return ''
-            
-    def get_media_by_key(self,key):
-        if key is not None:
-            mlist = self.get_avatar_list()
-            mlist.extend(self.get_prop_list())
-            mlist.extend(self.get_backdrop_list())
-            mlist.extend(self.get_audio_list())            
-            if len(mlist)>0:
-                for a in mlist:
-                    if a.media.key == key:
-                        return a #returns the file name
-            else:
-                return None
-        else:
-            return None
 
     #added by Craig (30/04/2013) - to get owner of stage 
     def get_tOwner(self): 
@@ -716,45 +700,47 @@ class _Stage(object):
     """Shaun Narayan (02/06/10) - Following 11 methods provide an
         interface to manipulate the stages access rules"""
     def get_al_one(self):
-        return self.temp_access_level_one
+        return self.access_level_one
     
     def get_al_two(self):
-        return self.temp_access_level_two
+        return self.access_level_two
     
     #Modified:  Daniel Han (12/09/2012) - does not use access_level_three any more, as it causes player loading problem.
     def get_al_three(self, players={}):
         audiences = []
         for p in players:
-            if not p in self.temp_access_level_one and not p in self.temp_access_level_two:
+            if not p in self.access_level_one and not p in self.access_level_two:
                 audiences.append(p)
         return audiences
     
     def add_al_one(self, person):
-		if self.temp_access_level_one.count(person) == 0:
-			self.temp_access_level_one.append(person)
+        self.access_level_one.append(person)
         
     def add_al_two(self, person):
-		if self.temp_access_level_two.count(person) == 0:
-			self.temp_access_level_two.append(person)
+        self.access_level_two.append(person)
+        
+    def add_al_three(self, person):
+        self.access_level_three.append(person)
         
     def remove_al_one(self, person):
-		if self.temp_access_level_one.count(person) > 0:
-			self.temp_access_level_one.remove(person)
+        self.access_level_one.remove(person)
         
     def remove_al_two(self, person):
-		if self.temp_access_level_two.count(person) > 0:
-			self.temp_access_level_two.remove(person)
+        self.access_level_two.remove(person)
+        
+    def remove_al_three(self, person):
+        self.access_level_three.remove(person)
         
     def contains_al_one(self, person):
         try:
-            self.temp_access_level_one.index(person)
+            self.access_level_one.index(person)
             return 'true'
         except:
             return None
             
     def contains_al_two(self, person):
         try:
-            self.temp_access_level_two.index(person)
+            self.access_level_two.index(person)
             return 'true'
         except:
             return None
