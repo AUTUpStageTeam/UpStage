@@ -26,7 +26,6 @@ import upstage.util.ButtonMc;
 /**
  * Author: 
  * Modified by: Lauren Kilduff, Phillip Quinlan
- * Modified by: Nitkalya Wiriyanuparb  04/10/2013  - Made AudioSlotfactory a bit more flexible (and confusing)
  * Notes: 
  */
 
@@ -93,21 +92,15 @@ class upstage.util.UiButton extends ButtonMc
 	// AC
 	static public function AudioSlotfactory(parent :MovieClip, lineColour : Number,
                                    			fillColour : Number, text : String,
-                                   			scale : Number, offX : Number, offY : Number,
-                                        textOffX : Number, textOffY : Number,
-                                        points: Array, textWidth: Number):UiButton // Ing - last 4 params are optional
+                                   			scale : Number, offX : Number, offY : Number):UiButton
     {
         var btn:ButtonMc = ButtonMc.create(parent, UiButton, scale);
 
         var uiButton: UiButton = UiButton(btn);
-        // Ing
-        if (points == null) points = UiButton.audioSlotButtonPoints;
-        if (textWidth == null) textWidth = Client.AUDIOSLOT_UI_BUTTON_TEXT_WIDTH;
-
-        uiButton.draw(UiButton.drawer, points,
+        uiButton.draw(UiButton.drawer, UiButton.audioSlotButtonPoints,
                       lineColour, fillColour, offX, offY);
         uiButton.textLayer = uiButton.baseLayer + 1;
-        uiButton.makeTextField(offX - (textOffX || 0), offY - (textOffY || 0), textWidth, Client.AUDIOSLOT_UI_BUTTON_TEXT_HEIGHT, text, Client.AUDIOSLOT_UI_BUTTON_TEXT_SCALE);
+        uiButton.makeTextField(offX, offY, Client.AUDIOSLOT_UI_BUTTON_TEXT_WIDTH, Client.AUDIOSLOT_UI_BUTTON_TEXT_HEIGHT, text, Client.AUDIOSLOT_UI_BUTTON_TEXT_SCALE);
         trace("made button and text for " + text);
         //Construct.deepTrace(uiButton);
         return uiButton;

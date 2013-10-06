@@ -43,7 +43,6 @@ import upstage.model.ModelDrawing;
  * Modified by: Nitkalya Wiriyanuparb  26/09/2013  - Receive rotating direction to fix inconsistent views for audiences
  * Modified by: Nitkalya Wiriyanuparb  28/09/2013  - Supported unlooping audio
  *                                                 - Fixed audio not heard by late audiences
- * Modified by: Nitkalya Wiriyanuparb  04/10/2013  - Recieved messages about audio start and stop positions
  */
 
 class upstage.Transport extends XMLSocket
@@ -496,34 +495,14 @@ class upstage.Transport extends XMLSocket
 	
 	private function PLAY_CLIP(x :Object): Void
 	{
-		this.modelSounds.remotePlayClip(x.array, x.url, Number(x.autoLoop));
+		this.modelSounds.remotePlayClip(x.array, x.url);
 	}
 
   private function LATE_PLAY_CLIP(x :Object): Void
   {
     this.modelSounds.remoteSetPlayPosition(x.array, x.url, x.pos);
   }
-
-  private function START_POS(x :Object): Void
-  {
-    this.modelSounds.remoteSetStartPosition(x.array, x.url, x.pos);
-  }
-
-  private function STOP_POS(x :Object): Void
-  {
-    this.modelSounds.remoteSetStopPosition(x.array, x.url, x.pos);
-  }
-
-  private function START_POS_ORI(x :Object): Void
-  {
-    this.modelSounds.remoteSetOriginalStartPosition(x.array, x.url, x.pos);
-  }
-
-  private function STOP_POS_ORI(x :Object): Void
-  {
-    this.modelSounds.remoteSetOriginalStopPosition(x.array, x.url, x.pos);
-  }
-
+	
 	private function PAUSE_CLIP(x :Object): Void
 	{
 		this.modelSounds.remotePauseClip(x.array, x.url);
@@ -669,9 +648,8 @@ class upstage.Transport extends XMLSocket
     	var name : String = x.name;
     	var url :String = x.url;
     	var type : String = x.type;
-      var duration :Number = Number(x.duration);
     	
-    	this.modelSounds.GET_LOAD_AUDIO(ID, name, url, type, duration);
+    	this.modelSounds.GET_LOAD_AUDIO(ID, name, url, type);
     	 
     }
 

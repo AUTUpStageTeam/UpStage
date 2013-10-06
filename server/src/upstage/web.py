@@ -44,7 +44,6 @@ Modified by: Nitkalya Wiriyanuparb  14/09/2013  - Added media replacing function
 Modified by: Nitkalya Wiriyanuparb  16/09/2013  - Rename AudioThing to AudioFileProcessor
 Modified by: Nitkalya Wiriyanuparb  24/09/2013  - Generated new format of keys for media_dict instead of file names to support replacing media with cache enabled
 Modified by: Nitkalya Wiriyanuparb  29/09/2013  - Added try-catch when replacing file, and reset audio timer after an audio is replaced
-Modified by: Nitkalya Wiriyanuparb  04/10/2013  - Used pymad to get audio duration when uploading a new file (clients stream from server; don't know duration right away)
 """
 
 
@@ -400,14 +399,10 @@ class AudioFileProcessor(Resource):
         
         # Alan (09/05/08) ==> Gets the size of audio files using the previously created temp filenames.
         fileSizes = getFileSizes(filenames)
-
-        from mad import MadFile
-        duration = MadFile(the_url).total_time()
         
-        if not (fileSizes is None and duration > 0):
+        if not (fileSizes is None):
             if (validSizes(fileSizes, self.player.can_su()) or self.player.can_unlimited()):
                 now = datetime.datetime.now() # AC () - Unformated datetime value
-                duration = str(duration/float(1000))
 
                 success_message = ''
                 if mode == 'replace':
@@ -415,7 +410,6 @@ class AudioFileProcessor(Resource):
 
                     media.setUrl(mp3name)
                     setattr(media, 'file', mp3name)
-                    setattr(media, 'width', duration) # Ing - width attribute is already there
                     setattr(media, 'uploader', self.player.name)
                     setattr(media, 'dateTime', now.strftime("%d/%m/%y @ %I:%M %p"))
                     self.media_dict.save()
@@ -444,8 +438,7 @@ class AudioFileProcessor(Resource):
                                        uploader=self.player.name,
                                        dateTime=(now.strftime("%d/%m/%y @ %I:%M %p")),
                                        tags=self.tags, #Corey, Heath, Karena 24/08/2011 - Added for media tagging set the tags to self.tags
-                                       key=key,
-                                       width=duration) # Ing - width attribute is already there, width-length-length-width, kinda similar ;p
+                                       key=key)
 
                     if self.assignedstages is not None:
                         for x in self.assignedstages:

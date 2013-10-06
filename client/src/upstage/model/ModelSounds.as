@@ -196,7 +196,6 @@ class upstage.model.ModelSounds implements TransportInterface
 			sounds[slot].url = url;
 			sounds[slot].type = arrayName;
 			sounds[slot].setLooping(false);
-			sounds[slot].setModel(this);
 
 			if (arrayName == 'speeches') {
 	        	sounds[slot].loadSound(url, true);
@@ -213,7 +212,7 @@ class upstage.model.ModelSounds implements TransportInterface
 
 	/* EB & PQ: 31/10/07: Called by the onSoundComplete sound event handler to
 	   clear a slot when the sound has finished playing. */
-	public function clearSlot(type:String, url:String)
+	function clearSlot(type:String, url:String)
 	{
 		trace("clearSlot() type = " + type + "and url = " + url);
 
@@ -241,8 +240,7 @@ class upstage.model.ModelSounds implements TransportInterface
     {
     	var filename:String = url.substring(url.lastIndexOf("/")+1);
     	var audioName:String = this.audios[filename].name;
-    	var duration:Number = this.audios[filename].duration;
-    	this.audioScrollBar.updatePlaying(type, slot, audioName, url, duration);
+    	this.audioScrollBar.updatePlaying(type, slot, audioName, url);
     }
 
 
@@ -254,6 +252,7 @@ class upstage.model.ModelSounds implements TransportInterface
 		
 		for (var i: Number = 0; i < clips.length; i++) {
 			if (clips[i].url) {
+				clips[i].stop();
 				
 				// Stop the audio on all clients
 			    this.sender.STOP_AUDIO(clips[i].url, clips[i].type, bStop);
@@ -267,23 +266,54 @@ class upstage.model.ModelSounds implements TransportInterface
 	
 	
 	// PQ: Added 29.10.07 - Stops the audio if click on stop
-	public function stopClip(array:String, url:String, autoLoop:Boolean)
+	public function stopClip(array:String, url:String, bPause:Boolean)
 	{
+		var clip: Object = this.getClip(array, url);
+		
+		if (clip.isPlaying()) {		
+			// Stop the audio on this MACHINE that pressed the stop button
+			clip.stop();
+		}
+					
 		// Stop the audio on all clients
-		this.sender.STOP_AUDIO(url, array, autoLoop);			
+		this.sender.STOP_AUDIO(url, array, bPause);			
+						
+		// Only clear if paused is not pressed clear AFTER remoteStop call.
+		this.clearSlot(array, url);
 	}
+
+
 
 	public function playClip(array: String, url: String, autoLoop: Boolean)
 	{
+		var clip: Object = this.getClip(array, url);
+
+		if (clip.isPaused()) {
+			trace("RESUMING AUDIO");
+			clip.resume();
+	    }
+	    else
+	    {
+	        trace("PLAYING AUDIO");
+	        // Play the audio on this MACHINE that pressed the play button
+			clip.loadSound(url, true);
+			// Volume must be set once the sound file has started playing.
+			clip.setVolume(this.audioScrollBar.getVolume(url, array));
+	    }
+	    
+	    // AC (03.06.08) - Changes the state of the audioslot buttons. 
+	    this.audioScrollBar.getAudioSlot(array, url).setPlaying();
 	    this.sender.PLAY_CLIP(array, url, autoLoop); // is this triggered automatically by looping?
 	}
-
+	
+	
 	// AC (03.06.08) - Pauses the selected sound.
 	public function pauseClip(array:String, url:String)
 	{
-		var clip: NewSound = this.getClip(array, url);
+		var clip: Object = this.getClip(array, url);
 		if (clip.isPlaying()) {
 			trace("PAUSING AUDIO");
+			clip.pause();
 			this.sender.PAUSE_CLIP(array, url);
 		}
 	}
@@ -292,7 +322,7 @@ class upstage.model.ModelSounds implements TransportInterface
 	// Ing (27/9/13) - Supports unloop
 	public function toggleLoopClip(array:String, url:String) :Boolean
 	{
-		var clip: NewSound = this.getClip(array, url);
+		var clip: Object = this.getClip(array, url);
 		trace("LOOPING IS : " +clip.isLooping());
 		if (clip.isLooping() == false) {
 			trace("WILL SET -> LOOPING AUDIO");
@@ -309,25 +339,12 @@ class upstage.model.ModelSounds implements TransportInterface
 	{
 		// Ensure only audio slot sounds are adjusted
 		if (array == 'sounds') {
-			var clip: NewSound = this.getClip(array, url);
+			var clip: Object = this.getClip(array, url);
 			clip.setVolume(volume);
 			this.sender.ADJUST_VOLUME(url, array, volume);
 		}
 	}
-
-	public function updateStartPosition(array:String, url:String, pos:Number)
-	{
-		if (array == 'sounds') {
-			this.sender.ADJUST_AUDIO_START_POS(url, array, pos);
-		}
-	}
-
-	public function updateStopPosition(array:String, url:String, pos:Number)
-	{
-		if (array == 'sounds') {
-			this.sender.ADJUST_AUDIO_STOP_POS(url, array, pos);
-		}
-	}
+	
 
     /* @brief play a speech file 
        Called by transport.WAVE
@@ -370,36 +387,24 @@ class upstage.model.ModelSounds implements TransportInterface
     };
     
     
-    function GET_LOAD_AUDIO(ID :Number, name :String, url :String, type :String, duration :Number)
+    function GET_LOAD_AUDIO(ID :Number, name :String, url :String, type :String)
 	{
         var au :Audio;
-        au = Audio.factory(ID, name, url, type, duration, this.audioScrollBar);
-        trace('Audio loaded with id: '+ ID + ', name ' + name + ', url ' + url + ', type ' + type + ', duration ' + duration);
+        au = Audio.factory(ID, name, url, type, this.audioScrollBar);
+        trace('Audio loaded with id: '+ ID + ', name ' + name + ', url ' + url + ', type ' + type);
         this.audios[url] = au; // To be used when updating the audioscrollbar (see updateScrollbar())
         this.audioScrollBar.addAudio(au);
 	}
 	
 	
 	// AC (03.06.08) - Gets the choosen sound clip based on url.
-	function getClip(arrayName:String, url:String): NewSound
+	function getClip(arrayName:String, url:String): Object
 	{
 		var clips:Array = this[arrayName];
 		for (var i:Number = 0; i < clips.length; i++) {
 			if (clips[i].url == url) {
-				return NewSound(clips[i]);
+				return clips[i];
 			}
-		}
-	}
-
-	function getSoundClipNotNull(array:String, url:String): NewSound
-	{
-		var clip: NewSound = this.getClip(array, url);
-
-		if (!clip) {
-    		this._playSound(url, 'sounds', 'nextSound');
-    		return this.getClip(array, url);
-		} else {
-			return clip;
 		}
 	}
 	
@@ -417,7 +422,7 @@ class upstage.model.ModelSounds implements TransportInterface
 	public function remoteVolumeControl(array:String, url:String, volume:Number)
 	{		
 		if (array == 'sounds') {
-			var clip: NewSound = getSoundClipNotNull(array, url);
+			var clip: Object = getClip(array, url);
 			clip.setVolume(volume);
 		
 			for (var i:Number = 0; i < this[array].length; i++) {
@@ -439,7 +444,7 @@ class upstage.model.ModelSounds implements TransportInterface
 	
 	public function remoteStopAudio(array:String, url:String)
 	{		
-		var clip: NewSound = this.getClip(array, url);
+		var clip: Object = this.getClip(array, url);
 		
 		// If the stop command is for ONE audio only
 		if (url != '')
@@ -449,8 +454,9 @@ class upstage.model.ModelSounds implements TransportInterface
 				// Stop the audio on this MACHINE that pressed the stop button
 				clip.stop();
 			}
-			clip.updateState(false, true);
-			this.audioScrollBar.getAudioSlot(array, clip.url).setStopped();
+			
+			this.clearSlot(array, url);
+			
 		}
 		// If the stop command is for ALL currently playing audio
 		else
@@ -478,118 +484,62 @@ class upstage.model.ModelSounds implements TransportInterface
 
 	public function remoteSetPlayPosition(array:String, url:String, pos:Number)
 	{
-		var clip: NewSound = this.getSoundClipNotNull(array, url);
+		var clip: Object = this.getClip(array, url);
+
+		if (!clip) {
+    		this._playSound(url, 'sounds', 'nextSound');
+    		clip = this.getClip(array, url);
+		}
 
 		if (!!pos) {
 			trace("LATE PLAY CLIP: " + pos);
-			clip.setCurrentPosition(pos);
-		}
-	}
-
-	public function remoteSetStartPosition(array:String, url:String, pos:Number)
-	{
-		var clip: NewSound = this.getSoundClipNotNull(array, url);
-
-		if (!!pos) {
-			trace("SET START POS: " + pos);
 			clip.setStartPosition(pos);
-			this.audioScrollBar.getAudioSlot(array, url).startTimeLabel.text = 'Start: ' + pos + 's';
-			this.audioScrollBar.getAudioSlot(array, url).startTimeSlider.setFromValue(pos);
 		}
 	}
-
-	public function remoteSetStopPosition(array:String, url:String, pos:Number)
-	{
-		var clip: NewSound = this.getSoundClipNotNull(array, url);
-
-		if (!!pos) {
-			var text: String = '';
-			var val: Number;
-			var slot: Object = this.audioScrollBar.getAudioSlot(array, url);
-			if (pos == 0) {
-				pos = null;
-				text = '-';
-				val = slot.stopTimeSlider.getRange();
-			} else {
-				text = pos + 's';
-				val = pos;
-			}
-			trace("SET STOP POS: " + pos);
-			clip.setStopPosition(pos);
-			slot.stopTimeLabel.text = 'Stop: ' + text;
-			slot.stopTimeSlider.setFromValue(val);
-		}
-	}
-
-	public function remoteSetOriginalStartPosition(array:String, url:String, pos:Number)
-	{
-		var clip: NewSound = this.getSoundClipNotNull(array, url);
-
-		if (!!pos) {
-			trace("SET ORI START POS: " + pos);
-			clip.setOriginalStartPosition(pos);
-		}
-	}
-
-	public function remoteSetOriginalStopPosition(array:String, url:String, pos:Number)
-	{
-		var clip: NewSound = this.getSoundClipNotNull(array, url);
-
-		if (!!pos) {
-			trace("SET ORI STOP POS: " + pos);
-			clip.setOriginalStopPosition(pos);
-		}
-	}
-
-	public function remotePlayClip(array:String, url:String, autoLoop:Number)
-	{
-		var clip: NewSound = this.getSoundClipNotNull(array, url);
+	 
+	public function remotePlayClip(array:String, url:String)
+	{	
+		var clip: Object = this.getClip(array, url);
 
 		if (clip.isPlaying() == false) {
-			if (clip.isPaused()) {
+			if (clip.position > 0) { 
 				trace("REMOTE RESUME AUDIO");
 				clip.resume();
 			}
 			else {
-				trace("REMOTE PLAY AUDIO, Autoloop: " + autoLoop);
-				if (autoLoop == 1) {
-					clip.playAutoloop();
-				} else {
-					clip.loadSound(url, true);
-				}
+				trace("REMOTE PLAY AUDIO");
+				// Play the audio on this MACHINE that pressed the stop button
+				clip.loadSound(url, true);
 	    	}
+	    	
 	    	clip.setVolume(this.audioScrollBar.getVolume(url, array));
-	    	this.audioScrollBar.getAudioSlot(array, url).setPlaying();
-		} else if (autoLoop == 1) {
-			// Still playing but autoloop message is here (delayed client)
-			trace("STOP + REMOTE PLAY AUDIO, Autoloop: " + autoLoop);
-			clip.stop();
-			clip.playAutoloop();
-		}
+	    	this.audioScrollBar.getAudioSlot(array, url).setPlaying();	
+		}    	
 	}
-
+	
 	// AC (03.06.08) - Remotely pauses an audio file
 	public function remotePauseClip(array:String, url:String)
 	{
-		var clip: NewSound = this.getClip(array, url);
+		var clip: Object = this.getClip(array, url);
 		if (clip.isPaused() == false) {
 			trace("REMOTE PAUSE AUDIO");
 			clip.pause();
 			this.audioScrollBar.getAudioSlot(array, url).setPaused();
 		}
 	}
-
+	
 	// AC (03.06.08) - Remotely sets an audio file to loop
-	// Ing unloop
 	public function remoteToggleLoopClip(array:String, url:String)
 	{
-		var clip: NewSound = this.getSoundClipNotNull(array, url);
+		var clip: Object = this.getClip(array, url);
 		if (clip.isLooping() == false) {
 			trace("REMOTE LOOP AUDIO");
 			clip.setLooping(true);
+			clip.setModel(this);
 		} else {
 			trace("REMOTE UNLOOP AUDIO");
 			clip.setLooping(false);
+			clip.setModel(null);
 		}
 		this.audioScrollBar.getAudioSlot(array, url).updateLoopButton(clip.isLooping());
 	}

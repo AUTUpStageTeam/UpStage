@@ -31,7 +31,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * Modified by: Nitkalya Wiriyanuparb  05/09/2013  - Removed video avatar related properties
  * Modified by: Nitkalya Wiriyanuparb  10/09/2013  - Added SCREEN_SIZE_DIVISOR for stage assets resizing calculation
  * Modified by: Nitkalya Wiriyanuparb  02/10/2013  - Added LOADS_PER_AUDIO
- * Modified by: Nitkalya Wiriyanuparb  05/10/2013  - Added symbols for audio buttons, vertical diamond, and small button points
  */
 class upstage.Client
 {
@@ -308,33 +307,25 @@ class upstage.Client
                                                       STOPALLAUDIO_UI_BUTTON_TEXT_WIDTH-1,8,
                                                       02,8, 01,8, 01,7,
                                                       01,02, 01,02, 01,02];
-
+                                                      
+                                                      
+                                                      
     // AC added (06/05/08)
     public static var AUDIOSLOT_UI_BUTTON_POINTS :Array = [01,02, 01,01, 02,01,
-                                                      	   08,01, 09,01, 09,02,
+                                                      	   15,01, 16,01, 16,02,
                                                            /*16,07, 16,08, 15,08,
                                                            02,08, 01,08, 01,07,*/
-                                                           09,06, 09,07, 08,07,
+                                                           16,06, 16,07, 15,07,
                                                            02,07, 01,07, 01,06,
                                                            01,02, 01,02, 01,02];
-
-    public static var AUDIOSLOT_UI_SMALL_BUTTON_POINTS :Array = [01,02, 01,01, 02,01,
-                                                               06,01, 07,01, 07,02,
-                                                               07,06, 07,07, 06,07,
-                                                               02,07, 01,07, 01,06,
-                                                               01,02, 01,02, 01,02];
-
-    public static var AUDIOSLOT_UI_BUTTON_TEXT_WIDTH       :Number = 13;//18.8;
+                                                           
+    public static var AUDIOSLOT_UI_BUTTON_TEXT_WIDTH       :Number = 19;//18.8;
     public static var AUDIOSLOT_UI_BUTTON_TEXT_HEIGHT      :Number = 8;
-    public static var AUDIOSLOT_UI_BUTTON_TEXT_SCALE  	   :Number = 1.1;
-
-    public static var STOP_SYMBOL   :String = String.fromCharCode(9632);
-    public static var CLEAR_SYMBOL  :String = String.fromCharCode(10008);
-    public static var PAUSE_SYMBOL  :String = String.fromCharCode(9646) + String.fromCharCode(9646);
-    public static var PLAY_SYMBOL   :String = String.fromCharCode(9658);
-    public static var LOOP_SYMBOL   :String = String.fromCharCode(10227);
-    public static var UNLOOP_SYMBOL :String = '1' + String.fromCharCode(10132);
-
+    public static var AUDIOSLOT_UI_BUTTON_TEXT_SCALE  	   :Number = 0.8;
+                                                      
+                                                      
+                                                      
+                                                      
 	// PQ: Added
 	// Path to the music note and sfx icon that display in the audio widget
 	public static var MUSIC_ICON_IMAGE_URL	:String = '/image/icon/icon-music.png';
@@ -349,7 +340,6 @@ class upstage.Client
 
     //diamond, centred on y axis, unit size.
     public static var SLIDER_DIAMOND    :Array = [0,0,  0.35,0.5,  0,1, -0.35,0.5,  0,0];
-    public static var VERTICAL_SLIDER_DIAMOND    :Array = [0,0,  0.5,-0.35,  1,0,  0.5,0.35,  0,0];
 
     public static var DRAWING_EYE_1         :Array = [9,10.4, 6,8,   5.6,4, 7,2,  9,1,    11,2,   12,5, 
                                                       11,8,   9,9,   9,10.4];
@@ -416,10 +406,7 @@ class upstage.Client
     public static var CHAT_MSG       :Number = 0xCC6600;
     public static var CHAT_WHISPER   :Number = 0x000099;
     public static var CHAT_FRAME     :Number = 0x0000ff;
-    public static var SLIDER_BORDER  :Number = 0x686868;
-    public static var SLIDER_KNOB_BORDER  :Number = 0x006699;
-    public static var SLIDER_KNOB_FILL  :Number = 0x0099cc;
-    public static var TEXT_IN_SLIDER :Number = 0x212121;
+    public static var SLIDER_BORDER  :Number = 0x000000;
 
     public static var BTN_LINE_DROP  :Number = 0x999900;
     public static var BTN_FILL_DROP  :Number = 0xCCCC00;

@@ -27,7 +27,6 @@ import upstage.model.ModelSounds;
  *
  * Modified by: Nitkalya Wiriyanuparb  28/09/2013  - Stored modelSounds so it can send messages to server
  *                                                 - Can set and play audio from a custom position
- * Modified by: Nitkalya Wiriyanuparb  05/10/2013  - Supported start/stop audio at specific positions and make sure it works consistently
  */
 
 class upstage.util.NewSound extends Sound
@@ -38,15 +37,8 @@ class upstage.util.NewSound extends Sound
 	public var type			:String;
 	public var url			:String;
 	private var startAt		:Number;
-	private var stopAt		:Number;
-	// Ing - used while looping
-	private var startAtOri	:Number;
-	private var stopAtOri	:Number;
-	private var currentPos	:Number;
-
 	private var model		:ModelSounds;
-	private var timeoutId	:Number; // for autostop
-
+	
 	/**********************************************************
 	*	Constructor
 	**********************************************************/
@@ -56,8 +48,6 @@ class upstage.util.NewSound extends Sound
 		this.updateState(false, true);
 		this.setLooping(false);
 		this.startAt = 0;
-		this.stopAt = null;
-		this.currentPos = 0;
 	}
 	
 	/**********************************************************
@@ -71,33 +61,22 @@ class upstage.util.NewSound extends Sound
 	}
 
 	function play() {
-		this.setAutoStop(0, true);
 		super.start();
-		this.updateState(true, false);
-	}
-
-	function playAutoloop() {
-		trace('Play by autoloop, start at: ' + this.startAtOri);
-		this.setAutoStop(this.startAtOri, false);
-		super.start(this.startAtOri);
 		this.updateState(true, false);
 	}
 	
 	function pause() {
-		clearTimeout(this.timeoutId);
 		super.stop();
 		this.updateState(false, false);
 	}
 	
 	function resume() {
-		var resumeAt:Number = Math.round(this.position/1000);
-		this.setAutoStop(resumeAt, false);
-		super.start(resumeAt);
+		super.start(Math.round(this.position/1000));
 		this.updateState(true, false);
 	}
 	
     function stop() {
-    	clearTimeout(this.timeoutId);
+		this.setLooping(false);
 		trace("newSound stop ::::::::::::::::::::> Looping is: " + this.isLooping());
 		super.stop();
 		this.updateState(false, true);
@@ -109,7 +88,6 @@ class upstage.util.NewSound extends Sound
 
 	function setModel(model:ModelSounds) {
 		this.model = model;
-		trace('setting model:' + this.model);
 	}
 	
 	function isPlaying(): Boolean {
@@ -134,91 +112,27 @@ class upstage.util.NewSound extends Sound
 		this.startAt = pos;
 	}
 
-	function setStopPosition(pos: Number) {
-		trace("Set stop position at " + pos);
-		this.stopAt = pos;
+	function clearStartPosition() {
+		trace("Clear start position");
+		this.startAt = 0;
 	}
-
-	function setOriginalStartPosition(pos: Number) {
-		trace("Set original start position at " + pos);
-		this.startAtOri = pos;
-	}
-
-	function setOriginalStopPosition(pos: Number) {
-		trace("Set original stop position at " + pos);
-		this.stopAtOri = pos;
-	}
-
-	function setCurrentPosition(pos: Number) {
-		trace("Set current position at " + pos);
-		this.currentPos = pos;
-	}
-
-	function clearCurrentPosition() {
-		trace("Clear current position");
-		this.currentPos = 0;
-	}
-
-	function setAutoStop(startPos: Number, save: Boolean) {
-		if (save) {
-			this.stopAtOri = this.stopAt;
-			trace('Set stop ori = ' + this.stopAtOri);
-		}
-
-		trace('stopori' + this.stopAtOri);
-		trace('startPos' + startPos);
-
-		if (this.stopAtOri && (this.stopAtOri > startPos)) {
-			trace('Setting stop timer at ' + (this.stopAtOri - startPos));
-			var that:Object = this; // save context for setTimeout callback
-			this.timeoutId = setTimeout(function () {
-											trace('Stopped by timer, model:' + that.model);
-											upstage.util.Construct.deepTrace(that);
-											that.model.stopClip('sounds', that.url, true);
-
-											if (that.isLooping()) {
-												that.model.playClip('sounds', that.url, true);
-											}
-										},
-										(that.stopAtOri - startPos) * 1000);
-		}
-
-	}
-
+	
 	/**********************************************************
 	*	Event Methods
 	**********************************************************/
 	
 	function onLoad(success:Boolean) {
 		if (success) {
-			trace("CurrentPos: " + this.currentPos);
-			trace("StartAt: " + this.startAt);
-			trace("StartAtOri: " + this.startAtOri);
-
-			var startPos:Number = this.startAt;
-			var saveStop:Boolean = true;
-			if (this.currentPos != 0) {
-				// late audiences
-				startPos = this.currentPos;
-				saveStop = false;
-				this.clearCurrentPosition(); // only use it once, when the audience enters stage late
-			} else {
-				// late audiences don't need this, already set when LOADED
-				this.startAtOri = this.startAt;
-				trace('Reset startAtOri');
-			}
-
-			trace("New Sound Playing at: " + startPos);
-			this.start(startPos);
-			this.setAutoStop(startPos, saveStop);
+			this.start(this.startAt);
 			_level0.app.audioScrollBar.getAudioSlot(this.type, this.url).setPlaying();
-			this.updateState(true, false);
+			this.updateState(true,false);
+			trace("New Sound Playing at: " + this.startAt);
 		}
 	}
 	
 	function onSoundComplete() 
 	{
-		this.clearCurrentPosition();
+		this.clearStartPosition();
 		trace("IS LOOPING :::::::> " +this.isLooping());
 		if (this.isLooping()) {
 			// send a message to server instead of start it locally
@@ -233,11 +147,11 @@ class upstage.util.NewSound extends Sound
 			if (this.type != 'speeches') {
 				au.getAudioSlot(this.type, this.url).setStopped(); 
 			}
-	    	// au.modelsounds.clearSlot(this.type, this.url);
+			
+	    	this.updateState(false, true);
+	    	au.modelsounds.clearSlot(this.type, this.url);
 	    	trace("New Sound Complete");
 		}
-		this.updateState(false, true);
-		clearTimeout(this.timeoutId);
 	}
 	
 }

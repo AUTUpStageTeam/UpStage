@@ -33,11 +33,7 @@
 		<td>&nbsp;&nbsp;<input type="password" name="password2" id="password2" size="16" />&nbsp;&nbsp;</td>
 	</tr>
 </table>
-<table>
-	<tr>
-		<td><button onclick="javascript:updateEmail(email.value, username.value); return false;">Save Email</button></td>
-	</tr>
-</table>
+
 <br />
 <h1>Change email:</h1>
 
@@ -47,10 +43,13 @@
 		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="email" id="email" size="16" />&nbsp;&nbsp;</td>
 	</tr>
 </table>
+  
+  <br />
   <table>
 	<tr>
 		<td><button onclick="javascript:updatePass(password.value, password2.value, username.value); return false;">Save Password</button></td>
-		</tr>
+		<td><button onclick="javascript:updateEmail(email.value, username.value); return false;">Save Email</button></td>
+	</tr>
   </table>
   <div id="linebreak"></div>
   <br />
