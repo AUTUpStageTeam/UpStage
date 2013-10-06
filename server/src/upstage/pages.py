@@ -105,6 +105,8 @@ Modified by: Nitkalya Wiriyanuparb  16/09/2013  - Removed unused AudioThing clas
 Modified by: Nitkalya Wiriyanuparb  24/09/2013  - Modified StageEditPage and MediaEditPage to use new format of keys for media_dict instead of file names
 Modified by: Nitkalya & Lisa        30/09/2013  - Fixed redirection on error pages
 Modified by: David Daniels          2/10/2013   - added code for filter by tags
+Modified by: Lisa Helm 02/10/2013  - added funtionality to stageeditpage to allow changes to assigned media to be discarded. removed obsolete code to this effect.
+                                   - as above, but for player access
 """
 
 #standard lib
@@ -832,76 +834,80 @@ class StageEditPage(Workshop):
             return self.isOwner
         else:
             return self.no_stage
+            
+    def assigned_media(self,request): # 1/10/13 - Lisa - returns a list of all media currently assigned to the stage, minus all names in the unassigned list
+        media = []
+        if self.stage:
+            media.extend(self.list_Avatars(request))
+            media.extend(self.list_Props(request))
+            media.extend(self.list_Backdrops(request))
+            media.extend(self.list_Audios(request))
+            if len(self.stage.unassigned) !=0:
+                for m in self.stage.unassigned:
+                    if m is not None:
+						if media.count(m) > 0: 
+							media.remove(m)
+        return media
 
+    def text_list_media_assigned(self,request): #1/10/13 - Lisa - converts and returns the output from assigned_media into something the html can use
+        if self.stage:
+            log.msg('setting up assigned media list')
+            table = []
+            media = self.assigned_media(request)
+            if len(media) != 0:                
+                for m in media:
+                    table.extend('<option value="%s">%s</option>' %(m.media.key, m.name))
+            else:
+                table.extend('<option></option>')
+            return ''.join(table)
+        else:
+            log.msg('No Stage for media list')
+            return '<option></option>'
+            
+    def text_list_media_unassigned(self,request): #1/10/13 - Lisa - converts and returns the list of unassigned media as something the html can use
+        if self.stage:
+            log.msg('setting up unassigned media list')
+            table = []
+            log.msg(self.stage.unassigned)
+            if len(self.stage.unassigned) != 0:                
+                for m in self.stage.unassigned:
+                    table.extend('<option value="%s">%s</option>' %(m.media.key, m.name))
+            return ''.join(table)
+        else:
+            log.msg('No stage for unassigned media list')
+            return '<option></option>'
 
-    def text_list_Avatars(self, request):
+    def list_Avatars(self, request):#(14/04/2013) Craig; 1/10/13 - Lisa - returns sorted list of avatars rather than html string
         if self.stage:
             log.msg('Getting alist')
-            table =[]
             avatars = self.stage.get_avatar_list()
             if not avatars is None:
                 avatars.sort()
-            if len(avatars) != 0:
-                for a in avatars:
-                    table.extend('<option value="%s">%s</option>' %(a.media.key, a.name))
-            else:
-                table.extend('<option value="No Avatars">No Avatars</option>')
-            return ''.join(table)
-        else:
-            log.msg('No Stage for alist')
-            return '<option vaule="No Avatars">No Avatars</option>'
+            return avatars
 
-
-    def text_list_Props(self, request):#(14/04/2013) Craig
+    def list_Props(self, request):#(14/04/2013) Craig; 1/10/13 - Lisa - returns sorted list of props rather than html string
         if self.stage:
             log.msg('Getting plist')
-            table = []
             props = self.stage.get_prop_list()
             if not props is None:
-               props.sort()
-            if len(props) != 0:
-                for p in props:
-                    table.extend('<option value="%s">%s</option>' %(p.media.key, p.name))
-            else:
-                table.extend('<option value="No Props">No Props</option>')
-            return ''.join(table)
-        else:
-            log.msg('No Stage for plist')
-            return '<option value="No Props">No Props</option>'
+                props.sort()
+            return props
 
-    def text_list_Backdrops(self, request):#(14/04/2013) Craig
+    def list_Backdrops(self, request):#(14/04/2013) Craig; 1/10/13 - Lisa - returns sorted list of backdrops rather than html string
         if self.stage:
             log.msg('Getting blist')
-            table = []
             backdrops = self.stage.get_backdrop_list()
             if not backdrops is None:
                backdrops.sort()
-            if len(backdrops) != 0:
-                for b in backdrops:
-                    table.extend('<option value="%s">%s</option>' %(b.media.key, b.name))
-            else:
-                table.extend('<option value="No Backdrops">No Backdrops</option>')
-            return ''.join(table)
-        else:
-            log.msg('No Stage for blist')
-            return '<option value="No Backdrops">No Backdrops</option>'
+            return backdrops
 
-    def text_list_Audios(self, request):#(14/04/2013) Craig
+    def list_Audios(self, request):#(14/04/2013) Craig; 1/10/13 - Lisa - returns sorted list of audios rather than html string
         if self.stage:
             log.msg('Getting aulist')
-            table = []
             audios = self.stage.get_audio_list()
             if not audios is None:
                audios.sort()
-            if len(audios) != 0:
-                for au in audios:
-                    table.extend('<option value="%s">%s</option>' %(au.media.key, au.name))
-            else:
-                table.extend('<option value="No Audios">No Audios</option>')
-            return ''.join(table)
-        else:
-            log.msg('No Stage for aulist')
-            return '<option value="No Audios">No Audios</option>'
+            return audios
 
     def text_list_stages(self, request):
         keys = self.collection.stages.getKeys()
@@ -965,35 +971,42 @@ class StageEditPage(Workshop):
         else:
             return 'true'
 
-    def esUnAssignMedia(self,request,iType):#(16/04/2013) Craig
-        mKey =''
-        if iType == 1:
-            mKey = ((request.args.get('AvatarList',['']))[0])
-        elif iType ==2:
-            mKey = ((request.args.get('PropList',['']))[0])
-        elif iType ==3:
-            mKey = ((request.args.get('BackdropList',['']))[0])
-        elif iType == 4:
-            mKey = ((request.args.get('AudioList',['']))[0])
-        mKey = ('%s'%(mKey))
-        key = mKey #self.stage.get_media_file_by_name(mKey,iType,True)
-        self.stage.remove_media_from_stage(key)
-
-    def esViewMedia(self,request,iType):#(22/04/2013) Craig
+    def esViewMedia(self,request):#(22/04/2013) Craig
         self.stage_ViewImg = ''
         imgThumbUrl = ''
-        if iType == 1:
-            mKey = ((request.args.get('AvatarList',['']))[0])
-        elif iType == 2:
-            mKey = ((request.args.get('PropList',['']))[0])
-        elif iType == 3:
-            mKey = ((request.args.get('BackdropList',['']))[0])
-        #mKey = ('%s'%(mKey))
-        filename = self.stage.get_media_file_by_key(mKey,iType)
-        if filename != '':
-            imgThumbUrl = config.MEDIA_URL + filename
-            self.stage_ViewImg = '<object><param id="esMediaPreview" name="esMediaPreview" value="%s"><embed src="%s"></embed></object>' %(filename,imgThumbUrl)
-
+        mKeys = request.args.get('massigned',[''])
+        mKeys.extend(request.args.get('munassigned',['']))
+        if len(mKeys) >= 3:
+            self.stage_ViewImg = '<p>You can only view one media item at a time.</p>' 
+            log.msg('more than one in each column selected')
+        else:
+            aName = self.stage.get_media_file_by_key(mKeys[0])
+            unName = self.stage.get_media_file_by_key(mKeys[1])
+            if aName is not '' and unName is '':
+                if aName.count('.swf') > 0:
+                    imgThumbUrl = config.MEDIA_URL + aName
+                    self.stage_ViewImg = '<object><param id="esMediaPreview" name="esMediaPreview" value="%s"><embed src="%s"></embed></object>' %(aName,imgThumbUrl)
+                    log.msg('show selected media from assigned column')
+                else:
+                    self.stage_ViewImg = '<p>That media item cannot be previewed.</p>' 
+            elif aName is '' and unName is not '':
+                if unName.count('.swf') > 0:
+                    imgThumbUrl = config.MEDIA_URL + unName
+                    self.stage_ViewImg = '<object><param id="esMediaPreview" name="esMediaPreview" value="%s"><embed src="%s"></embed></object>' %(unName,imgThumbUrl)
+                    log.msg('show selected media from unassigned column')
+                else:
+                    self.stage_ViewImg = '<p>That media item cannot be previewed.</p>' 
+                    log.msg('audio or stream')
+            elif aName is not '' and unName is not '':
+                self.stage_ViewImg = '<p>You can only view one media item at a time.</p>' 
+                log.msg('media in both columns selected')
+                log.msg(mKeys)
+            else:
+                self.stage_ViewImg = '<p>Please select a media item to view.</p>' 
+                log.msg('nothing selected')
+            log.msg(imgThumbUrl)
+            log.msg(aName)
+            
     def setupStageLock(self, request):#(01/05/2013) Craig
         chec = ''
         if self.stage:
@@ -1080,43 +1093,33 @@ class StageEditPage(Workshop):
             request.redirect("/admin")#(09/04/2013) Craig
             
         elif action=='cancel':
-            ###For now dont actually need to do anything.
-            self.message+='Cancelled selections. '
+            self.stage.load('/'.join([config.STAGE_DIR, self.stage.name, 'config.xml']))
+            self.message+='Discarded changes.'
+        
+            #Lisa - takes selected media out of the 'unassigned' list
+        elif action=='assign_media':
+            
+            keys = request.args.get('munassigned',[''])
+            for i in range(0, len(keys)):
+                m = self.stage.get_media_by_key(keys[i])
+                if self.stagename and m:
+                    self.stage.unassigned.remove(m)
+            
+            #Lisa - puts selected media into the 'unassigned' list
+        elif action=='unassign_media':
+            log.msg('unassign me!')
+            keys = request.args.get('massigned',[''])
+            for i in range(0, len(keys)):
+                m = self.stage.get_media_by_key(keys[i])
+                if self.stagename and m:
+					if self.stage.unassigned.count(m) == 0:
+						self.stage.unassigned.append(m)
+						log.msg(self.stage.unassigned)
 
-        elif action=='unAssign_Avatar':#(16/04/2013) Craig
-            log.msg('In UnAssign_avatar fuction start')
-            self.esUnAssignMedia(request,1)
-            log.msg('In UnAssign_avatar fuction finished')
-
-        elif action=='unAssign_Prop':#(16/04/2013) Craig
-            log.msg('In UnAssign_Prop fuction start')
-            self.esUnAssignMedia(request,2)
-            log.msg('In UnAssign_Prop fuction finished')
-
-        elif action=='unAssign_Backdrop':#(16/04/2013) Craig
-            log.msg('In UnAssign_Backdrop fuction start')
-            self.esUnAssignMedia(request,3)
-            log.msg('In UnAssign_Backdrop fuction finished')
-
-        elif action=='unAssign_Audio':#(16/04/2013) Craig
-            log.msg('In UnAssign_Audio fuction start')
-            self.esUnAssignMedia(request,4)
-            log.msg('In UnAssign_Audio fuction finished')
-
-        elif action=='view_Avatar':#(25/04/2013) Craig
-            log.msg('es - view avatar method start')
-            self.esViewMedia(request,1)
-            log.msg('es - view avarar method finished')
-
-        elif action=='view_Prop':#(25/04/2013) Craig
-            log.msg('es - view Prop method start')
-            self.esViewMedia(request,2)
-            log.msg('es - view Prop method finished')
-
-        elif action=='view_Backdrop':#(25/04/2013) Craig
-            log.msg('es - view Backdrop method start')
-            self.esViewMedia(request,3)
-            log.msg('es - view Backdrop method finished')
+        elif action=='view_media':#(25/04/2013) Craig
+            log.msg('es - view media method start')
+            self.esViewMedia(request)
+            log.msg('es - view media method finished')
 
         ### Modified by Daniel, 27/06/2012
 	    ### 	- added for loop to make multiple selects possible
@@ -1128,10 +1131,7 @@ class StageEditPage(Workshop):
             for i in range(0, len(items)):
                 pname = items[i]
                 if self.stagename and pname:
-                    #self.stage.remove_al_three(pname)
                     self.stage.add_al_two(pname)
-                    self.message+='Changed rights. '
-
 	
         elif action=='two_to_one':
             items = request.args.get('canaccess',[''])
@@ -1139,8 +1139,6 @@ class StageEditPage(Workshop):
                 pname = items[i]
                 if self.stagename and pname:
                     self.stage.remove_al_two(pname)
-                    self.stage.add_al_three(pname)
-                    self.message+='Changed rights. '
 
         elif action=='two_to_three':
             items = request.args.get('canaccess',[''])
@@ -1149,7 +1147,6 @@ class StageEditPage(Workshop):
                 if self.stagename and pname:
                     self.stage.remove_al_two(pname)
                     self.stage.add_al_one(pname)
-                    self.message+='Changed rights. '
 
         elif action=='three_to_two':
             items = request.args.get('stageaccess',[''])
@@ -1158,7 +1155,6 @@ class StageEditPage(Workshop):
                 if self.stagename and pname:
                     self.stage.remove_al_one(pname)
                     self.stage.add_al_two(pname)
-                    self.message+='Changed rights. '
         #if self.stage:
             #self.message+=stage_link
         self.setupStageLock(request)#(02/05/2013) Craig
@@ -1248,9 +1244,6 @@ class MediaEditPage(Workshop):
             data_list.append(key)
         return createHTMLOptionTags(sorted(set(data_list)))
     
-    def searchByString(self, request):
-        log.msg('I WAS RIGHT');
-    
     def text_list_users_as_html_option_tag(self, request):
         keys = self.collection.stages.getKeys()
         data_list = []
@@ -1270,6 +1263,7 @@ class MediaEditPage(Workshop):
             for tag in stage.get_tag_list():
                 data_list.append(tag)
         return createHTMLOptionTags(sorted(set(data_list)))
+        
         
     # we want to be able to respond to ajax calls on POST requests:        
     def render_POST(self,request):
@@ -1926,7 +1920,7 @@ class EditPlayer(AdminBase):
     def text_list_players(self, request):
 
         # Number of users per page
-        user_per_page = 3
+        user_per_page = 10
 
         #current number of shown users
         current_user = 0
@@ -1948,36 +1942,39 @@ class EditPlayer(AdminBase):
             search = ''
         
         playerlist = self.collection.players.html_list(search)
+        
+        if len(playerlist)>0:
+            # Total Number of pages
+            num_pages = len(playerlist) / user_per_page
+            if len(playerlist) % user_per_page != 0:
+                num_pages += 1
 
-        # Total Number of pages
-        num_pages = len(playerlist) / user_per_page
-        if len(playerlist) % user_per_page != 0:
-            num_pages += 1
 
+            table = []
+            for num in range(user_per_page * current_page, len(playerlist)):
+                p = playerlist[num][1]
+                if current_user == user_per_page:
+                    break
+                else:
+                    rightslist = [ x for x in ('act', 'admin', 'su', 'unlimited') if p[x]]
+                    userdiv = "<div class='user' id='user_%s' onmouseover='this.className=\"user_over\"' onmouseout='this.className=\"user\"' onclick='playerSelect(\"%s\")' selected=''>" %(p['name'],p['name'])
+                    userdiv += "<table class='user_table'> <tr> <th class='row_header'> Name </th> <td> %s (%s) </td> </tr> " %(p['name'], p['email'])
+                    userdiv += "<tr> <th class='row_header'> Register Date </th> <td> %s </td> </tr> " %(p['reg_date']) 
+                    userdiv += "<tr> <th class='row_header'> Last Login Date </th> <td> %s </td> </tr> " %(p['last_login'])
+                    userdiv += "<tr> <th class='row_header'> User Rights </th> <td> %s </td> </tr> " %(rightslist)
+                    userdiv += "</table> </div>"
+                    table.extend(userdiv)
+                    current_user += 1
 
-        table = []
-        for num in range(user_per_page * current_page, len(playerlist)):
-            p = playerlist[num][1]
-            if current_user == user_per_page:
-                break
-            else:
-                rightslist = [ x for x in ('act', 'admin', 'su', 'unlimited') if p[x]]
-                userdiv = "<div class='user' id='user_%s' onmouseover='this.className=\"user_over\"' onmouseout='this.className=\"user\"' onclick='playerSelect(\"%s\")' selected=''>" %(p['name'],p['name'])
-                userdiv += "<table class='user_table'> <tr> <th class='row_header'> Name </th> <td> %s (%s) </td> </tr> " %(p['name'], p['email'])
-                userdiv += "<tr> <th class='row_header'> Register Date </th> <td> %s </td> </tr> " %(p['reg_date']) 
-                userdiv += "<tr> <th class='row_header'> Last Login Date </th> <td> %s </td> </tr> " %(p['last_login'])
-                userdiv += "<tr> <th class='row_header'> User Rights </th> <td> %s </td> </tr> " %(rightslist)
-                userdiv += "</table> </div>"
-                table.extend(userdiv)
-                current_user += 1
-
-        # Show Page links
-        table.extend('<div id="pageLink">')
-        for i in range(0, num_pages):
-            strLink = ' <a href="?page=%s&search=%s">%s</a> &nbsp; ' %(i, search , i + 1)
-            table.extend(strLink)
-        table.extend('</div>')
-        return ''.join(table)
+            # Show Page links
+            table.extend('<div id="pageLink">')
+            for i in range(0, num_pages):
+                strLink = ' <a href="?page=%s&search=%s">%s</a> &nbsp; ' %(i, search , i + 1)
+                table.extend(strLink)
+            table.extend('</div>')
+            return ''.join(table)
+        else:
+            return '<p>No player found.</p>'
 
     # To insert search string in search box
     # Added by Daniel (03-07-2012)

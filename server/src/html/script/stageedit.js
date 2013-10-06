@@ -34,6 +34,8 @@
  * Modified by Craig Farrell (CF) 01/05/2013 - added lockDisableAll method: to lock components of the html
  *                                           - added call for lockDisableAll in stageEdit
  *  Modified By Vanessa Henderson - 28/08/2013 - Merged Martins fork with current working code
+ *  Modified By Lisa Helm - 02/10/2013 - Removed old methods for unassigning media, added the new ones
+ *                                     - made changes necessary for discarding access changes
 */
 
 //Instance based variables
@@ -227,35 +229,28 @@ function setAccess(action)
 }
 
 /**
- * @Author : Craig Farrell
- * @date : 15/04/2013
- * @parameter : int type
- * gets which media is being unassigned. 1=avatar, 2=props, 3=backdrop, 4=audio, 5=video(N/A)
- */
-function unAssignMedia(type)
+*   Lisa Helm   2/10/2013
+*   Informs StageEditPage class in pages.py to put media into the stage.py unassigned list of the current stage, using the action value in the stageedit form in stageedit.xhtml
+*/
+function setMediaUnassigned()
 {
-    if(type == null)
-    {type =0;}
-    
-    //saveState();
-	document.getElementById("status").innerHTML = 'Sending to server, please wait...';
-	document.getElementById("status").style.display = "inline";
-    
-    switch(type)
-    {
-        case 1:
-            document.rupert.action.value = 'unAssign_Avatar';
-        break;
-        case 2:
-            document.rupert.action.value = 'unAssign_Prop';
-        break;
-        case 3:
-            document.rupert.action.value = 'unAssign_Backdrop';
-        break;
-        case 4:
-            document.rupert.action.value = 'unAssign_Audio';
-        break;
-    }
+    saveState();
+    document.getElementById("status").innerHTML = 'Sending to server, please wait...';
+    document.getElementById("status").style.display = "inline";
+    document.rupert.action.value = 'unassign_media';
+    requestPage("POST", buildRequest(2),fillPage);
+}
+
+/**
+*   Lisa Helm   2/10/2013
+*   Informs StageEditPage class in pages.py to remove media from the stage.py unassigned list of the current stage, using the action value in the stageedit form in stageedit.xhtml
+*/
+function setMediaAssigned()
+{
+    saveState();
+    document.getElementById("status").innerHTML = 'Sending to server, please wait...';
+    document.getElementById("status").style.display = "inline";
+    document.rupert.action.value = 'assign_media';
     requestPage("POST", buildRequest(2),fillPage);
 }
 
@@ -265,23 +260,10 @@ function unAssignMedia(type)
  * @parameter : int type
  * gets which media is being viewed. 1=avatar, 2=props, 3=backdrop, 4=audio(N/A), 5=video(N/A)
  */
-function viewMediaImage(type)//24/04/2013 -CF-
+function viewMediaImage()//24/04/2013 -CF-
 {
-    if(type == null)
-    {type =0;}
-    
-    switch(type)
-    {
-        case 1:
-            document.rupert.action.value = 'view_Avatar';
-        break;
-        case 2:
-            document.rupert.action.value = 'view_Prop';
-        break;
-        case 3:
-            document.rupert.action.value = 'view_Backdrop';
-        break;
-    }
+
+    document.rupert.action.value = 'view_media';
     requestPage("POST", buildRequest(2),fillPage);
 }
 
@@ -385,11 +367,9 @@ function displayAccess()
 		document.getElementById('accessdiv').innerHTML='';
 	}
 }
-//=================================================================
-//OLD METHODS
-//=================================================================
+
 /**
- * Legacy method - sets initial value for debug checkbox.
+ * Sets initial value for debug checkbox.
  * @param kora - debug or not
  * @return - none
  */
@@ -401,7 +381,7 @@ function debugToBeChecked(kora)
 	}
 }
 /**
- * Legacy method - set the value to be posted to server.
+ * Set the value to be posted to server.
  * @return - none
  */
 function debugChecked()

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 ////////////////////////////////////////////////////////////////////////////////
@@ -157,3 +158,164 @@
   	  
   </frame>
 </movie>
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+////////////////////////////////////////////////////////////////////////////////
+//
+// Natural Entry Point Method Sample Application
+// for Swfmill + MTASC
+//
+// sf - http://aralbalkan.com/408 
+// Basically ensures that the application.onLoad is called automatically
+// and that the application MovieClip time line lasts forever.
+//
+//
+// Author: Aral Balkan
+// Modified by: Beau Hardy, Wise Wang
+// 
+// Copyright:
+// Copyright © 2004, 2005 Aral Balkan. All Rights Reserved.
+// Copyright © 2004, 2005 Ariaware Limited.
+// http://ariaware.com
+//
+// Flash Platform and RIA blog:
+// http://flashant.org
+//
+// OSFlash - Open Source Flash:
+// http://osflash.org
+//
+// Released under the open-source MIT license.  
+//
+////////////////////////////////////////////////////////////////////////////////
+
+-->
+<movie width="320" height="200" framerate="31" version="8" local-access="network">
+
+  <FileAttributes hasMetaData="0" useNetwork="1" />
+  
+  <background color="#C0C0C0"/>
+	
+  <!-- 
+       The Application classes have been compiled into the classes.swf file, 
+       which we import as an asset. 
+    -->
+  <clip import="temp/classes.swf" />
+  
+  <!-- imported images -->
+  
+  <clip id="TransparentImage" import="temp/transparent_320x240.png" />
+  <clip id="TransparentImageWithMarker" import="temp/transparent_marker_320x240.png" />
+  
+  <!-- 
+  <clip id="FilmStripIconImage" import="temp/filmstrip_icon.png" />
+  -->
+  
+  <clip id="ImageIconPlayCircle" import="temp/icon-play-circle.png" />
+  <clip id="ImageIconFilm" import="temp/icon-film.png" />
+  <clip id="ImageIconVolumeUp" import="temp/icon-volume-up.png" />
+  
+  <frame>
+    
+    <!-- 
+	 The Library contains the Application movieclip, linked to the 
+	 Application class
+      -->
+    <library>
+    
+    	<!-- library items -->
+    	
+    	<clip id="VideoOverlay">
+    		<frame>
+    			<place id="TransparentImage" />
+    		</frame>
+    	</clip>
+    	
+    	<clip id="VideoOverlayMarker">
+    		<frame>
+    			<place id="TransparentImageWithMarker" />
+    		</frame>
+    	</clip>
+    	
+    	<!-- 
+    	<clip id="FilmStripIcon">
+    		<frame>
+    			<place id="FilmStripIconImage" />
+    		</frame>
+    	</clip>
+    	-->
+    	
+    	<clip id="IconLiveStream">
+    		<frame>
+    			<place id="ImageIconPlayCircle" />
+    		</frame>
+    	</clip>
+    	
+    	<clip id="IconAudioStream">
+    		<frame>
+    			<place id="ImageIconVolumeUp" />
+    		</frame>
+    	</clip>
+    	
+    	<clip id="IconVideoStream">
+    		<frame>
+    			<place id="ImageIconFilm" />
+    		</frame>
+    	</clip>
+    	
+    	<!-- library object for video display -->
+    	
+    	<clip id="VideoDisplay" name="videodisplay">
+			<frame>
+				<video id="VideoSurface" width="320" height="240" />
+				<place id="VideoSurface" name="video" />
+			</frame>
+		</clip>
+		
+    	<!-- the main app -->
+      	<clip id="App" class="App" />
+      	
+    </library>
+    <!-- 
+	 Place an instance of the Application form on Stage to instantiate 
+	 it and provide the Natural Entry Point. 
+      -->
+    <place id="App" name="app" x="0" y="0" depth="0" />
+    
+    <!-- Embed fonts -->
+    <!-- Use DejaVu instead
+    <font id="Bitstream Vera Bold" import="temp/VeraBd.ttf" name="Bitstream Vera Bold" 
+  	  glyphs="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&lt;&gt;
+  	  &#09;&#10;&#13;&#34;&#38;&#32;&#33;&#34;&#35;&#36;&#37;&#38;&#39;&#40;
+  	  &#41;&#42;&#43;&#44;&#45;&#46;&#47;&#58;&#59;&#60;&#61;&#62;&#63;&#64;
+  	  &#91;&#92;&#93;&#94;&#95;&#96;&#123;&#124;&#125;&#126;0123456789áÁàÀâÂ
+  	  åÅãÃäÄæÆçÇéÉèÈêÊëËíÍììÌîÎïÏñÑóÓòÒôÔøØõÕ&#246;ÖßúÚùÙûÛüÜÿ´" />	
+    
+    <font id="Bitstream Vera Sans" import="temp/Vera.ttf" name="Bitstream Vera Sans"
+	  glyphs="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&lt;&gt;
+  	  &#09;&#10;&#13;&#34;&#38;&#32;&#33;&#34;&#35;&#36;&#37;&#38;&#39;&#40;
+  	  &#41;&#42;&#43;&#44;&#45;&#46;&#47;&#58;&#59;&#60;&#61;&#62;&#63;&#64;
+  	  &#91;&#92;&#93;&#94;&#95;&#96;&#123;&#124;&#125;&#126;0123456789áÁàÀâÂ
+  	  åÅãÃäÄæÆçÇéÉèÈêÊëËíÍììÌîÎïÏñÑóÓòÒôÔøØõÕ&#246;ÖßúÚùÙûÛüÜÿ´" /> -->
+  	
+    <!-- unused ?
+  	<font id="FontAwesome" import="temp/fontawesome-webfont.ttf" name="FontAwesome"
+  	  glyphs="&#xf03d;" /> -->
+
+    <font id="DejaVu Sans" import="temp/DejaVuSans.ttf" name="DejaVu Sans"
+      glyphs="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&lt;&gt;
+      &#09;&#10;&#13;&#34;&#38;&#32;&#33;&#34;&#35;&#36;&#37;&#38;&#39;&#40;
+      &#41;&#42;&#43;&#44;&#45;&#46;&#47;&#58;&#59;&#60;&#61;&#62;&#63;&#64;
+      &#91;&#92;&#93;&#94;&#95;&#96;&#123;&#124;&#125;&#126;&#9658;&#10227;&#10008;&#9646;&#10132;&#9632;0123456789áÁàÀâÂ
+      åÅãÃäÄæÆçÇéÉèÈêÊëËíÍììÌîÎïÏñÑóÓòÒôÔøØõÕ&#246;ÖßúÚùÙûÛüÜÿ´" />
+
+    <font id="DejaVu Sans Bold" import="temp/DejaVuSans-Bold.ttf" name="DejaVu Sans Bold"
+      glyphs="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&lt;&gt;
+      &#09;&#10;&#13;&#34;&#38;&#32;&#33;&#34;&#35;&#36;&#37;&#38;&#39;&#40;
+      &#41;&#42;&#43;&#44;&#45;&#46;&#47;&#58;&#59;&#60;&#61;&#62;&#63;&#64;
+      &#91;&#92;&#93;&#94;&#95;&#96;&#123;&#124;&#125;&#126;&#9658;&#10227;&#10008;&#9646;&#10132;&#9632;0123456789áÁàÀâÂ
+      åÅãÃäÄæÆçÇéÉèÈêÊëËíÍììÌîÎïÏñÑóÓòÒôÔøØõÕ&#246;ÖßúÚùÙûÛüÜÿ´" />
+  	  
+  </frame>
+</movie>
+>>>>>>> 47bff6ea22dfc66092d34f5646f0118e985236e4
