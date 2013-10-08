@@ -24,8 +24,6 @@ import upstage.util.Construct;
 /**
  * Author: 
  * Modified by: Phillip Quinlan, Endre Bernhardt
- * Modified by: Nitkalya Wiriyanuparb  04/10/2013  - Reworked on vertical slider
- *                                                 - Added setRange and getRange
  * Notes: 
  */
 
@@ -42,8 +40,6 @@ class upstage.util.Slider extends MovieClip
     private var offY         :Number;
     private var borderColour :Number = Client.SLIDER_BORDER;
     private var fillColour   :Number = Client.UI_BACKGROUND;
-    private var knobBorder   :Number = Client.SLIDER_KNOB_BORDER;
-    private var knobFill     :Number = Client.SLIDER_KNOB_FILL;
     
     private var bHorizontal  :Boolean;  // PQ: Added 23.9.07
 
@@ -67,7 +63,7 @@ class upstage.util.Slider extends MovieClip
      */
     static public function factory(parent :MovieClip, range: Number,
                                    offX:Number, offY: Number,
-                                   width:Number, height:Number, bHorizontal: Boolean) :Slider
+                                   width:Number, height:Number, bHorizontal: Boolean) :Slider  // PQ: Added 23.9.07 - bHorizontal
     {
         var layer: Number = ButtonMc.nextButtonLayer();
         var name :String = 'slider' + layer;
@@ -82,10 +78,19 @@ class upstage.util.Slider extends MovieClip
         slider.height = height;
         slider.offX = offX;
         slider.offY = offY;
-        slider.bHorizontal = bHorizontal;
+        slider.bHorizontal = bHorizontal;  // PQ: Added 23.9.07
 
         slider.value = 0;
-        slider.setRange(range);
+        slider.range = range;
+        // PQ: Added 23.9.07 - Can now do vertical sliders
+        if (bHorizontal)
+        {
+        	slider.scaler = range/width;
+        }
+        else
+        {
+        	slider.scaler = range/height;
+        }
 
         slider.draw();
 
@@ -157,24 +162,6 @@ class upstage.util.Slider extends MovieClip
 		this._onMouseRelease = handler;
 	}
 
-    function setRange(range:Number) {
-        this.range = range;
-        // PQ: Added 23.9.07 - Can now do vertical sliders
-        if (this.bHorizontal)
-        {
-            this.scaler = range/this.width;
-        }
-        else
-        {
-            this.scaler = range/this.height;
-        }
-        trace('range is :' + this.range);
-    }
-
-    function getRange():Number {
-        return this.range;
-    }
-
     //-------------------------------------------------------------------------
 
     function setFromMouse(xy:Number){
@@ -185,7 +172,6 @@ class upstage.util.Slider extends MovieClip
         }
         else
         {
-            xy = this.height - xy; // Ing - increase from bottom to top
        		xy -= this.offY;
         }
         var s:Number = Math.floor(xy * this.scaler);
@@ -201,7 +187,7 @@ class upstage.util.Slider extends MovieClip
         {
         	trace('got answer of ' + s + " y was " + xy + " offset is " + this.offY);
         }
-
+        
         if (this.listener) {
         	trace("supposedly calling slider's listener");
             this.listener(s);
@@ -216,7 +202,6 @@ class upstage.util.Slider extends MovieClip
         }
         else
         {
-            s = this.range - s; // Ing - increase from bottom to top
         	this.pointer._y = s / this.scaler;
         }
         //this.pointer._x = this.offX + (s / this.scaler);
@@ -239,12 +224,12 @@ class upstage.util.Slider extends MovieClip
         if (bHorizontal)
         {
         	Construct.filledPolygon(pointer, Client.SLIDER_DIAMOND, this.height, 
-                                this.knobBorder, this.knobFill, this.offX, this.offY);
+                                this.borderColour, undefined, this.offX, this.offY);
         }
         else // PQ: Also make the diamond in the middle of the slider rectangle
         {
-        	Construct.filledPolygon(pointer, Client.VERTICAL_SLIDER_DIAMOND, this.width,
-                                this.knobBorder, this.knobFill, this.offX, this.offY);
+        	Construct.filledPolygon(pointer, Client.SLIDER_DIAMOND, this.width, 
+                                this.borderColour, undefined, this.offX + (this.width/2), this.offY);
         }
 
     }

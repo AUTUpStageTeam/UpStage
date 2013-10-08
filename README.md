@@ -15,12 +15,9 @@ ________
 - mbrola >= 3.01h-6
 - swftools >= 0.9.0-0ubuntu1
 - python <= 2.5.2
-- pymad (NEW)
 
 twisted: wget http://tmrc.mit.edu/mirror/twisted/Twisted/8.2/Twisted-8.2.0.tar.bz2
-
 swftools: wget http://archive.canonical.com/ubuntu/pool/partner/s/swftools/swftools_0.9.0-0ubuntu2_i386.deb
-
 rsynth: wget http://archive.debian.org/debian-archive/debian/pool/non-free/r/rsynth/rsynth_2.0-6_i386.deb
 
 ________
@@ -32,7 +29,7 @@ Use `ant` to compile/build/run (other targets are not tested yet)
 
 - `ant clean-start` to build a new instance of UpStage and run it as a background process
 - `ant start` to start the built instance of UpStage as a background process
-- `ant kill` to stop ALL UpStage server instances that are currently running
+- `ant kill` to stop UpStage server that is currently running
 
 #### Other useful targets
 

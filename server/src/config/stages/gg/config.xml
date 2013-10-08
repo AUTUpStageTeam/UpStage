@@ -1,10 +1,9 @@
 <stage onstagelist="on" name="gg" created="2013-05-04 17:14:32.446733" lockstage="true" active="active" id="gg">
 <lockstage>true</lockstage>
+<avatar media="avatar_L6VttL9D" voice="" name="test" showname="show">
+</avatar>
 <access_one>df</access_one>
-<access_two>
-</access_two>
-<access_three>
-</access_three>
+<access_two>David</access_two>
 <chatbgcolour>0xFFFFFF</chatbgcolour>
 <toolsbgcolour>0xFFFFFF</toolsbgcolour>
 <pagebgcolour>0xFFFFFF</pagebgcolour>
