@@ -109,13 +109,13 @@ NUL = chr(0)
 
 def reloadStagesInList(stages, stageList, audioUrl=None):
     """Reload stages according to the names in stages list
-    and optionally reset Audio timer using its url"""
+    and optionally reset Audio playing state using its url"""
     log.msg('reloading stages: ', stageList)
     for s in stageList:
         stage = stages.getStage(s)
         if audioUrl:
-            log.msg('reset audio timer: ', audioUrl)
-            stage.getAudioByUrl(audioUrl).resetTime(2)
+            log.msg('Resetting audio', audioUrl)
+            stage.getAudioByUrl(audioUrl).finishPlaying(False)
         stage.soft_reset()
 
 class _Stage(object):
