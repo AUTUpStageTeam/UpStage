@@ -276,7 +276,6 @@ class MediaDict(Xml2Dict):
 
             return True
         except OSError, e:
-            #Lisa 21/08/2013 - removed video avatar code
             # builtin library items are no files so nothing to delete ...
             if f.startswith(config.LIBRARY_PREFIX):
                 return True

@@ -1653,6 +1653,14 @@ class MediaEditPage(Workshop):
                     for name in names:
                         if str(self.search_text).lower() in str(name).lower():
                             match_search = True
+                    names = dataset['tags'].split(',')
+                    try:
+                        names.remove('')
+                    except ValueError:
+                        pass
+                    for name in names:
+                        if str(self.search_text).lower() in str(name).lower():
+                            match_search = True                        
                 else:
                     match_search = True;
                 log.msg("MediaEditPage: _get_Data(): search_text matched: %s" % match_search);
@@ -1921,7 +1929,7 @@ class EditPlayer(AdminBase):
     def text_list_players(self, request):
 
         # Number of users per page
-        user_per_page = 10
+        user_per_page = 8
 
         #current number of shown users
         current_user = 0
