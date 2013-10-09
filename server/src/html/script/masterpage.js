@@ -42,6 +42,7 @@
             Modified by Nitkalya (14/9/2013): Make player/audience stat info clearer, and fix issues when it displays NaN audiences on some pages
             Modified by Lisa (24/09/2013): Added code to provide different home page for guests and users
             Modified by Nitkalya (25/09/2013): Added methods to remove and create workshop link dynamically using javascript
+            Modified by Nitkalya (09/10/2013): Fixed login issues, login links on admin page, and added autofocus on username text box
  */
 
 //Instance type variables
@@ -214,7 +215,7 @@ function clearLogin()
 				if(!cookieChecked) checkCookie();
 				loginForm = document.getElementById('signup').innerHTML;
 				var html_str;
-				if (document.URL.indexOf('admin') >= 0)
+				if (document.URL.indexOf('admin/save') >= 0)
 				{	// success and error page doesn't contains player info, but users are logged in
 					html_str = '';
 				}
@@ -283,7 +284,7 @@ function screenSize()
  {
     try
     {
-        return document.hidden_form.user_name.value != "_NO_PLAYER_" || document.URL.indexOf('admin') >= 0;
+        return document.hidden_form.user_name.value != "_NO_PLAYER_" || document.URL.indexOf('admin/save') >= 0;
     }catch(err){ return false; }
  }
  
@@ -353,11 +354,18 @@ function openStage(id)
 
 function login()
 {
+	// first time that the user tries to login (never reaches woven's guard realm before) - then init session
+	// requesting the perspective-init page without a session cookie will init the session
+	if (document.cookie.indexOf("woven_guard") === -1) {
+		requestPage("GET", '/admin/perspective-init', null);
+	}
+
 	if(document.hidden_form.can_signup.value=='true')
 	{
 		loginForm += signup_html;
 	}
 	document.getElementById('signup').innerHTML = loginForm;
+	document.getElementById('username').focus();
 }
 
 function navStageWorkshop()
@@ -385,11 +393,9 @@ function navUserPage()
  */
 function logout()
 {
-	var cookies = document.cookie.split(";");
-	for (var i = 0; i < cookies.length; i++) {
-		deleteCookie(cookies[i].split("=")[0]);
-	};
-	window.location='/admin/perspective-destroy';
+	// not deleting woven session cookie anymore, the guard realm needs it
+	// the cookie does not contain anything about users' credentials
+	requestPage("GET", '/admin/perspective-destroy', null);
 	document.getElementById('signup').innerHTML = loginLinks;
 	window.location = '/home';
 }

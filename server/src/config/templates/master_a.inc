@@ -94,7 +94,7 @@ if (/*@cc_on!@*/false) {
 			</form>
 				<div id="signup">
 					<form name="rupert" action="/perspective-init"> 
-					  Login: <input name="username" size="13" />
+					  Login: <input name="username" id="username" size="13" />
 					  Password: <input type="password" name="password" size="13" /><br />
 					  Remember me? <input type="checkbox" name="remember" />
 					  <button onclick="javascript:setPassword(username.value, password.value); return false;">Login</button><br />
