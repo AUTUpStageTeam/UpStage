@@ -345,7 +345,7 @@ class upstage.Client
 
 	// PQ: Added 30.10.07
 	// Text to display on the audio widget's "Stop All Audio" button
-	public static var AUDIO_STOPALLAUDIO_TEXT :String= 'stop all';
+	public static var AUDIO_STOPALLAUDIO_TEXT :String= 'clear all';
 
     //diamond, centred on y axis, unit size.
     public static var SLIDER_DIAMOND    :Array = [0,0,  0.35,0.5,  0,1, -0.35,0.5,  0,0];

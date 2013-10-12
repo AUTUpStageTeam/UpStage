@@ -29,34 +29,33 @@
 <script type="text/javascript" src="/script/jquery.colorpicker/colorpicker.min.js"></script>
 
 
-<h1 style="margin:20px 0;">Edit/View Media</h1>
+<h1 style="margin:15px 0;">Edit/View Media</h1>
 
+<p class="filterTitle">Search and Filter:</p>
 <div id="filterDiv">
 
 	<div class="filterRow">
-	
-		<p class="filterTitle">Filter:</p>
-		
-		<div class="filterBlock">
+
+		<div class="filterBlock" style="margin-left: 0;">
 			<label for="filterUser">User:</label>
-			<select id="filterUser" name="filterUser" style="width:150px;">
+			<select id="filterUser" name="filterUser" style="width:80px;">
 				<option value=""></option>
 				%(list_users_as_html_option_tag)s
 			</select>
 		</div>
-		
+
 		<div class="filterBlock">
 			<label for="filterStage">Stage:</label>
-			<select id="filterStage" name="filterStage" style="width:150px;">
+			<select id="filterStage" name="filterStage" style="width:130px;">
 				<option value=""></option>
 				<option value="^"> -- not assigned -- </option><!-- dummy char '^' used for unassigned stages, see pages.py -->
 				%(list_stages_as_html_option_tag)s
 			</select>
 		</div>
-		
+
 		<div class="filterBlock">
 			<label for="filterType">Type:</label>
-			<select id="filterType" name="filterType" style="width:100px;" onchange="javascript:mediumFilter();">
+			<select id="filterType" name="filterType" style="width:90px;" onchange="javascript:mediumFilter();">
 				<option value=""></option>
 				<option value="avatar">Avatar</option>
 				<option value="prop">Prop</option>
@@ -64,14 +63,14 @@
 				<option value="audio">Audio</option>
 			</select>
 		</div>
-			
+
 		<div class="filterBlock">
 			<label for="filterMedium">Medium:</label>
-			<select id="filterMedium" name="filterMedium" style="width:120px;">
+			<select id="filterMedium" name="filterMedium" style="width:90px;">
                 <option value=""></option>>
 			</select>
 		</div>
-        
+
         <div class="filterBlock">
 			<label for="filterTags">Tags:</label>
 			<select id="filterTags" name="filterTags" style="width:150px;">
@@ -79,25 +78,23 @@
 				%(list_tags_as_html_option_tag)s
 			</select>
 		</div>
-	
-		<div class="filterBlock">
-		    <input id="buttonUpdateView" type="button" class="button-standard" value="Apply Filter" />
+
+		<div class="filterButtons">
+		    <input id="buttonUpdateView" type="button" style="width:60px;" value="Apply" />
 	    	<input id="buttonResetView" type="button" style="width:60px;" value="Reset" />
 	 	</div>
-	 
+
+	 	<div style="clear:both;"></div>
 	</div>
-    
+
     <div id = "searchDiv">
-    <div class = "searchBlock">
+	    <div class = "searchBlock">
+	    	<label for="searchText">Name or Tag:</label>
             <input id="searchText" name="searchText" type="text" onblur="if(this.value=='') this.value=defaultValue" onclick="if(this.defaultValue==this.value) this.value=''" value="Search">
             <input id="buttonSearch" type="button" style="width:60px;" onclick="javascript:searchByString()" value="Search" />
-    </div>
+	    </div>
+	</div>
 </div>
-</div>
-
-</div>
-
-
 
 <hr />
 

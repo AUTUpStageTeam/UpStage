@@ -215,21 +215,9 @@ class upstage.model.ModelSounds implements TransportInterface
 	   clear a slot when the sound has finished playing. */
 	public function clearSlot(type:String, url:String)
 	{
-		trace("clearSlot() type = " + type + "and url = " + url);
+		trace("SEND clear slot message: type = " + type + "and url = " + url);
 
-		var sounds:Array = this[type];
-
-		for (var x:Number = 0; x < sounds.length; x++) {
-			if ((sounds[x].url == url) && (sounds[x] != null)) {
-
-				// Clear these things
-				sounds[x] = null;
-
-				this.audioScrollBar.clearSlot(type, x);
-				// Clear slot for all clients
-				this.sender.CLEAR_AUDIOSLOT(type, url);
-			}
-		}
+		this.sender.CLEAR_AUDIOSLOT(type, url);
 	}
 
 
@@ -250,22 +238,20 @@ class upstage.model.ModelSounds implements TransportInterface
 	public function stopAllAudio()
 	{
 		var clips: Array = this['sounds'];
-		var bStop:Boolean = true;
-		
+
 		for (var i: Number = 0; i < clips.length; i++) {
 			if (clips[i].url) {
-				
+
 				// Stop the audio on all clients
-			    this.sender.STOP_AUDIO(clips[i].url, clips[i].type, bStop);
-			    
+			    this.sender.STOP_AUDIO(clips[i].url, clips[i].type, false);
+
 			    // Clear all the audio slots
 				this.clearSlot(clips[i].type, clips[i].url);
 
 			}
 		}
 	}
-	
-	
+
 	// PQ: Added 29.10.07 - Stops the audio if click on stop
 	public function stopClip(array:String, url:String, autoLoop:Boolean)
 	{
@@ -444,7 +430,7 @@ class upstage.model.ModelSounds implements TransportInterface
 		// If the stop command is for ONE audio only
 		if (url != '')
 		{
-			trace("REMOTE STOP AUDIO");
+			trace("REMOTE STOP AUDIO, playing?: " + clip.isPlaying());
 			if (clip.isPlaying()) {
 				// Stop the audio on this MACHINE that pressed the stop button
 				clip.stop();
@@ -468,13 +454,6 @@ class upstage.model.ModelSounds implements TransportInterface
 			}
 		}
 	}
-	
-	/***********************************************************************
-	 * Remote Play - Audio Method
-	 * 
-	 * Description: This method is called remotely by another client
-	 * and starts an already assigned audio file.
-	 **********************************************************************/
 
 	public function remoteSetPlayPosition(array:String, url:String, pos:Number)
 	{
@@ -592,5 +571,23 @@ class upstage.model.ModelSounds implements TransportInterface
 			clip.setLooping(false);
 		}
 		this.audioScrollBar.getAudioSlot(array, url).updateLoopButton(clip.isLooping());
+	}
+
+	// Ing separate it out
+	public function remoteClearSlot(type:String, url:String)
+	{
+		trace("clearSlot() type = " + type + "and url = " + url);
+
+		var sounds:Array = this[type];
+
+		for (var x:Number = 0; x < sounds.length; x++) {
+			if ((sounds[x].url == url) && (sounds[x] != null)) {
+
+				// Clear these things
+				sounds[x] = null;
+
+				this.audioScrollBar.clearSlot(type, x);
+			}
+		}
 	}
 }

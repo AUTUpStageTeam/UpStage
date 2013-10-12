@@ -969,24 +969,30 @@ a.IconButton
 #filterDiv {
 	display:inline-block;
 	margin-bottom:10px;
+	clear:both;
 }
 
 .filterRow {
 	width:100%;
 	display:block;
 	clear:both;
-	float:left;
 	margin-bottom:5px;
 }
 
 .filterTitle {
-	float:left;
+	margin-top: 20px;
+	margin-bottom: 10px;
 	font-weight:bold;
 }
 
 .filterBlock {
 	float:left;
-	margin: 7px 0 7px 10px;
+	margin: 7px 0 7px 5px;
+}
+
+.filterButtons {
+	float: right;
+	margin: 7px 0 7px 20px;
 }
 
 #viewPanel {

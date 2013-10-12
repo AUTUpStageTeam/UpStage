@@ -410,7 +410,8 @@ class _UpstageSocket(LineOnlyReceiver):
     """ PQ: Added 29.10.07 - Stop ONE audio on all clients """
     def handle_STOP_AUDIO(self, url, type, autoLoop):
         audio = self.stage.getAudioByUrl(url)
-        audio.finishPlaying(int(autoLoop) == 1)
+        if audio:
+            audio.finishPlaying(int(autoLoop) == 1)
         self.stage.broadcast('STOPAUDIO', url=url, type=type)
     
     def handle_CLEAR_AUDIOSLOT(self, type, url):

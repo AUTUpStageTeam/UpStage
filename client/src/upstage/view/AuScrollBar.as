@@ -270,7 +270,7 @@ class upstage.view.AuScrollBar extends MovieClip
 				break;
 			case 2:
 				this.audioSlot3.volumeSlider.setFromValue(volume)
-                this.audioSlot2.volLabel.text = 'Vol: ' + volume;
+                this.audioSlot3.volLabel.text = 'Vol: ' + volume;
 				break;
 		}
 	}

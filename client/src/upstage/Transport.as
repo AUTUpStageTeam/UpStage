@@ -572,7 +572,7 @@ class upstage.Transport extends XMLSocket
 	{
 		var type: String = x.type;
 		var url: String = x.url;
-		this.modelSounds.clearSlot(type, url);	
+		this.modelSounds.remoteClearSlot(type, url);	
 	}	
 		
     /**
