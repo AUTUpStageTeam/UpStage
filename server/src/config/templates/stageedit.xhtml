@@ -63,23 +63,45 @@ window.onresize = resizePage;
 
 <div id="divForm">
 <form name="rupert" action="">
-	<div id="stagename">
-		<h1>Stage name</h1>
-		<table>
-			<tr>
-				<td>Full name:</td>
-				<td><input type="text" name="longName" id = "longName" value="%(name)s" size="20" /></td>
-			</tr>
-			<tr>
-				<td>Short name for URL:</td>
-				<td><input type="text" name="shortName" value="%(ID)s" size="20" readonly="readonly"/>(used for URL)</td>
-			</tr>
-            <tr>
-                <td colspan="2"> %(attr:stage_link)s </td>
-            </tr>
-		</table>
-	</div>
-	<!-- -->
+    <div id="nameandbuttons">
+    <div id="editStageSubmit">
+            <input type="hidden" name="action" value="" />
+            <table>
+                <tr><!--#(08/04/2013)Craig-->
+                    <td style="width:0%;"><input type="button" id="seSaveonly" onclick="seSaveOnly();" value="Save stage " /></td>
+                    <td style="width:0%;"><input type="button" id="seSaveReload" onclick="saveStage(0);" value="Save and reload stage" /></td>
+                    <!-- <td colspan="3" style="width:50%;"><span id="warning">Warning: This will cause the stage to reload for everyone currently on it, and you will lose the chat log.</span></td> -->
+                </tr>
+                <tr><td style="width:0%;"><input type="button" id="seClearS" onclick="warn(3);" value="Clear stage" /></td><td >Clears the text chat and drawing layers.</td></tr>
+                <tr><td style="width:0%;" ><input type="button" id="seCancel" onclick="warn(1);" value="Cancel" /></td><td >Discard the changes you have made.</td></tr>
+                <tr><td style="width:0%;"><input type="button" id="seDelete" onclick="warn(5);" value="Delete" /></td><td >Delete this stage (does not delete media that is assigned to this stage).</td></tr>                
+            </table>            
+        </div>    
+        <div id="stagename">
+            <div id="title">          
+                <h1>Stage name</h1>
+            </div>
+            <div id="stageinput">
+                <table>
+                    <tr>
+                        <td>Full name:</td>
+                        <td><input type="text" name="longName" id = "longName" value="%(name)s" size="20" /></td>
+                    </tr>
+                    <tr>
+                        <td>Short name for URL:</td>
+                        <td><input type="text" name="shortName" value="%(ID)s" size="20" readonly="readonly"/>(used for URL)</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"> %(attr:stage_link)s </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    
+        <!-- -->
+        
+    </div>
+    
 	<div id="edit">
 		<input type="hidden" name="displayaccess" value="%(display_access)s" />
 
@@ -213,27 +235,6 @@ window.onresize = resizePage;
 				</table>
 			</div>							
 		</div>
-		<!-- -->
-		<div id="submit">
-			<input type="hidden" name="action" value="" />
-			<table>
-				<tr><!--#(08/04/2013)Craig-->
-					<td style="width:0%;"><input type="button" id="seSaveonly" onclick="seSaveOnly();" value="Save stage " /></td>
-					<td style="width:0%;"><input type="button" id="seSaveReload" onclick="saveStage(0);" value="Save and reload stage" /></td>
-			  		<!-- <td colspan="3" style="width:50%;"><span id="warning">Warning: This will cause the stage to reload for everyone currently on it, and you will lose the chat log.</span></td> -->
-				</tr>
-				<tr>	
-                <!--#(06/09/2013) Vanessa-->
-                    <td style="width:0%;" ><input type="button" id="seCancel" onclick="warn(1);" value="Cancel" /></td>
-					<td style="width:0%;"><input type="button" id="seDelete" onclick="warn(5);" value="Delete" /></td>				
-					<td style="width:0%;"><input type="button" id="seClearS" onclick="warn(3);" value="Clear stage" /></td>
-					<td style="width:50%;">Clears the text chat and drawing layers.</td>
-				</tr>	
-				<tr>
-				</tr>
-			</table>
-		</div>
-	
 	</div>
 <script type="text/javascript">stageEdit()</script>
 </form>

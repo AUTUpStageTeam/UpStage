@@ -36,6 +36,7 @@
  *  Modified By Vanessa Henderson - 28/08/2013 - Merged Martins fork with current working code
  *  Modified By Lisa Helm - 02/10/2013 - Removed old methods for unassigning media, added the new ones
  *                                     - made changes necessary for discarding access changes
+ *  Modified by Lisa Helm - 10/10/2013 - if no stage is selected, remove entire form, rather than just pieces of it
 */
 
 //Instance based variables
@@ -60,6 +61,7 @@ function stageEdit()
 	var cols = document.rupert.colorvals.value;
 	if(cols!='No stage selected')
 	{
+        
 		var temp = cols.split(",");
 		colourNumOnLoad(temp);
 		resizePage();
@@ -67,16 +69,13 @@ function stageEdit()
 		//document.getElementById("debugp").style.left="40%";
         onStagelistToBeChecked(document.rupert.onstagelistMsg.value);// 8/04/2013 -CF-: on load it checks if the stage is on the stagelist.
         lockDisableAll((document.getElementById("lockStageMsg").value),document.getElementById("ownerMsg").value);//01/05/2013 -CF-
+        
 	}
 	else
 	{
-
-        var rm = document.getElementById("stagename");
+        var rm = document.getElementById("divForm");
         rm.parentNode.removeChild(rm);
-        rm = document.getElementById("edit");
-        rm.parentNode.removeChild(rm);
-        //rm = document.getElementById("submit");
-        //rm.parentNode.removeChild(rm);
+        
 	}
     
 }
@@ -289,6 +288,7 @@ function stageChooseSubmit()
 	document.getElementById("status").style.display = "inline";
 	requestPage("POST", buildRequest(1), fillPage);//'/admin/workshop/stage?shortName='+document.selectstage.shortName.value, fillPage);
 }
+
 
 /**
  * Saves the stage edited by the user 

@@ -387,23 +387,18 @@
 						<div class="fieldrow">
 				
 							<label class="field-label" for="editVoice">Voice:</label>
-							<select name="editVoice" size="1" id="selectEditVoice" class="field-select">%(list_voices_as_html_option_tag)s</select>
+							<select name="editVoice" size="1" id="selectEditVoice" class="field-select" onchange="javascript:checkVoiceTest();">%(list_voices_as_html_option_tag)s</select>
 							
-							<!-- TODO add voice test for preview -->
-							<!-- 
-							<div id="voiceTestPanel" style="display:inline-block">
-								<input type="text" name="text" id="text" maxlength="128" value="The quick brown fox jumps over the lazy dog" style="width:45%" />
-							 	<input type="button" value="Test voice"  id="buttonEditVoiceTest" />
-							 	<input type="button" value="Cancel" style="display:none" id="buttonCancelEditVoiceTest" />
-								<div id="editVoiceTest"> 
-							        <div id="editVoiceTestDiv"></div>
-							        <div id="editVoiceTestError"></div>
-								</div>
-							</div>
-						 	-->
-						 
-						 </div>
-						
+						</div>
+                        <div id="voiceTestPanel" style="display:inline;">
+                            <input type="text" name="text" id="voicetext" maxlength="128" value="The quick brown fox jumps over the lazy dog" style="width:70%"/>
+                            <input type="button" onclick="voiceTest(); return false;" value="Test voice"  id="buttonTestVoice" />
+                            <input type="button" onclick="javascript:resetVoiceTest();return false;" value="Cancel" style="display:none" id="cancelVoiceTest" />
+                            <div id="voicetest" style="display:inline; visibility:hidden" height="20px"> 
+                                <div id="voicediv" style="display:block"></div>
+                                <div id="voiceerror"></div>
+                            </div>
+                        </div>
 					</div>
 				</div>
 				

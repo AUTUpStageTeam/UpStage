@@ -587,6 +587,21 @@ a.IconButton
 
 }
 
+#editStageSubmit
+{
+	float:right;
+	margin: 10px;
+	border-left: #690 1px dashed;
+	padding-left: 10px;
+    padding-bottom: 10px;
+	height:130px;
+	width: 316px;
+    display: block;
+    position: absolute;
+    right:200px;    
+}
+
+
 #editStageColor
 {
 	float:right;
@@ -597,14 +612,21 @@ a.IconButton
 	width: 300px;
 }
 
-#stagename
+#nameandbuttons
 {
 	width: 100%;
 	border-bottom: #690 1px dashed;
 	border-top: #690 1px dashed;
-	padding-top: 10px;
 	padding-bottom: 10px;
+    height: 150px;
 	
+}
+
+#stagename
+{
+    padding-top: 20px;
+	padding-bottom: 10px;
+    width: 500px;
 }
 
 #editStageSplash
@@ -617,14 +639,14 @@ a.IconButton
 
 #editStageAccess
 {
-	border-bottom: #690 1px dashed;
+	
 	padding-top: 40px;
 	padding-bottom: 10px;
 }
 
 #splash_message
 { 
-	width:100%;
+	width:880px;
 	height:8em;
 }
 

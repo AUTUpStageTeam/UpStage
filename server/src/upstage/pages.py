@@ -916,6 +916,7 @@ class StageEditPage(Workshop):
             table.extend('<option value="new_stage" selected="selected">New Stage</option>')
         else:
             table.extend('<option value="new_stage">New Stage</option>') 
+            
            
         for k in keys:
             current_stage = self.collection.stages.getStage(k)
@@ -977,6 +978,7 @@ class StageEditPage(Workshop):
         mKeys = request.args.get('massigned',[''])
         mKeys.extend(request.args.get('munassigned',['']))
         if len(mKeys) >= 3:
+          
             self.stage_ViewImg = '<p>You can only view one media item at a time.</p>' 
             log.msg('more than one in each column selected')
         else:
@@ -1103,7 +1105,7 @@ class StageEditPage(Workshop):
             for i in range(0, len(keys)):
                 m = self.stage.get_media_by_key(keys[i])
                 if self.stagename and m:
-                    if self.stage.unassigned.count(m) == 0:
+                    if self.stage.unassigned.count(m) == 1:
                         self.stage.unassigned.remove(m)
             
             #Lisa - puts selected media into the 'unassigned' list
@@ -1159,6 +1161,11 @@ class StageEditPage(Workshop):
         #if self.stage:
             #self.message+=stage_link
         self.setupStageLock(request)#(02/05/2013) Craig
+        keys = self.collection.stages.getKeys()           
+        for k in keys:
+            s = self.collection.stages.getStage(k)       
+            if s is not self.stage:
+                s.load('/'.join([config.STAGE_DIR, s.name, 'config.xml']))
         return AdminBase.render(self, request)
 
 """ Rewrite of MediaEditPage using Ajax POST calls """
@@ -1778,7 +1785,7 @@ class MediaUploadPage(Workshop):
     
     def text_voice_list(self, request):
         """dropdown list of available voices"""
-        table = ['<option value=""> -- none -- </option>']
+        table = ['<option value="no_voice"> -- none -- </option>']
         vk = VOICES.keys()
         vk.sort()
         for v in vk:

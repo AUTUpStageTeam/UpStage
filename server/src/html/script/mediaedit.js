@@ -536,6 +536,7 @@ function setupDataGrid() {
 						}
 					}
 					$('#selectEditVoice').val(preselectedVoice);
+                    checkVoiceTest();
 					
 					// panelEditStream
 					$('#inputEditStreamserver').val(selectedMediaData['streamserver']);
@@ -1897,4 +1898,165 @@ function searchByString()
     {
         //search media names for matches
     }
+}
+
+//-------------------------------- VOICE TESTING -----------------------------//
+
+function checkVoiceTest() {
+	log.debug("checkVoiceTest()");
+	var selection = _getElementById('selectEditVoice').selectedIndex;
+	log.debug("checkVoiceTest(): selectedIndex = " + selection);
+	if(selection == 0) {
+		hideVoiceTest();	// hide voice test if 'none' is selected
+	} else {
+		showVoiceTest();
+	}
+}
+
+function showVoiceTest() {
+	log.debug("showVoiceTest()");
+    _getElementById('voiceTestPanel').style.visibility = 'visible';
+}
+
+function hideVoiceTest() {
+	log.debug("hideVoiceTest()");
+    _getElementById('voiceTestPanel').style.visibility = 'hidden';
+
+}
+
+function voiceTest()
+{
+	log.debug("voiceTest()");
+	
+	var action = "/admin/test.mp3";
+    var voicefile = action + '?voice='+ _getElementById("selectEditVoice").value + '&text=' + _getElementById("voicetext").value;
+    
+    var voiceDiv = _getElementById("voicediv");
+    var voiceError = _getElementById("voiceerror");
+    
+    voiceDiv.style.height = '0px';
+    
+    voiceError.style.display = 'none';
+    voiceError.style.margin = '10px';
+    
+    var cancelVoiceTest = _getElementById("cancelVoiceTest");
+    
+    flowplayer("voicediv", "/script/flowplayer/flowplayer-3.2.16.swf", {
+    	
+    	/*
+    	debug: true,
+    	log: {
+    		level: 'info'
+    	},
+    	*/
+    	
+    	onLoad: function() {
+            this.setVolume(100);
+            voiceError.innerHTML = ''; // clear error display
+            cancelVoiceTest.style.display = 'inline';	// show cancel button
+        },
+        
+        onFinish: function() {
+        	//voiceDiv.style.display = 'none';	// hide player
+        	cancelVoiceTest.style.display = 'none';	// hide cancel button
+        	this.unload();
+        },
+        
+        onError: function(errorCode) {
+        	
+        	/*
+        	 * Error codes
+        	 * see: http://flash.flowplayer.org/documentation/configuration/player.html
+        	 * 
+        	 * 100 Plugin initialization failed
+        	 * 200 Stream not found
+        	 * 201 Unable to load stream or clip file
+        	 * 202 Provider specified in clip is not loaded
+        	 * 300 Player initialization failed
+        	 * 301 Unable to load plugin
+        	 * 302 Error when invoking plugin external method
+        	 * 303 Failed to load resource such as stylesheet or background image
+        	 * 
+        	 */
+        	
+        	var errorMessage = "Unknown error<br />"+voicefile;
+        	
+        	switch(errorCode) {
+        		case 200:
+        			errorMessage = "Stream not found<br />"+voicefile;
+        			break;
+        		case 201:
+        			errorMessage = "Unable to load stream or clip file<br />"+voicefile;
+        			break;
+        	}
+        	
+        	// hide player
+        	voiceDiv.style.display = 'none';
+        	
+        	// show error
+        	voiceError.style.display = 'block';
+        	voiceError.innerHTML = '<p style="color:red">Error ' + errorCode + ': ' + errorMessage + '</p>';
+        	
+        	cancelVoiceTest.style.display = 'none';	// hide cancel button
+        	
+        	this.unload();
+        },
+    	
+    	clip: {
+    		url: voicefile,
+    		autoPlay: true,
+    		autoBuffering: true,
+    		/*
+    		onMetaData: function(data) {
+    			console.log(data);
+    		}
+    		*/
+    	},
+    	
+        plugins: {
+        	audio: {
+                url: '/script/flowplayer.audio/flowplayer.audio-3.2.10.swf'
+            },
+        	controls: {
+                url: '/script/flowplayer/flowplayer.controls-3.2.15.swf',
+                fullscreen: false,
+                height: 30,
+                autoHide: false,
+                showErrors: false
+            }
+            
+        }
+    	
+    });
+
+}
+
+function resetVoiceTest() {
+	
+	log.debug("resetVoiceTest()");
+	
+	// hide cancel button
+	var cancelVoiceTest = _getElementById("cancelVoiceTest");
+	cancelVoiceTest.style.display = 'none';	
+	
+	var voiceDiv = _getElementById("voicediv");
+	var voiceError = _getElementById("voiceerror");
+	
+	// reset flowplayer
+	var player = flowplayer(voiceDiv);
+	if(player != null) {
+		if (player.isLoaded()) {
+			player.stop();
+			player.close();
+			player.unload();
+		}
+	}
+	
+	// remove player
+	voiceDiv.innerHTML = '';
+	voiceDiv.style.display = 'none';
+	
+	// reset error display
+	voiceError.innerHTML = '';
+	voiceError.style.display = 'none';
 }
