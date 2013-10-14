@@ -1095,7 +1095,7 @@ class StageEditPage(Workshop):
             request.redirect("/admin")#(09/04/2013) Craig
             
         elif action=='cancel':
-            self.stage.load('/'.join([config.STAGE_DIR, self.stage.name, 'config.xml']))
+            self.stage.load('/'.join([config.STAGE_DIR, self.stage.ID, 'config.xml']))
             self.message+='Discarded changes.'
         
             #Lisa - takes selected media out of the 'unassigned' list
@@ -1165,7 +1165,7 @@ class StageEditPage(Workshop):
         for k in keys:
             s = self.collection.stages.getStage(k)       
             if s is not self.stage:
-                s.load('/'.join([config.STAGE_DIR, s.name, 'config.xml']))
+                s.load('/'.join([config.STAGE_DIR, s.ID, 'config.xml']))
         return AdminBase.render(self, request)
 
 """ Rewrite of MediaEditPage using Ajax POST calls """

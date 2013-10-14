@@ -81,6 +81,7 @@ Modified by: David Daniels          2/10/2013   - Added get_tags_list() to get a
 Modified by: Lisa Helm  02/10/2013      - added the unassigned media list + functionality and made it so that the xml of a stage is reloaded after it is saved
                                         - removed all unused code relating to access_level_three
                                         - added temp_access_level_one/two to allow for changes to be obviously discarded
+Modified by: Nitkalya Wiriyanuparb  14/10/2013  - Remember applause and volunteer buttons visibility state
 """
 
 #std lib
@@ -172,6 +173,8 @@ class _Stage(object):
         self.unassigned = []        
         self.temp_access_level_one = []
         self.temp_access_level_two = []
+        self.applauseEnabled = False
+        self.volunteerEnabled = False
     
     def set_default(self):
         self.wake()
@@ -188,6 +191,8 @@ class _Stage(object):
         self.access_level_two = []
         self.temp_access_level_one = []
         self.temp_access_level_two = []
+        self.applauseEnabled = False
+        self.volunteerEnabled = False
         
     def reset(self):        
         """[re-]initialises the stage """
@@ -972,18 +977,22 @@ class _Stage(object):
         
     # LK: Added to hide applause button. Added on 29/10/07
     def noapplause(self, applause):
+        self.applauseEnabled = False
         self.broadcast('NO_APPLAUSE', applause=applause)
         
     # LK: Added to display applause button added on 17/10/07
     def applause(self, applause):
+        self.applauseEnabled = True
         self.broadcast('APPLAUSE', applause=applause)    
         
      # LK: Added to display volunteer button added on 31/10/07
     def volunteerbtn(self, volunteer):
+        self.volunteerEnabled = True
         self.broadcast('VOLUNTEER', volunteer=volunteer)
         
      # LK: Added to display volunteer button added on 31/10/07
     def novolunteerbtn(self, novolunteer):
+        self.volunteerEnabled = False
         self.broadcast('NO_VOLUNTEER', novolunteer=novolunteer)
 
     def think(self, avatar, thought):

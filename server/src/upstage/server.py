@@ -35,6 +35,7 @@ Modified by:    Nitkalya Wiriyanuparb  28/09/2013  - Supported unlooping audio
                                                    - Stored details about playing audio (playing, looping, start time, and elapsed time)
                                                    - Loaded currently playing audio and played from the currently playing position for late audiences
 Modified by:    Nitkalya Wiriyanuparb  05/10/2013  - Supported custom start/stop position for audios, made sure it works for late audiences
+Modified by:    Nitkalya Wiriyanuparb  14/10/2013  - Show applause and volunteer buttons for late audiences if they're enabled
 Notes: 
 """
 
@@ -225,7 +226,13 @@ class _UpstageSocket(LineOnlyReceiver):
             chat = chat.replace('>', '&gt;')# Vishaal 15/10/09 Changed to ACTUALLY fix < > chatlog problem
             self.send('LOAD_CHAT',chat=chat)           
             self.stage.draw_replay(self) #sends out drawing messages.
-            
+
+            if self.stage.applauseEnabled:
+                text = ('Applause button is now active')
+                self.stage.applause(text)
+            if self.stage.volunteerEnabled:
+                text = ('Volunteer button is now active')
+                self.stage.volunteerbtn(text);
         else:
             log.err('Tried to set up client with no stage: doing nothing')
 
