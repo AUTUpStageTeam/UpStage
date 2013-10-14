@@ -54,6 +54,7 @@ import upstage.Client;
  *  This is set visible when the avatar is selected.
  *  The position is never changed
  *  Modified by: Vibhu 31/08/2011 - Changed create function to take one more parameter for the color value.
+ *  Modified by: Nitkalya Wiriyanuparb  14/09/2013  - Adjusted rename method for mute symbols
  */
 class upstage.view.AvScrollBar extends MovieClip
 {
@@ -368,16 +369,16 @@ class upstage.view.AvScrollBar extends MovieClip
     /**
      *  @brief Rename an avatar for the duration of the performance
      */
-    function rename(item: AvScrollBarItem, name: String): Void
+    function rename(item: AvScrollBarItem, name: String, prefix: String): Void
     {
-        item.nameof = name;
-        item.nameField.text = name;
+        item.nameof = prefix + name; // on mirror - before rename
+        item.nameField.text = name; // on wardrobe
         
         // Update mirror text if this is the selected item
         if (item = this.icon)
-            {
-                this.avName.text = name;
-            }
+        {
+            this.avName.text = prefix + name; // on mirror - after rename
+        }
     };
 
 

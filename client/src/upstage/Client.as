@@ -32,6 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * Modified by: Nitkalya Wiriyanuparb  10/09/2013  - Added SCREEN_SIZE_DIVISOR for stage assets resizing calculation
  * Modified by: Nitkalya Wiriyanuparb  02/10/2013  - Added LOADS_PER_AUDIO
  * Modified by: Nitkalya Wiriyanuparb  05/10/2013  - Added symbols for audio buttons, vertical diamond, and small button points
+ * Modified by: Nitkalya Wiriyanuparb  14/10/2013  - Added mute symbols for streaming avatars
  */
 class upstage.Client
 {
@@ -79,7 +80,7 @@ class upstage.Client
     //base size of thought bubble polyps
     public static var THOUGHT_POLYP_W  :Number = 9;  
 
-    public static var TF_WIDTH         :Number = 40;
+    public static var TF_WIDTH         :Number = 60;
     public static var TF_HEIGHT        :Number = 12;
 
     public static var INFO_WIDTH       :Number = 30;
@@ -334,6 +335,10 @@ class upstage.Client
     public static var PLAY_SYMBOL   :String = String.fromCharCode(9658);
     public static var LOOP_SYMBOL   :String = String.fromCharCode(10227);
     public static var UNLOOP_SYMBOL :String = '1' + String.fromCharCode(10132);
+
+    public static var SOUND_SYMBOL  :String = String.fromCharCode(9835);
+    public static var MUTE_SYMBOL   :String = "(" + Client.CLEAR_SYMBOL + Client.SOUND_SYMBOL + ")"
+    public static var NOT_MUTE_SYMBOL  :String = "(" + Client.SOUND_SYMBOL + ")"
 
 	// PQ: Added
 	// Path to the music note and sfx icon that display in the audio widget
@@ -650,7 +655,7 @@ class upstage.Client
     // AC: 10.06.08
     public static var AUDIO_SOUNDS			:Number = 3;
     // PQ & LK: 31.10.07
-    public static var APPLAUSE_SOUNDS       :Number = 10;  // Max concurrent applauses
+    public static var MAX_APPLAUSE_SOUNDS   :Number = 10;  // Max concurrent applauses
 
     //how many things get loaded for each media type (icons, etc count as a separate load)
     public static var LOADS_PER_AVATAR      :Number = 3;

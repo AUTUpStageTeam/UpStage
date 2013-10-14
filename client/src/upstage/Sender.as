@@ -15,7 +15,7 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
-
+import upstage.Client;
 import upstage.Transport;
 
 /**
@@ -28,6 +28,7 @@ import upstage.Transport;
  * Modified by: Nitkalya Wiriyanuparb  28/09/2013  - Supported unlooping audio
  *                                                 - Fixed audio not heard by late audiences
  * Modified by: Nitkalya Wiriyanuparb  04/10/2013  - Sent messages about audio start and stop positions
+ * Modified by: Nitkalya Wiriyanuparb  14/09/2013  - Adjusted RENAME for mute symbols
  * Notes: 
  */
 
@@ -164,6 +165,12 @@ class upstage.Sender
      */
     function RENAME(name :String) :Void
     {
+        // get rid of any mute symbol
+        name = name.split(Client.MUTE_SYMBOL + " ").join("");
+        name = name.split(Client.MUTE_SYMBOL).join(""); // also without a space
+        name = name.split(Client.NOT_MUTE_SYMBOL + " ").join("");
+        name = name.split(Client.NOT_MUTE_SYMBOL).join(""); // also without a space
+
         this.send( 'RENAME', 'name', name );
     };
 

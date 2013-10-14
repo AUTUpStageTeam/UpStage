@@ -44,6 +44,7 @@ import upstage.util.NewSound;
  * 
  * Modified by: Nitkalya Wiriyanuparb  28/09/2013  - Supported unlooping audio
  *                                                 - Can set audio to play from a position and fixed audio not heard by late audiences
+ * Modified by: Nitkalya Wiriyanuparb  14/10/2013  - Fixed play applause
  */
 class upstage.model.ModelSounds implements TransportInterface
 {
@@ -57,8 +58,7 @@ class upstage.model.ModelSounds implements TransportInterface
     
     private var sounds		:Array;
     
-	// PQ & LK: Added 31.10.07    
-    private var applause    :Array;    
+    private var applause    :Number;    
     
     //offsets to the next to be tried in each pool (cycles, unless pool is full)
     private var nextSpeech  :Number;
@@ -67,7 +67,6 @@ class upstage.model.ModelSounds implements TransportInterface
     private var nextSound	:Number;
     
     // PQ & LK: Added 31.10.07
-    private var nextApplause   :Number
     private var sender         :Sender;
     
     /*
@@ -102,16 +101,14 @@ class upstage.model.ModelSounds implements TransportInterface
     	// Set up sound arrays
         this.speeches = ModelSounds.getSoundArray(Client.SPEECH_SOUNDS);
 		this.sounds = ModelSounds.getSoundArray(Client.AUDIO_SOUNDS);        
-        
+        this.applause = 0;
         // PQ & LK: Added 31.10.07
-        this.applause = ModelSounds.getSoundArray(Client.APPLAUSE_SOUNDS);
         this.nextSpeech = 0;
 
         // AC: Added 10/09/08
         this.nextSound = 0;
         
         // PQ & LK: Added 31.10.07
-        this.nextApplause = 0;
         this.sender = sender;
         this.audios = new Array();
     };
@@ -347,12 +344,35 @@ class upstage.model.ModelSounds implements TransportInterface
     
      /**
      * @brief Play streaming applause from the server
-     * TODO Not implemented on server side & completely untested
      * Called by transport.APPLAUSE_PLAY
+     * Can have concurrent applause: MAX = Client.MAX_APPLAUSE_SOUNDS // Ing
      */
     function playApplause(url :String)
     {
-        this._playSound(url, 'applause', 'nextApplause');
+    	if (this.applause >= Client.MAX_APPLAUSE_SOUNDS) {
+    		trace("Exceed maximum number of concurrent applause");
+    		return;
+    	}
+    	if (this.applause < 0) // possible? just being defensive
+    		this.applause = 0;
+
+    	var applauseSound:Sound = new Sound();
+    	var that:Object = this;
+
+    	applauseSound.onLoad = function(success:Boolean) {
+    	    if (success) {
+	    	    applauseSound.start();
+	    	    trace("Applause sound loaded, concurrent: " + (++that.applause));
+    	    } else {
+	    	    trace("Applause sound failed");
+    	    }
+    	};
+
+    	applauseSound.onSoundComplete = function() {
+    		that.applause--;
+    	};
+
+    	applauseSound.loadSound(url, true);
     };
     
     

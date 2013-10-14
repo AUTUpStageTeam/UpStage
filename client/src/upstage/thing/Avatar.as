@@ -42,6 +42,7 @@ import upstage.util.LoadTracker;
  * Modified by: Nitkalya Wiriyanuparb  29/08/2013  - Add isStream to identify streaming avatar for mute/unmute
  * Modified by: Nitkalya Wiriyanuparb  05/09/2013  - Fix issue where avatars with different sizes appear to be the same size on stage
  * Modified by: Nitkalya Wiriyanuparb  10/09/2013  - Really fix avatar resizing issue using real swf width/height, see comment in calcSize()
+ * Modified by: Nitkalya Wiriyanuparb  14/09/2013  - Adjusted rename method for mute symbols
  */
  
 class upstage.thing.Avatar extends Thing
@@ -157,7 +158,7 @@ class upstage.thing.Avatar extends Thing
 
         this.setUpTextField();
         this.bubble = new Bubble(this);
-        this.rename(this.name);
+        this.rename(this.name, this.isStream ? Client.NOT_MUTE_SYMBOL + " " : ""); // default, not muted
         //XXX goto first frame; breaks animated avatars.
         this.frame(this.frameNumber);
         this.tfBG._visibility = false;
@@ -326,16 +327,17 @@ class upstage.thing.Avatar extends Thing
     /**
      * @brief Rename the avatar
      */
-    function rename(name :String)
+    function rename(name :String, prefix :String)
     {
         this.name = name;
-        if (this.tf != null)
-            this.tf.text = name;
+
+        if (this.tf != null) {
+            this.tf.text = prefix + name;
             this.tf.autosize = "center";
-            
+        }
         if (this.icon != null){
-            this.icon.nameof = name; //XXX why such duplication?
-            this.icon.nameField.text = name;
+            this.icon.nameof = prefix + name; // label on mirror
+            this.icon.nameField.text = name; // label on wardrobe
         }
     };
 
