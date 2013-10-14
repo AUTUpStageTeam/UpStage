@@ -1147,6 +1147,7 @@ input[type=checkbox] {
 	color:#999;
 	border:2px solid #999;
 	border-radius:5px;
+	width: 12%;
 }
 
 .controlButton .icon-2x{
