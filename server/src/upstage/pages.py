@@ -972,13 +972,19 @@ class StageEditPage(Workshop):
         else:
             return 'true'
 
-    def esViewMedia(self,request):#(22/04/2013) Craig
+    def esViewMedia(self,request):#(22/04/2013) Craig - (15/10/2013) Lisa
         self.stage_ViewImg = ''
         imgThumbUrl = ''
+        #get all selected media in both columns
         mKeys = request.args.get('massigned',[''])
         mKeys.extend(request.args.get('munassigned',['']))
-        if len(mKeys) >= 3:
-          
+        #remove double-ups (firefox adds things to selected list twice)
+        
+        for i in mKeys:
+            if mKeys.count(i)>1:
+                if i is not '':
+                    mKeys.remove(i)
+        if len(mKeys) >= 3:            
             self.stage_ViewImg = '<p>You can only view one media item at a time.</p>' 
             log.msg('more than one in each column selected')
         else:
@@ -987,14 +993,14 @@ class StageEditPage(Workshop):
             if aName is not '' and unName is '':
                 if aName.count('.swf') > 0:
                     imgThumbUrl = config.MEDIA_URL + aName
-                    self.stage_ViewImg = '<object><param id="esMediaPreview" name="esMediaPreview" value="%s"><embed src="%s"></embed></object>' %(aName,imgThumbUrl)
+                    self.stage_ViewImg = '<object><param id="esMediaPreview" name="esMediaPreview" value="%s"><embed src="%s" width="150px" height="150px"></embed></object>' %(aName,imgThumbUrl)
                     log.msg('show selected media from assigned column')
                 else:
-                    self.stage_ViewImg = '<p>That media item cannot be previewed.</p>' 
+                    self.stage_ViewImg = '<p>That media item cannot be previewed.</p>'
             elif aName is '' and unName is not '':
                 if unName.count('.swf') > 0:
                     imgThumbUrl = config.MEDIA_URL + unName
-                    self.stage_ViewImg = '<object><param id="esMediaPreview" name="esMediaPreview" value="%s"><embed src="%s"></embed></object>' %(unName,imgThumbUrl)
+                    self.stage_ViewImg = '<object><param id="esMediaPreview" name="esMediaPreview" value="%s"><embed src="%s" width="150px" height="150px"></embed></object>' %(unName,imgThumbUrl)
                     log.msg('show selected media from unassigned column')
                 else:
                     self.stage_ViewImg = '<p>That media item cannot be previewed.</p>' 
@@ -1064,6 +1070,7 @@ class StageEditPage(Workshop):
                     else:
                         self.stage = self.collection.stages.get(ID)
                         self.message = '<hr />Stage created! '
+                        self.stage.save()
                 except FormError, e:
                     log.msg(e)                    
                     return errorpage(request, e, 'stage')
@@ -1156,13 +1163,14 @@ class StageEditPage(Workshop):
             for i in range(0, len(items)):
                 pname = items[i]
                 if self.stagename and pname:
-                    self.stage.remove_al_one(pname)
-                    self.stage.add_al_two(pname)
+                    if pname != self.stage.tOwner:
+                        self.stage.remove_al_one(pname)
+                        self.stage.add_al_two(pname)
         #if self.stage:
             #self.message+=stage_link
         self.setupStageLock(request)#(02/05/2013) Craig
         keys = self.collection.stages.getKeys()           
-        for k in keys:
+        for k in keys: #lisa - 15/10/2013 - clears unsaved changes from all but current stage
             s = self.collection.stages.getStage(k)       
             if s is not self.stage:
                 s.load('/'.join([config.STAGE_DIR, s.ID, 'config.xml']))
