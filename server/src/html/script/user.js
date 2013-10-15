@@ -12,6 +12,8 @@
  * Gavin                13/09/2012 - Added alert for players when they update their password with different inputs 
  * Nitkalya             24/09/2013 - Added email format validation and make sure username and password are not blank when creating new users
  * Nitkalya             02/10/2013 - Added validation to make sure username are alphanumerics only, and changed that weird confirmation message
+ * Nitkalya             15/10/2013 - Did not use JS date anymore when creating a new player
+ * Nitkalya             15/10/2013 - Redesigned edit player page
  */
 
 /**
@@ -22,7 +24,7 @@
 function validateEmailFormat(email)
 {
 	email = email.trim();
-	var re = /[\w-\.\+]+@[a-z0-9-_\.\+]+\.[a-z]{2,}/i;
+	var re = /^[\w-\.\+]+@[a-z0-9-_\.\+]+\.[a-z]{2,}$/i;
 	return email.match(re);
 }
 
@@ -183,7 +185,6 @@ function validateInfoBeforeSave(username, password, password2, email)
 */
 function savePlayer()
 {
-	var date = new Date();
 	var username = document.getElementById('name').value.trim();
 	var password = document.getElementById('password').value.trim();
 	var password2 = document.getElementById('password2').value.trim();
@@ -206,7 +207,7 @@ function savePlayer()
 	}
 	
 	requestPage("POST", '/admin/workshop/newplayer?username='+unescape(username) +
-			'&password='+hex1+'&password2='+hex2+'&date='+date+'&email='+email+
+			'&password='+hex1+'&password2='+hex2+'&email='+email+
 			'&act='+act+'&admin='+admin+'&su='+su+'&unlimited='+unlimited+
 			'&submit=saveplayer', toUser);
 }
@@ -289,8 +290,8 @@ function stringChecked(val, valname)
 function closeEdit()
 {
     // Gavin Chan (29/08/2012) Makes the form and components hidden
-    document.getElementById("userdetails").style.visibility = "Hidden";
-    document.getElementById("edit_player").style.visibility = "Hidden";
+    document.getElementById("editPanel").style.display = "None";
+	document.getElementById("listPanel").className = "full";
 }
 
 function displayError()
@@ -302,6 +303,7 @@ function playerSelect(uname)
 {
 	// added uname as a parameter of uname so does not have get pname from its value (Daniel Han)
 	document.getElementById("dispplayername").innerHTML = uname;	//18/05/2011 set the player name bieng edited on HTML page (Vibhu and Henry)
+	document.getElementById("listPanel").className = "half";
 	requestPage("GET", '/admin/workshop/editplayers?name='+uname+'&submit=getplayer', renderPlayer);
 }
 
@@ -325,8 +327,7 @@ function renderPlayer()
 			document.getElementById("editadmin").checked = compareBool(admin);
 			document.getElementById("editsu").checked = compareBool(su);
 			document.getElementById("editunlimited").checked = compareBool(unlimited);
-			document.getElementById("userdetails").style.visibility = "visible";
-			document.getElementById("edit_player").style.visibility = "visible";
+			document.getElementById("editPanel").style.display = "inherit";
 			document.getElementById("userdetails").style.display = "inline";
 			document.getElementById("dispplayername").style.display = "inline";
 			document.getElementById("email").value = (email.match(/unset/i)) ? "" : email;

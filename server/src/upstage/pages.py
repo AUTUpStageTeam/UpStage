@@ -107,6 +107,7 @@ Modified by: Nitkalya & Lisa        30/09/2013  - Fixed redirection on error pag
 Modified by: David Daniels          2/10/2013   - added code for filter by tags
 Modified by: Lisa Helm 02/10/2013  - added funtionality to stageeditpage to allow changes to assigned media to be discarded. removed obsolete code to this effect.
                                    - as above, but for player access
+Modified by: Nitkalya Wiriyanuparb  15/10/2013  - Redesigned editplayer page; used a more compact table layout and showed all players
 """
 
 #standard lib
@@ -1938,23 +1939,8 @@ class EditPlayer(AdminBase):
                 return errorpage(request, "That didn't work! %s" % e, 'user')
             
         return AdminBase.render(self, request)
-        
-    #Modified by Daniel (03/07/2012) to make pages.    
+
     def text_list_players(self, request):
-
-        # Number of users per page
-        user_per_page = 8
-
-        #current number of shown users
-        current_user = 0
-
-        # Check if argument 'page' is valid. otherwise current page = 0
-        try:
-            current_page = int(request.args['page'][0])
-            if current_page is None:
-                current_page = 0
-        except:
-            current_page = 0
 
         # Check if there is a search text.
         try:
@@ -1963,41 +1949,37 @@ class EditPlayer(AdminBase):
                 search = ''
         except:
             search = ''
-        
+
         playerlist = self.collection.players.html_list(search)
-        
+
         if len(playerlist)>0:
-            # Total Number of pages
-            num_pages = len(playerlist) / user_per_page
-            if len(playerlist) % user_per_page != 0:
-                num_pages += 1
-
-
             table = []
-            for num in range(user_per_page * current_page, len(playerlist)):
+            for num in range(len(playerlist)):
                 p = playerlist[num][1]
-                if current_user == user_per_page:
-                    break
-                else:
-                    rightslist = [ x for x in ('act', 'admin', 'su', 'unlimited') if p[x]]
-                    userdiv = "<div class='user' id='user_%s' onmouseover='this.className=\"user_over\"' onmouseout='this.className=\"user\"' onclick='playerSelect(\"%s\")' selected=''>" %(p['name'],p['name'])
-                    userdiv += "<table class='user_table'> <tr> <th class='row_header'> Name </th> <td> %s (%s) </td> </tr> " %(p['name'], p['email'])
-                    userdiv += "<tr> <th class='row_header'> Register Date </th> <td> %s </td> </tr> " %(p['reg_date']) 
-                    userdiv += "<tr> <th class='row_header'> Last Login Date </th> <td> %s </td> </tr> " %(p['last_login'])
-                    userdiv += "<tr> <th class='row_header'> User Rights </th> <td> %s </td> </tr> " %(rightslist)
-                    userdiv += "</table> </div>"
-                    table.extend(userdiv)
-                    current_user += 1
+                rightslist = [ x for x in ('act', 'admin', 'su', 'unlimited') if p[x]]
+                rights = ", ".join(rightslist)
+                userdiv = "<tr class='user' id='user_%s' onmouseover='this.className=\"user_over\"' onmouseout='this.className=\"user\"' onclick='playerSelect(\"%s\")' selected=''>" %(p['name'],p['name'])
+                userdiv += "<td><strong>%s</strong></td>" %(p['name'])
+                userdiv += "<td>%s</td>" %(p['email'])
+                userdiv += "<td>%s</td>" %(rights)
+                userdiv += "<td>%s</td>" %(p['last_login'])
+                userdiv += "<td>%s</td>" %(p['reg_date'])
+                userdiv += "</tr>"
+                table.extend(userdiv)
 
-            # Show Page links
-            table.extend('<div id="pageLink">')
-            for i in range(0, num_pages):
-                strLink = ' <a href="?page=%s&search=%s">%s</a> &nbsp; ' %(i, search , i + 1)
-                table.extend(strLink)
-            table.extend('</div>')
             return ''.join(table)
         else:
-            return '<p>No player found.</p>'
+            return '<td colspan=5 style="text-align:center;">No player found.</td>'
+
+    def text_num_players(self, request):
+        try:
+            search = request.args['search'][0]
+            if search is None:
+                search = ''
+        except:
+            search = ''
+
+        return str(len(self.collection.players.html_list(search)))
 
     # To insert search string in search box
     # Added by Daniel (03-07-2012)

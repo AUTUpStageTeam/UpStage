@@ -34,6 +34,7 @@
 2.1			28/08/13	Nikos Phillips	- merged Martin's fork	
 2.2			11/09/13	Nitkalya Wiriyanuparb	- Prefectly centered stage loading box and removed green background
 2.2			16/09/13	Nitkalya Wiriyanuparb	- Fixed preview panel appear at the bottom on small screens
+2.2			15/10/13	Nitkalya Wiriyanuparb	- Redesigned edit player page
 */
 
 
@@ -668,11 +669,27 @@ a.IconButton
 }
 
 /* Daniel Han  29/06/2012 */
-.left_section
+.topSearchBar
 {
-    margin: 10px;
     padding: 5px;
+}
 
+.topSearchBar form {
+	width: 60%;
+	display: inline;
+}
+
+#playerCount
+{
+	text-align: right;
+	float: right;
+	display: inline;
+}
+
+#playerCount p
+{
+	margin: 5px;
+	font-weight: bold;
 }
 
 .search_section
@@ -682,64 +699,114 @@ a.IconButton
     border-bottom: #ccc 1px solid;
 }
 
-.player_list
+#playerPanel
 {
+	max-height: 500px;
+	overflow: hidden;
+	width: 100%;
+}
+
+#listPanel
+{
+	overflow: auto;
+	height: inherit;
+	float: left;
+}
+
+#listPanel.full
+{
+	width: 100%;
+}
+
+#listPanel.half
+{
+	width: 60%;
+}
+
+.playerList
+{
+	overflow: auto;
 	padding: 5px;
 }
 
-.player_list .user
+.playerList .user
 {
 	margin: 10px;
 }
 
-.player_list .user_over
+.playerList .user_over
 {
 	background-color: #eee;
 	margin: 10px;
 	border-bottom: #ddd 1px solid;
 }
 
-.player_list .user[selected=selected]
+.playerList .user[selected=selected]
 {
 	background-color: #eee;
 }
 
-.user_table td
+#userTable
 {
-	padding: 5px;
+	min-width: 930px;
+	max-width: 100%;
+}
+
+#userTable td
+{
+	padding: 8px;
 }
 
 .row_header
 {
+	padding: 10px;
+	text-align: center;
+	vertical-align: middle;
 	color: #690;
 }
 
-.right_section
+#editPanel
 {
-	
+	height: 100%;
+	display: none;
     float: right;
     background-color: #FFF;
-    width: 500px;
-    border-left: #ddd 1px solid;
+    width: 40%;
+}
 
+#editPanel #playerName
+{
+	text-align: center;
 }
 
 .edit_player
 {
-	visibility: hidden;
-	margin:10px;
-	padding:15px;
-	position:fixed;
+	vertical-align: middle;
+	z-index: 10;
+	margin: 5px;
+	padding: 20px;
+	padding-top: 0;
+	position: relative;
 	background-color: #fff;
-	
-    left:30%;
-    top:30%;
-    height: 50%;
+    right:0;
+    top:0;
     overflow: auto;
-    box-shadow: #aaa 1px 1px 10px;
-    border-radius: 5px;
-    border: #888 2px solid;
-	
+    box-shadow: #aaa -5px 0px 4px -3px;
+    /*border-radius: 2px;*/
+}
+
+#exitButton
+{
+	margin-right: -20px;
+	font-weight: lighter;
+	float: right;
+    color: #000;
+    font-size: 20px;
+    background: #EEE;
+	border: 1px solid #CCC;
+	text-shadow: 0 1px 3px grey;
+	padding: 3px 5px 8px 5px;
+	text-decoration: none;
 }
 
 #wrapAccess
@@ -751,6 +818,11 @@ a.IconButton
 	border: #888 2px solid;
 	top: 655px;
 	background-color: #EEE;
+}
+
+.edit_player #playerButtonGroup
+{
+	text-align: right;
 }
 
 
@@ -857,20 +929,6 @@ a.IconButton
     top: 0px;
     left: 0px;
     z-index: 9998;
-}
-
-#exitButton
-{
-    position: relative;
-    left: 95%;
-    width: 45px;
-    top: auto;
-    bottom: auto;
-    color: #000;
-    font-size: 20px;
-    background: #EEE;
-	border: 1px solid #CCC;
-	text-shadow: 0 1px 3px grey;
 }
 
 .ie8 #divMessage

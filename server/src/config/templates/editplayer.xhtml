@@ -2,87 +2,105 @@
 <!include workshop_nav.inc>
 <script type="text/javascript">document.title='Editing Player Details';</script>
 
-<div class="left_section">
+<div class="topSearchBar">
 	<div class="search_section">
 		<form name="search" method="GET">
 				<input type="text" id="search" name="search" value="%(search_string)s" /> <input type="submit" value="Search" />
 		</form>
-	</div>
 
-<!-- End of SEARCH SECTION -->
-
-	<div class="right_section">
-	<div class="edit_player" id="edit_player">  
-    
-		<form class="hidden" name="userdetails" id="userdetails" action="%(req:path)s" >
-		<input type="hidden" name="playername" id="editplayername" value="" />
-		<input type="hidden" name="date" id="editdate" value="" />
-        <a href="#" id="exitButton" onclick="closeEdit();"> X </a>                                
-		<h2>Editing player details for <b id='dispplayername'></b></h2>  
-		  <h1>Change permissions</h1>
-		  <table>
-			<tr><th colspan="2">
-			  This player can:
-			</th></tr>
-			<tr>
-			  <td><input type="checkbox"  id="editadmin" name="admin" /></td>
-			  <td><b>User</b></td>
-			</tr>
-			<tr>
-			  <td><input type="checkbox"  id="editsu" name="su" /></td>
-			  <td><b>Administer</b></td>
-			</tr>
-			<tr>
-			  <td><input type="checkbox" id="editunlimited" name="unlimited" /></td>
-			  <td><b>Unlimited</b> - No restriction</td>
-			</tr>
-		  </table>
-          <br/>
-
-		<h1> Change Email </h1>
-
-		<table>
-		<tr>
-			<th> Email </th>
-			<td> <input type="text" name="email" id="email"/></td>
-		</tr>
-		</table>
-        <br/>
-		<h1>Change password</h1>
-
-		<p>
-		  <input type="checkbox" name="changepassword" id="changepassword" onclick="switchPasswordStuff(this.checked)" /> 
-		  Tick to change the user's password.
-		</p>
-
-		<p id="passwordpara">
-			<table>
-				<tr>
-					<td><b>New password:</b></td>
-					<td><input type="password" name="password" id="password" size="16" /></td>
-				</tr>
-				<tr>
-					<td><b>New password again:&nbsp;&nbsp;</b></td>
-					<td><input type="password" name="password2" id="password2" size="16" /></td>
-				</tr>
-			</table>
-		</p>
-		<br />
-
-		  <input type="button" onclick="javascript:updatePlayer();" value="Update Player" />
-		  <input type="button" onclick="javascript:deletePlayer();" value="Delete Player" />
-        </form>
-    
-	</div>
-	</div> <!-- end of right section -->
-
-
-
-
-
-	<div class="player_list">
-		%(list_players)s
+		<div id="playerCount">
+			<p><span>%(num_players)s</span> players</p>
+		</div>
 	</div>
 </div>
+
+<div id="playerPanel">
+
+	<div id="listPanel">
+		<div class="playerList">
+			<table id='userTable'>
+				<tr>
+					<th class='row_header'>Name</th>
+					<th class='row_header'>Email</th>
+					<th class='row_header'>User Rights</th>
+					<th class='row_header'>Last Login Date</th>
+					<th class='row_header'>Register Date</th>
+				</tr>
+				%(list_players)s
+			</table>
+		</div>
+	</div>
+
+	<div id="editPanel">
+
+		<div class="edit_player" id="edit_player">
+
+			<form name="userdetails" id="userdetails" action="%(req:path)s" >
+			<input type="hidden" name="playername" id="editplayername" value="" />
+			<input type="hidden" name="date" id="editdate" value="" />
+			<a href="#" id="exitButton" onclick="closeEdit();"> x </a>
+			<h2 id="playerName"><b id='dispplayername'></b></h2>
+			  <h1>Change Permissions</h1>
+			  <table>
+				<tr><th colspan="2">
+				  This player can:
+				</th></tr>
+				<tr>
+				  <td><input type="checkbox"  id="editadmin" name="admin" /></td>
+				  <td><b>User</b></td>
+				</tr>
+				<tr>
+				  <td><input type="checkbox"  id="editsu" name="su" /></td>
+				  <td><b>Administer</b></td>
+				</tr>
+				<tr>
+				  <td><input type="checkbox" id="editunlimited" name="unlimited" /></td>
+				  <td><b>Unlimited</b> - No restriction</td>
+				</tr>
+			  </table>
+			  <br/>
+
+			<h1>Change Email</h1>
+
+			<table>
+			<tr>
+				<th>Email: </th>
+				<td><input type="text" name="email" id="email"/></td>
+			</tr>
+			</table>
+			<br/>
+			<h1>Change Password</h1>
+
+			<p>
+			  <input type="checkbox" name="changepassword" id="changepassword" onclick="switchPasswordStuff(this.checked)" /> 
+			  Tick to change the user's password.
+			</p>
+
+			<p id="passwordpara">
+				<table>
+					<tr>
+						<td><b>New password:</b></td>
+						<td><input type="password" name="password" id="password" size="16" /></td>
+					</tr>
+					<tr>
+						<td><b>New password again:&nbsp;&nbsp;</b></td>
+						<td><input type="password" name="password2" id="password2" size="16" /></td>
+					</tr>
+				</table>
+			</p>
+			<br />
+
+			<div id="playerButtonGroup">
+				<button type="button" class="controlButton" title="Update" onclick="javascript:updatePlayer();"><i class="icon-save icon-2x"></i></button>
+				<button type="button" class="controlButton" title="Delete" onclick="javascript:deletePlayer();"><i class="icon-trash icon-2x"></i></button>
+			</div>
+			</form>
+
+		</div>
+
+	</div><!-- end of edit panel -->
+	<div style="clear:both;"></div>
+</div><!-- end of playerPanel -->
+
 <script type="text/javascript">switchPasswordStuff(false);</script>
 <!include master_b.inc>
