@@ -31,6 +31,7 @@ import upstage.Transport;
  * Modified by: Vishaal Solanki 15/10/09
  * Model for ChatField object sits between ChatField and Transport
  * Modified by: Heath / Vibhu 09/08/2011 - Added function SET_CHAT_PANE_COLOUR so part of fix for media management system colour changing.
+ * Modified by: Vanessa & Nitkalya 16/10/13 - Opening message of chat is now the same as the splash message
  */
 class upstage.model.ModelChat implements TransportInterface
 {
@@ -252,6 +253,16 @@ class upstage.model.ModelChat implements TransportInterface
 
     //-------------------------------------------------------------------------
     // Messages from server
+
+    /**
+     * @brief Gets the splash message from the server to set it as the opening chat message
+     * 
+     */
+     function GET_CHAT_OPENING(msg: String):Void
+     {
+        chatField.setWelcomeMsg(msg);
+     }
+
     /**
      * @brief Server wants model to display some text
          */

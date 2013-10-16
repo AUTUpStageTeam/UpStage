@@ -36,6 +36,7 @@ Modified by:    Nitkalya Wiriyanuparb  28/09/2013  - Supported unlooping audio
                                                    - Loaded currently playing audio and played from the currently playing position for late audiences
 Modified by:    Nitkalya Wiriyanuparb  05/10/2013  - Supported custom start/stop position for audios, made sure it works for late audiences
 Modified by:    Nitkalya Wiriyanuparb  14/10/2013  - Show applause and volunteer buttons for late audiences if they're enabled
+Modified by:    Nitkalya & Vanessa     16/10/2013  - Sent a custom chat opening message to the client
 Notes: 
 """
 
@@ -671,6 +672,7 @@ class _UpstageSocket(LineOnlyReceiver):
 
             # Tell the client we got the LOADED message
             self.send('CONFIRM_LOADED')
+            self.send('CHAT_MSG', msg = self.stage.splash_message)
         else:
             log.msg('blimey. client called for load when stage was None')
 

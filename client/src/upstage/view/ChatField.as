@@ -32,6 +32,7 @@ import upstage.Sender;
  * Modified by: Lauren Kilduff, Phillip Quinlan, Endre Bernhardt
  * Modified by: Wendy, Candy and Aaron 30/10/2008
  * Modified by: Vishaal Solanki 15/10/09
+ * Modified by: Vanessa and Nitkalya 16/10/13 -Allowed the opening chat message to be the same as a the splash message
  * Notes: 
  */
 
@@ -637,5 +638,15 @@ function buildURL(sLink:String):String
     function hideVolunteerBtn() :Void
     {
     	this.volunteerBtn._visible = false;
+    }
+
+    /*
+     * Added by Vanessa Henderson 10/10/13
+     *
+     */ 
+    function setWelcomeMsg(welcomeMessage :String):Void{
+
+      this.tf.text = welcomeMessage;
+      trace('Welcome message Set in Chat: '+ welcomeMessage);
     }
 };

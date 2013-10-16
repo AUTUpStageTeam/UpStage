@@ -44,6 +44,7 @@ import upstage.model.ModelDrawing;
  * Modified by: Nitkalya Wiriyanuparb  28/09/2013  - Supported unlooping audio
  *                                                 - Fixed audio not heard by late audiences
  * Modified by: Nitkalya Wiriyanuparb  04/10/2013  - Recieved messages about audio start and stop positions
+ * Modified by: Nitkalya & Vanessa     16/10/2013  - Set chat opening message to the same as splash message
  */
 
 class upstage.Transport extends XMLSocket
@@ -683,6 +684,14 @@ class upstage.Transport extends XMLSocket
     {
         this.modelSplashScreen.GET_SPLASH_DETAILS(x.avatars, x.props, x.backdrops, x.audios, x.msg);
     };
+    /**
+      *@brief Sets the message at the top of chat to the same as the Splash Message
+      *
+      */
+      private function CHAT_MSG(x: Object):Void
+      {
+        this.modelChat.GET_CHAT_OPENING(x.msg);
+      }
 
 
     /**
