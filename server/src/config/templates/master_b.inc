@@ -5,6 +5,5 @@
 		<div id="status" style="display:none;">
 		</div>
 	</div>
-<div style="height:225px"></div> <!--#(29/05/2013)Craig Farrell-->
 </body>
 </html>

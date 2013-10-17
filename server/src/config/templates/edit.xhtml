@@ -2,8 +2,11 @@
 <script type="text/javascript" src="/script/ckeditor/ckeditor.js"></script>
 <div id="divShade">
 </div>
-<div id="divPopup">
-%(attr:postback)s
+<div id="popup">
+	<div id="divPopup">
+	<span id="alertMsg">%(attr:postback)s</span>
+	<input id="alertBtn" type='button' onclick="hidePopup();" value='Close' />
+	</div>
 </div>
 
 <form method="POST">
@@ -32,11 +35,9 @@ window.onresize = function() { resizeEditor() }
 //]]>
 
 
-if(trim(document.getElementById("divPopup").innerHTML) != "")
+if(trim(document.getElementById("alertMsg").innerHTML) != "")
 {
-    document.getElementById("divPopup").style.display = 'block';
-    document.getElementById("divShade").style.display = 'block';
-    document.getElementById("divPopup").innerHTML += "<input type='button' onclick=\"hideDiv('divPopup'); hideDiv('divShade');\" value='Close' />";;
+    showAlertBox('');
 }
 </script>
 <!include master_b.inc>

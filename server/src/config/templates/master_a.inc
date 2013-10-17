@@ -78,7 +78,11 @@ if (/*@cc_on!@*/false) {
 <body>
     <div id="divShade">
     </div>
-    <div id="divPopup">
+    <div id="popup">
+    	<div id="divPopup">
+    		<span id="alertMsg"></span>
+			<input id="alertBtn" type='button' onclick="hidePopup();" value='Close' />
+    	</div>
     </div>
 	<script type="text/javascript">test_flash()</script>
 	<div id="masterpage">

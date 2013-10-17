@@ -35,6 +35,7 @@ Modified by David Daniels 22/05/2013 - fixed captials
 Modified by Vanessa Henderson 06/09/2013 - Changed the text displayed on the revert changes button
                                            - Swapped position of revert changes button and Delete button
 Modified by Lisa Helm 02/10/2013 - switched unassign/view media drop down boxes to select boxes
+Modified by Nitkalya  17/10/2013 - Modified popup message box and used the universal one
 -->
 <!include master_a.inc>
 <!include workshop_nav.inc>
@@ -44,16 +45,13 @@ window.onresize = resizePage;
 
 </script>
 
-<div id="divMessage">
-%(attr:message)s
-</div>
 <div id="stageselection">
 	<h1>Make a new stage, or select one to edit</h1>
 	<form name ="selectstage" action="%(req:path)s">
-		<select name="shortName" id="listName">
+		<select name="shortName" id="listName" onchange="stageChooseSubmit(false);">
 			%(list_stages)s
 		</select>
-		<input type="button" onclick="stageChooseSubmit();" value="Select" />
+		<input type="button" onclick="stageChooseSubmit(false);" value="Select" />
 	</form>
 </div>
 
@@ -175,7 +173,7 @@ window.onresize = resizePage;
 										</select>
 									</td>
                                     <td style="width:0%;"><input type="button" id="seViewMedia" onclick="javascript:viewMediaImage();" value="Preview" /></td>
-                                    <td><div id="editStageMediaPreview"><!-- Craig Farrell 25/04/2013 -->
+                                    <td><div id="editStageMediaPreview">
                                         %(attr:stage_ViewImg)s
                                     </div></td>
 								</tr>

@@ -38,7 +38,7 @@
 
 		<div class="filterBlock" style="margin-left: 0;">
 			<label for="filterUser">User:</label>
-			<select id="filterUser" name="filterUser" style="width:80px;">
+			<select id="filterUser" name="filterUser" style="width:80px;" onchange="callAjaxGetData();">
 				<option value=""></option>
 				%(list_users_as_html_option_tag)s
 			</select>
@@ -46,7 +46,7 @@
 
 		<div class="filterBlock">
 			<label for="filterStage">Stage:</label>
-			<select id="filterStage" name="filterStage" style="width:130px;">
+			<select id="filterStage" name="filterStage" style="width:130px;" onchange="callAjaxGetData();">
 				<option value=""></option>
 				<option value="^"> -- not assigned -- </option><!-- dummy char '^' used for unassigned stages, see pages.py -->
 				%(list_stages_as_html_option_tag)s
@@ -55,7 +55,7 @@
 
 		<div class="filterBlock">
 			<label for="filterType">Type:</label>
-			<select id="filterType" name="filterType" style="width:90px;" onchange="javascript:mediumFilter();">
+			<select id="filterType" name="filterType" style="width:90px;" onchange="callAjaxGetData();">
 				<option value=""></option>
 				<option value="avatar">Avatar</option>
 				<option value="prop">Prop</option>
@@ -66,14 +66,14 @@
 
 		<div class="filterBlock">
 			<label for="filterMedium">Medium:</label>
-			<select id="filterMedium" name="filterMedium" style="width:90px;">
+			<select id="filterMedium" name="filterMedium" style="width:90px;" onchange="callAjaxGetData();">
                 <option value=""></option>>
 			</select>
 		</div>
 
         <div class="filterBlock">
 			<label for="filterTags">Tags:</label>
-			<select id="filterTags" name="filterTags" style="width:110px;">
+			<select id="filterTags" name="filterTags" style="width:110px;" onchange="callAjaxGetData();">
 				<option value=""></option>
 				%(list_tags_as_html_option_tag)s
 			</select>
@@ -91,7 +91,7 @@
 	    <div class = "searchBlock">
 	    	<label for="searchText">Name or Tag:</label>
             <input id="searchText" name="searchText" type="text" onblur="if(this.value=='') this.value=defaultValue" onclick="if(this.defaultValue==this.value) this.value=''" value="Search">
-            <input id="buttonSearch" type="button" style="width:60px;" onclick="javascript:searchByString()" value="Search" />
+            <input id="buttonSearch" type="button" style="width:60px;" value="Search" />
 	    </div>
 	</div>
 </div>
@@ -225,16 +225,16 @@
 					<li id="tabPreviewAudio" class="tab"><a href="#panelPreviewAudio">Audio</a></li>
 					<li id="tabPreviewFlash" class="tab"><a href="#panelPreviewFlash">Flash</a></li>
 					<li id="tabPreviewStream" class="tab"><a href="#panelPreviewStream">Stream</a></li>
-					<li id="tabPreviewDetails" class="tab"><a href="#panelPreviewDetails">Details</a></li>
+					<!-- <li id="tabPreviewDetails" class="tab"><a href="#panelPreviewDetails">Details</a></li> -->
 				</ul>
 
-				<div id="panelPreviewDetails">
+				<!-- <div id="panelPreviewDetails">
 					<div class="tab-panel">
 					
 						<p>This feature is currently not implemented.</p>
 					
-						<!-- TODO using dummy data for now -->
-						<!-- 
+						<!-- TODO using dummy data for now
+						 
 						<table>
 							<tr>
 								<td>Filetype</td>
@@ -261,10 +261,10 @@
 								<td>0 Bytes</td>
 							</tr>
 						</table>
-						-->
+						
 						
 					</div>
-				</div>
+				</div> -->
 
 				<div id="panelPreviewImage">
 					<div class="tab-panel">
@@ -331,7 +331,9 @@
 			
 			<div id="assignMediaToStageSelectorPanel"></div>
 			
-			<p class="dialogNote"><strong>Note:</strong> Changes will force a reload only of the newly assigned and unassigned stages</p>
+			<p class="dialogNote">
+				<strong>Note:</strong> Changes will force a reload only of the newly assigned and unassigned stages
+				<strong>Tip:</strong> Press Enter to submit the changes or Escape to dismiss</p>
 			
 			<div class="dialogButtonRow">
 				<input type="button" class="buttonClose button-standard" value="Cancel" />
@@ -348,6 +350,8 @@
 			<h1>Set Tags for &quot;<span id="tagMediaName"></span>&quot;</h1>
 			
 			<div id="tagMediaSelectorPanel"></div>
+
+			<p class="dialogNote"><strong>Tip:</strong> Press Enter to accept, Shift+Enter to save changes, or Escape to dismiss</p>
 			
 			<div class="dialogButtonRow">
 				<input type="button" class="buttonClose button-standard" value="Cancel" />
@@ -562,7 +566,7 @@
 
 			</div><!-- end replaceMediaPanel -->
 
-			<p class="dialogNote"><hr><strong>Note:</strong> Changes will force a reload of all assigned stages</p>
+			<p class="dialogNote"><strong>Note:</strong> Changes will force a reload of all assigned stages</p>
 			
 			<div class="dialogButtonRow">
 				<input type="button" class="buttonClose button-standard" id="buttonExecuteReplaceCancel" value="Cancel" />

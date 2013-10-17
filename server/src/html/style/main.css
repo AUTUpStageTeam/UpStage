@@ -35,6 +35,7 @@
 2.2			11/09/13	Nitkalya Wiriyanuparb	- Prefectly centered stage loading box and removed green background
 2.2			16/09/13	Nitkalya Wiriyanuparb	- Fixed preview panel appear at the bottom on small screens
 2.2			15/10/13	Nitkalya Wiriyanuparb	- Redesigned edit player page
+2.2			17/10/13	Nitkalya Wiriyanuparb	- Centered the message popup box
 */
 
 
@@ -263,7 +264,7 @@ p.error
 }
 #edit
 {
-	height:550px;
+	height:100%;
 }
 
 /*Mohammed Al-Timimi (08/06/11) - Syntax was completely wrong for the following */
@@ -395,10 +396,10 @@ input, select, button {
 #muLeftContent {
 	position: relative;
 	float: left;
-	width: 60%;
+	width: 57%;
 	height: auto;
 	padding: 10px;
-	margin: 10px;
+	margin: 10px 0;
 	overflow: auto;
 	border: 2px solid #669900;
 }
@@ -406,24 +407,33 @@ input, select, button {
 #muRightContent {
 	position: relative;
 	float: left;
-	width: 30%;
-	height: 280px;
+	width: 35%;
+	/*height: 290px;*/
 	padding:10px;
-	margin: 10px;
+	margin: 10px 0;
+	margin-left: 2%;
 	border: 2px solid #669900;
 }
 
-#muLeftContent-audio {
-	float: left;
-	width: 40%;
-	height: 300px;
-	padding: 5%; /* 10px*/
-	margin: 10px;
-	overflow: auto;
-	border: 3px solid green;
-	
+#stageTable {
+	width: 100%;
 }
 
+#stageTable td {
+	width: 45%;
+}
+
+#stageTable td#buttonArea{
+	width: 10%;
+}
+
+#stageTable td#buttonArea td button{
+	margin: auto;
+}
+
+#stageTable td select{
+	width: 99%;
+}
 
 #mediaPreview {
 	float: top;
@@ -579,8 +589,8 @@ a.IconButton
 
 #divForm
 {
-	margin: 10px;
-	padding: 10px;
+	margin: auto 0;
+	padding: auto 0;
 }
 
 #editStageGeneral
@@ -596,10 +606,10 @@ a.IconButton
 	padding-left: 10px;
     padding-bottom: 10px;
 	height:130px;
-	width: 316px;
+	width: 300px;
     display: block;
-    position: absolute;
-    right:200px;    
+    position: relative;
+    right: 0;
 }
 
 
@@ -647,7 +657,7 @@ a.IconButton
 
 #splash_message
 { 
-	width:880px;
+	width: 98%;
 	height:8em;
 }
 
@@ -895,23 +905,31 @@ a.IconButton
     z-index: 9999;
 }
 
+#popup
+{
+	position: fixed;
+	width: 100%;
+	text-align: center;
+	top: 45%;
+	z-index: 9999;
+}
+
+#popup.preview
+{
+	top: 20%;
+}
+
 
 #divPopup
 {
-    margin: 10px;
+    margin: auto;
     padding: 15px;
     box-shadow: #AAA 1px 1px 10px;
     border-radius: 5px;
     border: #888 2px solid;
     background-color: #EEE;
-    position: fixed;
-    left: 35%;
-    right: auto;
-    top: 45%;
-    bottom: auto;
     text-align: center;
     display: none;
-    z-index: 9999;
 }
 
 #divShade
@@ -923,9 +941,7 @@ a.IconButton
     height: 100%;
     width: 100%;
     background-color: #000;
-    
     opacity: 0.7;
-    
     top: 0px;
     left: 0px;
     z-index: 9998;

@@ -43,6 +43,9 @@
             Modified by Lisa (24/09/2013): Added code to provide different home page for guests and users
             Modified by Nitkalya (25/09/2013): Added methods to remove and create workshop link dynamically using javascript
             Modified by Nitkalya (09/10/2013): Fixed login issues, login links on admin page, and added autofocus on username text box
+            Modified by Nitkalya (17/10/2013): Added showAlertBox(), hidePopup() and modified popup message box, so it's centered, and dismissible using the Enter key
+            Modified by Nitkalya (17/10/2013): Refactored buildRequest methods to move away from using form number, and added enterPressed and shiftEnterPressed
+            Modified by Nitkalya (17/10/2013): Used the alert box with shaded background to preview media on stage edit page
  */
 
 //Instance type variables
@@ -116,6 +119,38 @@ function countPlayerAndAudience()
 function trim(value) {
 	//return value.replace(/^\s+|\s+$/g, '');
 	return value.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+}
+
+/**
+ * Adds onkeydown event handler
+ * if the enter key is pressed
+ * invoke the passed function
+ * Ing - 17/10/2013
+ */
+function enterPressed(el, fn)
+{
+	el.onkeydown = function (event) { 
+		if (event.keyCode == 13){//} && this == document.activeElement) {
+			// pass on the 3rd (or more) ... parameters to the fn function
+			fn(Array.prototype.slice.call(arguments, 2));
+		}
+	}
+}
+
+/**
+ * Adds onkeydown event handler
+ * if the enter key is pressed while holding the shift key
+ * invoke the passed function
+ * Ing - 17/10/2013
+ */
+function shiftEnterPressed(el, fn)
+{
+	el.onkeydown = function (event) { 
+		if (event.keyCode == 13 && event.shiftKey){//} && this == document.activeElement) {
+			// pass on the 3rd (or more) ... parameters to the fn function
+			fn(Array.prototype.slice.call(arguments, 2));
+		}
+	}
 }
 
 //--------------------------------------
@@ -544,22 +579,27 @@ function requestPage(method,page,onReady)
 	xmlhttp.onreadystatechange=onReady;
 	xmlhttp.send(formStr);
  }
- 
- function popupAlert()
- {
-    if (xmlhttp.readyState==4)
-  	{
-		var html = xmlhttp.responseText;
-		divMsg = document.getElementById("divPopup");
-        divShad = document.getElementById("divShade");
-        divMsg.innerHTML = html;
-        divMsg.style.display = 'block';
-        divShad.style.display = 'block';
-        
-  	}
- }
- 
- 
+
+/**
+ * Show a popup message box with a custom message
+ * and a function to execute after the button is dismissed
+ * Ing - 17/10/2013
+ */
+function showAlertBox(message, buttonAction)
+{
+	document.getElementById("divPopup").style.display = 'inline-block';
+    document.getElementById("divShade").style.display = 'block';
+    if (message && message !== '') {
+	    document.getElementById("alertMsg").innerHTML = message;
+	}
+
+    var button = document.getElementById("alertBtn");
+    if (buttonAction && typeof buttonAction == "function") {
+	    button.onclick = function(event) { hidePopup(); buttonAction(); };
+	}
+    button.focus(); // just press enter to dismiss the popup
+}
+
 function checkLogin()
 {
 	if (xmlhttp.readyState==4)
@@ -636,20 +676,52 @@ function fillPage()
 		document.getElementById("status").style.display = "none";
 		document.getElementById("status").innerHTML = "";
         
-		if(document.title != 'Workshop - Media')
+		if(document.title != 'Workshop - Media') // probably the stage edit page
 		{
             try
             {
+            	// reset alert box if it was used to preview media
+        		document.getElementById('popup').className = "";
+
                 var temp = (xmlhttp.responseText).split('<!--remove-->');
-                
+
                 document.getElementById("page").innerHTML = temp[1];
                 stageEdit();
                 restoreState();
-                
-                showMessageDiv("divMessage");
-                
-                
-                if(document.getElementById("divMessage").innerHTML.indexOf("deleted") > 0)
+
+                var reply = trim(document.getElementById('successMsg').innerHTML);
+
+                if (reply != '') {
+	                showAlertBox(reply);
+
+					if (reply.indexOf('form') !== -1) {
+						// hide the form behind the popup
+						document.getElementById('successMsg').style.display = "none";
+						document.getElementById('name').focus();
+						enterPressed(document.getElementById('urlname'), stageChooseSubmit, true);
+					} else {
+						// auto clear the message at the top after 5 seconds
+						setTimeout(function () {
+							document.getElementById('successMsg').innerHTML = "";
+						}, 5000);
+					}
+	            } else {
+	            	hidePopup();
+
+	            	// if previewing media
+	            	var preBox = document.getElementById('editStageMediaPreview'),
+	            		preview = trim(preBox.innerHTML);
+
+	            	if (preview != '') {
+	            		showAlertBox(preview);
+	            		preBox.style.display = "none";
+	            		document.getElementById('popup').className = "preview";
+	            	} else {
+	            		preBox.style.display = "inherit"; // reset
+	            	}
+	            }
+
+                if(reply.indexOf("deleted") > 0)
                 {
                     navStageWorkshop();
                 }
@@ -670,7 +742,7 @@ function fillPage()
 		
         if(xmlhttp.status == 500)
         {
-            hideDiv("divShade");
+            hideElementById("divShade");
         }
         
 		//-------------------------------------------------------
@@ -678,35 +750,15 @@ function fillPage()
 	}
 }
 
-function hideDiv(div)
+function hideElementById(div)
 {
     document.getElementById(div).style.display = 'none';
 }
 
-function showMessage(div, message)
+function hidePopup()
 {
-    div.innerHTML = message;
-    showMessageDiv(div);
-}
-
-function showMessageDiv(div)
-{
-    // 22/08/2012 - Daniel, Gavin
-    /*
-        Added to make the postback message more visible. 
-    */
-    var divMessage = document.getElementById(div);
-    if(trim(divMessage.innerHTML) == "")
-    {
-        hideDiv(div);
-        hideDiv("divShade");
-    }
-    else
-    {
-        divMessage.style.display = 'block';
-        divMessage.innerHTML += "<input type='button' onclick=\"hideDiv('"+div+"'); hideDiv('divShade');\" value='Close' />";
-        document.getElementById("divShade").style.display = 'block';
-    }
+	hideElementById('divPopup');
+	hideElementById('divShade');
 }
 
 function GetXmlHttpObject()
@@ -723,6 +775,18 @@ function GetXmlHttpObject()
  	}
 	return null;
 }
+
+
+/**
+ * Eventually will replace buildRequest (using form number)
+ * Might switch to using ID, but use the form name for now
+ * Ing - 17/10/2013
+ */
+function buildRequestByFormName(formName)
+{
+	return buildRequestFromForm(document[formName]);
+}
+
 /**
  * Build a query string using the inputs from the specified form.
  *
@@ -737,14 +801,19 @@ function buildRequest(formNum)
 	// FIXME selection of values by their element id or name seems rather insecure, any change on the element names will break things!
 	// FIXME better break down to separate functions: reading values and creating the request string? 
 	// FIXME values are not checked for validity ('undefined') - results are vague and can not be determined ...
-	
+
 	log.debug("buildRequest() start: formNum=" + formNum);
-	
+
+	return buildRequestFromForm(document.forms[formNum]);
+}
+
+function buildRequestFromForm(formElement)
+{
 	var search = ['input','select','textarea'];
 	var str = '?';
 	for(i in search)
 	{
-		var elements = document.forms[formNum].getElementsByTagName(search[i]);
+		var elements = formElement.getElementsByTagName(search[i]);
 		for(e in elements)
 		{
 			if(elements[e].name == 'assigned' || elements[e].name == 'unassigned')

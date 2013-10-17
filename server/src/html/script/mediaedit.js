@@ -103,19 +103,21 @@ function setupMediaEdit(url_path,current_user,current_stages,set_filter_to_curre
 		setCurrentUserInFilter();	// set default user
 		callAjaxGetData();
 	});
-    
-    $("#buttonSearch").click(function(e)
+
+	var searchByString = function(e)
     {
         log.debug("click: #buttonSearch");
         $("#searchText").val();
         callAjaxGetData();
-    });
-	
+    };
+
+    $("#buttonSearch").click(searchByString);
+    enterPressed($('#searchText').get(0), searchByString);
+
 	if(set_filter_to_current_user) {
 		setCurrentUserInFilter();	// set default user
 	}
 	callAjaxGetData();		// set initial data
-	
 }
 
 function setCurrentUserInFilter() {
@@ -227,7 +229,9 @@ function callAjaxDeleteData(key,deleteIfInUse) {
         		
         		// gracefully refresh data
         		setupMediaEdit(url,user,stages,false);
-        		
+				
+				// reset keydown event on colorbox
+				enterPressed($('#colorbox').get(0), null); 
         		// close colorbox
         		$.fn.colorbox.close(); //return false;
         		
@@ -267,7 +271,9 @@ function callAjaxAssignToStage(key,selectedStages) {
         		
         		// gracefully refresh data
             	setupMediaEdit(url,user,stages,false);
-            	
+				
+				// reset keydown event on colorbox
+				enterPressed($('#colorbox').get(0), null);
         		// close colorbox
         		$.fn.colorbox.close(); //return false;
             	
@@ -309,6 +315,8 @@ function callAjaxUpdateData(key,updateData,forceStagesReload) {
         		// gracefully refresh data
             	setupMediaEdit(url,user,stages,false);
             	
+            	// reset keydown event on colorbox
+				enterPressed($('#colorbox').get(0), null);
         		// close colorbox
         		$.fn.colorbox.close(); //return false;
             	
@@ -559,7 +567,7 @@ function setupDataGrid() {
 					clickHandlerExecuteEditCancel = function(e) {
 						
 						log.debug("clickHandlerExecuteEditCancel: click: #buttonExecuteEditCancel, key="+selectedMediaData['key']);
-						
+						enterPressed($('#colorbox').get(0), null);
 						$.fn.colorbox.close();
 						$('.select-unavailable').remove(); // remove unavailable options from selectors: voice, video image path
 					}
@@ -612,7 +620,14 @@ function setupDataGrid() {
 					// bind click handler for final deletion
 					$("#buttonExecuteEdit").bind('click',clickHandlerExecuteEdit);
 					$("#buttonExecuteEditCancel").bind('click',clickHandlerExecuteEditCancel);
-					
+
+					// key pressed events
+					enterPressed($('#voicetext').get(0), voiceTest);
+					enterPressed($('#inputEditName').get(0), clickHandlerExecuteEdit);
+					enterPressed($('#selectEditVoice').get(0), clickHandlerExecuteEdit);
+					enterPressed($('#inputEditStreamserver').get(0), clickHandlerExecuteEdit);
+					enterPressed($('#inputEditStreamname').get(0), clickHandlerExecuteEdit);
+
 					// show edit panel
 					
 					$.colorbox({
@@ -650,7 +665,7 @@ function setupDataGrid() {
 
 				// Ing 14/09/2013  - Added media replacing functionality
 				clickHandlerReplaceMedia = function(e) {
-					console.log(selectedMediaData);
+					// console.log(selectedMediaData);
 
 					$('#avatarBits').hide();
 					$('#backdropBits').hide();
@@ -699,6 +714,7 @@ function setupDataGrid() {
 						log.debug("clickHandlerExecuteReplaceCancel: click: #buttonExecuteReplaceCancel, key="+selectedMediaData['key']);
 						displayFields('bkframecount', 'bk', 1);
 						//displayFields('avframecount', 'av');
+						enterPressed($('#colorbox').get(0), null); // reset keydown event on colorbox
 						$.fn.colorbox.close();
 					}
 					
@@ -886,6 +902,9 @@ function setupDataGrid() {
 					
 					// bind click handler for final deletion
 					$("#buttonExecuteAssign").bind('click',clickHandlerExecuteAssign);
+
+					enterPressed($('#colorbox').get(0), clickHandlerExecuteAssign);
+					enterPressed($('#assignMediaToStageSelector').get(0), clickHandlerExecuteAssign);
 					
 					// show assign panel
 					$.colorbox({
@@ -1021,6 +1040,9 @@ function setupDataGrid() {
 					
 					// bind click handler for final tagging
 					$("#buttonExecuteTag").bind('click',clickHandlerExecuteTag);
+
+					// press enter anywhere will submit the changes
+					shiftEnterPressed($('#colorbox').get(0), clickHandlerExecuteTag);
 					
 					// show tag panel
 					$.colorbox({
@@ -1739,6 +1761,7 @@ function showDetails(single_data) {
 		
 			// bind handler to thumbnail preview
 			$("#thumbnailPreview").bind('click',clickHandlerPreviewMedia);
+
 		}
 		
 	} else {
@@ -1881,23 +1904,6 @@ function getBytesWithUnit(bytes) {
 		bytes = bytes.toFixed(1);
 	}
 	return bytes + units[i];
-}
-
-/**
-*   Added by David Daniels / Nikos Philips
-*       - Method to search the uploaded media by a string
-*/
-function searchByString()
-{
-    var searchText = document.getElementById('searchString').value;
-    if(searchText == 'Search' || searchText == '')
-    {
-        //search string is still default
-        alert("Please enter a search string");
-    } else
-    {
-        //search media names for matches
-    }
 }
 
 //-------------------------------- VOICE TESTING -----------------------------//

@@ -247,12 +247,8 @@ Changelog: Vibhu Patel - Aut UpStage 2011
 			</div>
 			
 			<div id="submitbuttons">
-				<table>
-					<tr>
-						<td><input id="btnSubmit" type="submit" name="saveMedia" value="Add Media" onclick="checkAllFields(); return sendPostAction();"/></td>
-						<td><input type="reset" name="cancelMedia" value="Reset" onclick="resetForm()" /></td>
-					</tr>
-				</table>
+				<input id="btnSubmit" type="submit" name="saveMedia" value="Add Media" onclick="checkAllFields(); return sendPostAction();"/></td>
+				<input type="reset" name="cancelMedia" value="Reset" onclick="resetForm()" /></td>
 			</div>
 			
 		</div>
@@ -263,13 +259,13 @@ Changelog: Vibhu Patel - Aut UpStage 2011
 			<div id=rightHeading><h1>Assign to a Stage:</h1></div>
 			<div id="stageList" style="display: none;"> 
 				<p> Select stages to assign the media to<br /><em>(Stages will <strong>not</strong> get reloaded)</em>:<p>
-				<table border="0" name="stageTable" id="stageTable" valign="top" style="margin-bottom : 80px;">
+				<table border="0" name="stageTable" id="stageTable" valign="top">
 					<tr>
 						<td>
 						<p><b>Unassigned:</b></p>
-							<select size="10" style="width:120px;" name="unassigned" id="unassigned" multiple="multiple">%(stage_list)s</select> 
+							<select size="10" name="unassigned" id="unassigned" multiple="multiple">%(stage_list)s</select> 
 						</td>
-						<td>
+						<td id="buttonArea">
 							<table>
 								<tr>
 									<td>
@@ -281,18 +277,16 @@ Changelog: Vibhu Patel - Aut UpStage 2011
 										<button type="button" onclick="switchSelection(assigned, unassigned); return false;" ><b>&lt;&lt;</b></button>
 									</td>
 								</tr>
-								
 							</table>
 						</td>
 						<td> 
 							<p><b>Assigned:</b></p>
-							<select size="10" style="width:120px;" multiple="multiple" name="assigned" id="assigned">
+							<select size="10" multiple="multiple" name="assigned" id="assigned">
 							</select> 
 						</td>
 					</tr>
 				</table>
 			</div>
-			<br/>
 		</div>
 		<!-- end right content -->
 

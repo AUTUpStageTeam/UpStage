@@ -994,14 +994,14 @@ class StageEditPage(Workshop):
             if aName is not '' and unName is '':
                 if aName.count('.swf') > 0:
                     imgThumbUrl = config.MEDIA_URL + aName
-                    self.stage_ViewImg = '<object><param id="esMediaPreview" name="esMediaPreview" value="%s"><embed src="%s" width="150px" height="150px"></embed></object>' %(aName,imgThumbUrl)
+                    self.stage_ViewImg = '<object><param id="esMediaPreview" name="esMediaPreview" value="%s"><embed src="%s" width="300px" height="300px"></embed></object><br><br>' %(aName,imgThumbUrl)
                     log.msg('show selected media from assigned column')
                 else:
                     self.stage_ViewImg = '<p>That media item cannot be previewed.</p>'
             elif aName is '' and unName is not '':
                 if unName.count('.swf') > 0:
                     imgThumbUrl = config.MEDIA_URL + unName
-                    self.stage_ViewImg = '<object><param id="esMediaPreview" name="esMediaPreview" value="%s"><embed src="%s" width="150px" height="150px"></embed></object>' %(unName,imgThumbUrl)
+                    self.stage_ViewImg = '<object><param id="esMediaPreview" name="esMediaPreview" value="%s"><embed src="%s" width="300px" height="300px"></embed></object><br><br>' %(unName,imgThumbUrl)
                     log.msg('show selected media from unassigned column')
                 else:
                     self.stage_ViewImg = '<p>That media item cannot be previewed.</p>' 
@@ -1070,14 +1070,17 @@ class StageEditPage(Workshop):
                         raise FormError("Stage didn't work, for reasons unknown")
                     else:
                         self.stage = self.collection.stages.get(ID)
-                        self.message = '<hr />Stage created! '
+                        self.message = 'Stage created! '
                         self.stage.save()
                 except FormError, e:
                     log.msg(e)                    
                     return errorpage(request, e, 'stage')
         elif 'new_stage' in self.stagename:
             #Modified by: Daniel, Gavin - Made the message to contain a <form> as well so it shows on the popup box.
-            self.message = '<form action="/admin/workshop/stage">Full name:<input type="text" name="name" id="name" />Short name for url:<input type="text" name="ID" id="urlname" size="12" />(no spaces).<button onclick="javascript:stageChooseSubmit(); return false;">Create Stage</button></form>'  
+            self.message = '<form name="createStage" action="/admin/workshop/stage">'
+            self.message += '<label for="name"><strong>Full Name:</strong></label><input type="text" name="name" id="name" />'
+            self.message += '<label for="ID"><strong> Short Name (URL):</strong></label><input type="text" name="ID" id="urlname" size="12" />(no spaces) '
+            self.message += '<button onclick="javascript:stageChooseSubmit(true); return false;"> Create Stage </button></form>'
         elif action=='save':
             if self.stage:
                 self.stage.update_from_form(form, self.player);
