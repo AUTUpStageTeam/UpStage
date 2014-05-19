@@ -601,8 +601,8 @@ class _Stage(object):
                 
         if refresh_stage == True:            
             self.soft_reset()
-        if(callLoad):
-            self.save(callLoad)
+        if(callLoad)
+        self.save(callLoad)
     
     """
         Heath Behrens 16/08/2011 - Function added to remove media from this stage object.
