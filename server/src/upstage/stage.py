@@ -318,7 +318,7 @@ class _Stage(object):
                                    comma separated.
 
     """
-    def save(self,config_file=None, callLoad = False):
+    def save(self,config_file=None):
         """Saves to XML config file"""
         config_file = config_file or self.config_file
         tree = microdom.lmx('stage')
@@ -395,8 +395,7 @@ class _Stage(object):
         nodeOwner.text(self.owner)
         save_xml(tree.node, config_file)
         del tree
-        if(callLoad):
-            self.load()
+        #self.load() commented out as a potential fix for git#193
 
     def wake(self):
         """Set stage to active"""
@@ -573,7 +572,7 @@ class _Stage(object):
                         uploaders_collection[v.key] = v.key
 
         #try to preserve local modification
-        callLoad = False
+
         # PQ & EB added 'self.audios' to this line on 13/10/07 
         # This is for updating the stage xml file from the workshop
         for collection in (self.avatars, self.props, self.backdrops, self.audios):
@@ -586,7 +585,6 @@ class _Stage(object):
                 # list displayed by the selected uploaders and not unassign media not it the current displayed list.
                 elif (k in collection.media) and (k in uploaders_collection):
                     collection.drop_mediafile(k)
-                    callLoad = True
         
         if 'assignToStages' in form:
             log.msg("attempting to assign media to stage nat")
@@ -601,8 +599,8 @@ class _Stage(object):
                 
         if refresh_stage == True:            
             self.soft_reset()
-        if(callLoad)
-        self.save(callLoad)
+            
+        self.save()
     
     """
         Heath Behrens 16/08/2011 - Function added to remove media from this stage object.
