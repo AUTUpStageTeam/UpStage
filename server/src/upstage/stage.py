@@ -318,7 +318,7 @@ class _Stage(object):
                                    comma separated.
 
     """
-    def save(self,config_file=None):
+    def save(self,config_file=None, needLoad = False):
         """Saves to XML config file"""
         config_file = config_file or self.config_file
         tree = microdom.lmx('stage')
@@ -395,7 +395,8 @@ class _Stage(object):
         nodeOwner.text(self.owner)
         save_xml(tree.node, config_file)
         del tree
-        #self.load() commented out as a potential fix for git#193
+        if needLoad:
+            self.load()
 
     def wake(self):
         """Set stage to active"""
@@ -1253,7 +1254,7 @@ class StageDict(Xml2Dict):
         node['lockstage']= stage.is_locked() #(30/04/2013)Craig
         node['owner']= stage.get_owner()#(01/05/2013)Craig
 
-    def update_from_form(self, form, player):
+    def update_from_form(self, form, player, needLoad = False):
         """Delete selected stages"""
         log.msg("Dict (Delete) update from form called")
         if player.is_player():
@@ -1273,7 +1274,7 @@ class StageDict(Xml2Dict):
                     except OSError, e:
                         log.msg("can't remove stage '%s' because: %s" % (x, e))
                     log.msg("Removing stage %s (%s)" % (x, xp))
-            self.save()
+            self.save(needLoad)
 
     #Shaun Narayan (02/06/10) - Added method to delete a single specified stage.
     def delete_stage(self, name, player):
