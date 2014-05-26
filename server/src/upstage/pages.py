@@ -783,7 +783,6 @@ class StageEditPage(Workshop):
     stage_ViewImg = ''#(30/04/2013) Craig
     stage_lock = ''#(01/05/2013) Craig
     isOwner = 'false'#(02/05/2013) Craig
-    needLoad = False
     
     def __init__(self, player, collection):
         AdminBase.__init__(self, player, collection)
@@ -1082,9 +1081,8 @@ class StageEditPage(Workshop):
             self.message += '<button onclick="javascript:stageChooseSubmit(true); return false;"> Create Stage </button></form>'
         elif action=='save':
             if self.stage:
-                self.stage.update_from_form(form, self.player, needLoad);
+                self.stage.update_from_form(form, self.player);
                 self.message+='Stage saved! '
-                needLoad = False
                 
         #added by Daniel (18/09/2012): Save only
         elif action=='saveonly':
@@ -1129,7 +1127,6 @@ class StageEditPage(Workshop):
                     if self.stage.unassigned.count(m) == 0:
                         self.stage.unassigned.append(m)
                         log.msg(self.stage.unassigned)
-                        needLoad = True
 
         elif action=='view_media':#(25/04/2013) Craig
             log.msg('es - view media method start')
