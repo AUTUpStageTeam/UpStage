@@ -1084,7 +1084,7 @@ class StageEditPage(Workshop):
                 needLoad = False
                 if len(self.stage.unassigned) > 0 or self.stage.stageNeedsReload:
                     needLoad = True
-                self.stage.update_from_form(form, self.player, True);
+                self.stage.update_from_form(form, self.player, needLoad);
                 self.message+='Stage saved! '
                 
         #added by Daniel (18/09/2012): Save only
