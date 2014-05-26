@@ -1081,13 +1081,16 @@ class StageEditPage(Workshop):
             self.message += '<button onclick="javascript:stageChooseSubmit(true); return false;"> Create Stage </button></form>'
         elif action=='save':
             if self.stage:
-                self.stage.update_from_form(form, self.player);
+                needLoad = False
+                if len(self.stage.unassigned) > 0 or self.stage.stageNeedsReload:
+                    needLoad = True
+                self.stage.update_from_form(form, self.player, True);
                 self.message+='Stage saved! '
                 
         #added by Daniel (18/09/2012): Save only
         elif action=='saveonly':
             if self.stage:
-                self.stage.update_from_form(form, self.player, {}, False);
+                self.stage.update_from_form(form, self.player, False, {}, False);
                 self.message+='Stage saved! '
                 self.stage_saved += 'Stage saved! '
         

@@ -143,6 +143,7 @@ class _Stage(object):
     unassigned = []
     temp_access_level_one = []
     temp_access_level_two = []
+    stageNeedsReload = False
 
 
     def __init__(self, ID, name=None, media_items=None):
@@ -318,7 +319,7 @@ class _Stage(object):
                                    comma separated.
 
     """
-    def save(self,config_file=None):
+    def save(self,config_file=None, needLoad = False):
         """Saves to XML config file"""
         config_file = config_file or self.config_file
         tree = microdom.lmx('stage')
@@ -395,7 +396,9 @@ class _Stage(object):
         nodeOwner.text(self.owner)
         save_xml(tree.node, config_file)
         del tree
-        #self.load() commented out as a potential fix for git#193
+        self.stageNeedsReload = False
+        if needLoad:
+            self.load()
 
     def wake(self):
         """Set stage to active"""
@@ -524,7 +527,7 @@ class _Stage(object):
             self.broadcast('SHOW_BACKDROP', ID=bg.ID)
 
 
-    def update_from_form(self, form, player, uploaders={}, refresh_stage = True):
+    def update_from_form(self, form, player, needLoad, uploaders={}, refresh_stage = True):
         """Put ticked thingies into stage, remove unticked"""
         log.msg("Stage update from form called.")
         if player.is_player():
@@ -600,7 +603,7 @@ class _Stage(object):
         if refresh_stage == True:            
             self.soft_reset()
             
-        self.save()
+        self.save(None, needLoad)
     
     """
         Heath Behrens 16/08/2011 - Function added to remove media from this stage object.
@@ -737,18 +740,22 @@ class _Stage(object):
     def add_al_one(self, person):
 		if self.temp_access_level_one.count(person) == 0:
 			self.temp_access_level_one.append(person)
+            self.stageNeedsReload = True
         
     def add_al_two(self, person):
 		if self.temp_access_level_two.count(person) == 0:
 			self.temp_access_level_two.append(person)
+            self.stageNeedsReload = True
         
     def remove_al_one(self, person):
 		if self.temp_access_level_one.count(person) > 0:
 			self.temp_access_level_one.remove(person)
+            self.stageNeedsReload = True
         
     def remove_al_two(self, person):
 		if self.temp_access_level_two.count(person) > 0:
 			self.temp_access_level_two.remove(person)
+            self.stageNeedsReload = True
         
     def contains_al_one(self, person):
         try:
