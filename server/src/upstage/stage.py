@@ -84,6 +84,10 @@ Modified by: Lisa Helm  02/10/2013      - added the unassigned media list + func
 Modified by: Nitkalya Wiriyanuparb  14/10/2013  - Remember applause and volunteer buttons visibility state
 Modified by: Lisa Helm and Vanessa Henderson (17/10/2013) changed user permissions to fit with new scheme
 Modified by: Lisa Helm and Vanessa Henderson (18/10/2013) changed tOwner to owner, changed owner to media_items
+Modified by: Nikos Phillsips (26/05/2014)   - added stageNeedsReload variable
+                                            - modified def's 'add_al_one', 'add_al_two', 'remove_al_one' and 'remove_al_two'
+                                            - modified def 'update_from_form' to check if xml needs reloading
+                                            - modified def 'save' to only call def 'load' when needed
 """
 
 #std lib

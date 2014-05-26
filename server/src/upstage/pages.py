@@ -110,6 +110,7 @@ Modified by: Lisa Helm 02/10/2013  - added funtionality to stageeditpage to allo
 Modified by: Nitkalya Wiriyanuparb  15/10/2013  - Redesigned editplayer page; used a more compact table layout and showed all players
 Modified by: Lisa Helm and Vanessa Henderson (17/10/2013) changed user permissions to fit with new scheme
 Modified by: Lisa Helm and Vanessa Henderson (18/10/2013) fixed stage lock, made it work with new permissions
+modified by: Nikos Phillips (26/05/2014)    -modified def 'render' in class 'StageEditPage' to check if media is being unassigned or player permission levels are being changed so that the stage is only cleared while saving if its needed.
 """
 
 #standard lib
