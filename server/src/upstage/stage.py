@@ -738,23 +738,23 @@ class _Stage(object):
         return audiences
     
     def add_al_one(self, person):
-		if self.temp_access_level_one.count(person) == 0:
-			self.temp_access_level_one.append(person)
+        if self.temp_access_level_one.count(person) == 0:
+            self.temp_access_level_one.append(person)
             self.stageNeedsReload = True
         
     def add_al_two(self, person):
-		if self.temp_access_level_two.count(person) == 0:
-			self.temp_access_level_two.append(person)
+        if self.temp_access_level_two.count(person) == 0:
+            self.temp_access_level_two.append(person)
             self.stageNeedsReload = True
         
     def remove_al_one(self, person):
-		if self.temp_access_level_one.count(person) > 0:
-			self.temp_access_level_one.remove(person)
+        if self.temp_access_level_one.count(person) > 0:
+            self.temp_access_level_one.remove(person)
             self.stageNeedsReload = True
         
     def remove_al_two(self, person):
-		if self.temp_access_level_two.count(person) > 0:
-			self.temp_access_level_two.remove(person)
+        if self.temp_access_level_two.count(person) > 0:
+            self.temp_access_level_two.remove(person)
             self.stageNeedsReload = True
         
     def contains_al_one(self, person):
