@@ -1,30 +1,24 @@
 <players>
-<player name="creator" rights="creator" last_login="Unset" date="Monday, 21 October 2013 11:50AM NZDT" password="4a8a08f09d37b73795649038408b5f33" email="Unset!">
+<player name="player" rights="player" last_login="Monday, 26 May 2014 01:50PM NZST" date="Monday, 21 October 2013 11:48AM NZDT" password="83878c91171338902e0fe0fb97a8c47a" email="Unset!">
 </player>
-<player name="admin" rights="creator" last_login="Monday, 21 October 2013 01:10PM NZDT" date="Monday, 08 November 2010 11:40PM NZDT" password="0cc175b9c0f1b6a831c399e269772661" email="reset@gmail.com">
+<player name="admin" rights="creator" last_login="Monday, 26 May 2014 01:53PM NZST" date="Monday, 08 November 2010 11:40PM NZDT" password="0cc175b9c0f1b6a831c399e269772661" email="reset@gmail.com">
 </player>
 <player name="vicki" rights="creator" last_login="Unset" date="Friday, 30 August 2013 05:41PM NZST" password="9e3669d19b675bd57058fd4664205d2a" email="Unset!">
 </player>
 <player name="nikos" rights="creator" last_login="Unset" date="Monday, 09 September 2013 09:50AM NZST" password="7b8b965ad4bca0e41ab51de7b31363a1" email="Unset!">
 </player>
-<player name="david" rights="creator" last_login="Friday, 18 October 2013 11:05AM NZDT" date="Monday, 09 September 2013 09:50AM NZST" password="8277e0910d750195b448797616e091ad" email="Unset!">
-</player>
-<player name="player" rights="player" last_login="Unset" date="Monday, 21 October 2013 11:48AM NZDT" password="83878c91171338902e0fe0fb97a8c47a" email="Unset!">
-</player>
 <player name="vanessa" rights="creator" last_login="Unset" date="Monday, 09 September 2013 09:51AM NZST" password="9e3669d19b675bd57058fd4664205d2a" email="Unset!">
 </player>
 <player name="helen" rights="creator" last_login="Unset" date="Friday, 30 August 2013 05:42PM NZST" password="2510c39011c5be704182423e3a695e91" email="Unset!">
 </player>
+<player name="umaker" rights="unlimitedmaker" last_login="Friday, 18 October 2013 11:07AM NZDT" date="Friday, 18 October 2013 11:06AM NZDT" password="7b774effe4a349c6dd82ad4f4f21d34c" email="Unset!">
+</player>
+<player name="anne" rights="unlimitedmaker" last_login="Unset" date="Friday, 30 August 2013 05:42PM NZST" password="0cc175b9c0f1b6a831c399e269772661" email="Unset!">
+</player>
+<player name="creator" rights="creator" last_login="Unset" date="Monday, 21 October 2013 11:50AM NZDT" password="4a8a08f09d37b73795649038408b5f33" email="Unset!">
+</player>
 <player name="maker" rights="maker" last_login="Friday, 18 October 2013 11:45AM NZDT" date="Friday, 18 October 2013 11:05AM NZDT" password="6f8f57715090da2632453988d9a1501b" email="Unset!">
 </player>
 <player name="martin" rights="unlimitedmaker" last_login="Unset" date="Friday, 30 August 2013 05:42PM NZST" password="6f8f57715090da2632453988d9a1501b" email="Unset!">
-</player>
-<player name="lisa" rights="creator" last_login="Monday, 21 October 2013 01:10PM NZDT" date="Monday, 09 September 2013 09:49AM NZST" password="2db95e8e1a9267b7a1188556b2013b33" email="Unset!">
-</player>
-<player name="umaker" rights="unlimitedmaker" last_login="Friday, 18 October 2013 11:07AM NZDT" date="Friday, 18 October 2013 11:06AM NZDT" password="7b774effe4a349c6dd82ad4f4f21d34c" email="Unset!">
-</player>
-<player name="ing" rights="creator" last_login="Monday, 09. September 2013 09:43AM" date="Monday, 09 September 2013 09:49AM NZST" password="865c0c0b4ab0e063e5caa3387c1a8741" email="Unset!">
-</player>
-<player name="anne" rights="unlimitedmaker" last_login="Unset" date="Friday, 30 August 2013 05:42PM NZST" password="0cc175b9c0f1b6a831c399e269772661" email="Unset!">
 </player>
 </players>

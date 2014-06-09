@@ -26,8 +26,8 @@ Modified by: Corey, Heath, Karena 24/08/2011 - Added media tagging to function s
                                              - Added media tagging set the tags to self.tags in AudioThing and VideoThing 
              Heath, Karena, Corey 26/08/2011 - Added retrieving tags from form when avatar uploaded so tags can now be added when media
                                                 is uploaded.                                      
-Modified by: Daniel Han 26/06/2012		- Modified Player part inside AdminRealm
-Modified by: Daniel Han 29/06/2012		- ADDed SU rights for Admin/Edit access. (inside AdminRealm)
+Modified by: Daniel Han 26/06/2012        - Modified Player part inside AdminRealm
+Modified by: Daniel Han 29/06/2012        - ADDed SU rights for Admin/Edit access. (inside AdminRealm)
 Modified by: Daniel Han 29/08/2012      - Added /Admin/Home and /Admin/Stages. so when user logged in, home and stages are linked to /Admin/Stages
                                         - Also, when user is not logged in, it will show it just as if user is in normal home or stages page.
 Modified by: Daniel Han 11/09/2012      - Added Edit/Player and Edit/Stages
@@ -47,6 +47,7 @@ Modified by: Nitkalya Wiriyanuparb  29/09/2013  - Added try-catch when replacing
 Modified by: Nitkalya Wiriyanuparb  04/10/2013  - Used pymad to get audio duration when uploading a new file (clients stream from server; don't know duration right away)
 Modified by: Lisa Helm and Vanessa Henderson (17/10/2013) changed user permissions to fit with new scheme
 Modified by: Lisa Helm (24/10/2013) - audio uploads now check their name and rename another media item exists with the same name 
+Modified by: Vanessa Henderson (25/05/2014) - Changed to allow player to edit their profile details
 """
 
 
@@ -72,7 +73,7 @@ from upstage.pages import  AdminLoginPage, AdminBase, errorpage, Workshop, HomeP
                            MediaUploadPage, MediaEditPage, CreateDir, \
                            NewPlayer, EditPlayer, NewAvatar, NewProp, NewBackdrop, NewAudio,     \
                            ThingsList, StagePage, UserPage, PlayerPage, PageEditPage, HomeEditPage, WorkshopEditPage, SessionCheckPage, successpage,\
-                           PlayerEditPage, StagesEditPage, SignupEditPage, AdminError
+                           PlayerEditPage, StagesEditPage, SignupEditPage, AdminError, UserPlayerPage
 
 #twisted
 from twisted.python import log
@@ -94,7 +95,7 @@ class NoCacheFile(static.File):
     """A file that tries not to be cached."""
     def render(self, request):
         """Set anti-cache headers before returning contents.""" 
-        no_cache(request)	
+        no_cache(request)    
         return static.File.render(self, request)
 
 # handle cached static.File: http://twistedmatrix.com/documents/8.1.0/api/twisted.web.static.File.html 
@@ -201,7 +202,7 @@ def _getWebsiteTree(data):
     # Shaun Narayan (02/01/10) - Added home and signup pages to docroot.
     docroot.putChild('home', HomePage(data))
     docroot.putChild('signup', SignUpPage())
- 	# Daniel Han (03/07/2012) - Added this session page.
+     # Daniel Han (03/07/2012) - Added this session page.
     docroot.putChild('session', SessionCheckPage(data.players))
     # pluck speech directory out of stages
     docroot.putChild(config.SPEECH_SUBURL, data.stages.speech_server)
@@ -214,80 +215,84 @@ def _getWebsiteTree(data):
 
 #XXX update to new guard? (or bespoke?)
 class AdminRealm:
-	"""The authentication part
-	All comes together here.
-	See twisted docs to try to understand.
-	Newer guard is different: http://twistedmatrix.com/documents/howto/guardindepth
-	"""
+    """The authentication part
+    All comes together here.
+    See twisted docs to try to understand.
+    Newer guard is different: http://twistedmatrix.com/documents/howto/guardindepth
+    """
 
-	__implements__ = IRealm
+    __implements__ = IRealm
 
-	def __init__(self, data):
-		self.data = data
+    def __init__(self, data):
+        self.data = data
 
 
-	def requestAvatar(self, username, mind, *interfaces):
-		"""Put together a web tree based on player admin permissions
-		@param username: username of player
-		@param mind: ignored
-		@param interfaces: interfaces
-		"""
+    def requestAvatar(self, username, mind, *interfaces):
+        """Put together a web tree based on player admin permissions
+        @param username: username of player
+        @param mind: ignored
+        @param interfaces: interfaces
+        """
 
-		if IResource not in interfaces:
-			raise NotImplementedError("WTF, tried non-web login")
-		player = self.data.players.getPlayer(username)
+        if IResource not in interfaces:
+            raise NotImplementedError("WTF, tried non-web login")
+        player = self.data.players.getPlayer(username)
 
-		self.data.players.update_last_login(player)		
+        self.data.players.update_last_login(player)        
 
-		if player.can_make(): 
-			tree = Workshop(player, self.data)
-			#Shaun Narayan (02/16/10) - Removed all previous new/edit pages and inserted workshop pages.
-			workshop_pages = {'stage' : (StageEditPage, self.data),
-							  'mediaupload' : (MediaUploadPage, self.data),
-							  'mediaedit' : (MediaEditPage, self.data),
-							  'user' : (UserPage, self.data),
-							  'newplayer' : (NewPlayer, self.data),
-							  'editplayers' : (EditPlayer, self.data)
-							  }
+        if player.can_make(): 
+            tree = Workshop(player, self.data)
+            #Shaun Narayan (02/16/10) - Removed all previous new/edit pages and inserted workshop pages.
+            workshop_pages = {'stage' : (StageEditPage, self.data),
+                              'mediaupload' : (MediaUploadPage, self.data),
+                              'mediaedit' : (MediaEditPage, self.data),
+                              'user' : (UserPage, self.data),
+                              'newplayer' : (NewPlayer, self.data),
+                              'editplayers' : (EditPlayer, self.data)
+                              }
 
-			""" Admin Only  - Password Page """      
+            """ Admin Only  - Password Page """      
             
-			# AC 01.06.08 - Allows admin only to change only their own password.
-			# Super Admin can change any players details.
-			# NR 03.04.10 - Deprecated due to all users being given access to the User Page and its
-			# password changer.       
-			# Assign the new and edit pages to the website tree         
-			tree.putChild('workshop', CreateDir(player, workshop_pages))
-			tree.putChild('save_thing', SwfConversionWrapper(self.data.mediatypes, player, self.data.stages))
-			#Lisa 21/08/2013 - removed video avatar code
-			# PQ & EB Added 12.10.07
-			tree.putChild('save_audio', AudioFileProcessor(self.data.mediatypes, player, self.data.stages))
-			tree.putChild('id', SessionID(player, self.data.clients))
-			# This is the test sound file for testing avatar voices in workshop - NOT for the audio widget
-			tree.putChild('test.mp3', SpeechTest(self.data.stages.speech_server))
+            # AC 01.06.08 - Allows admin only to change only their own password.
+            # Super Admin can change any players details.
+            # NR 03.04.10 - Deprecated due to all users being given access to the User Page and its
+            # password changer.       
+            # Assign the new and edit pages to the website tree         
+            tree.putChild('workshop', CreateDir(player, workshop_pages))
+            tree.putChild('save_thing', SwfConversionWrapper(self.data.mediatypes, player, self.data.stages))
+            #Lisa 21/08/2013 - removed video avatar code
+            # PQ & EB Added 12.10.07
+            tree.putChild('save_audio', AudioFileProcessor(self.data.mediatypes, player, self.data.stages))
+            tree.putChild('id', SessionID(player, self.data.clients))
+            # This is the test sound file for testing avatar voices in workshop - NOT for the audio widget
+            tree.putChild('test.mp3', SpeechTest(self.data.stages.speech_server))
 
-			if player.can_admin():
-				edit_pages = {'home' : (HomeEditPage, self.data),
-							  'workshop' : (WorkshopEditPage, self.data),
+            if player.can_admin():
+                edit_pages = {'home' : (HomeEditPage, self.data),
+                              'workshop' : (WorkshopEditPage, self.data),
                               'player' : (PlayerEditPage, self.data),
                               'stages' : (StagesEditPage, self.data),
                               'signup' : (SignupEditPage, self.data)}
-				tree.putChild('edit', PageEditPage(player, edit_pages))
+                tree.putChild('edit', PageEditPage(player, edit_pages))
                 
 
-		# player, but not admin.
-		elif player.is_player():
-		# Daniel modified 27/06/2012
-			tree = PlayerPage(player, self.data)	    
-			tree.putChild('id', SessionID(player, self.data.clients))
-		# anon - the audience.
-		else:
-			tree = AdminLoginPage(player)
-			tree.putChild('id', SessionID(player, self.data.clients))
+        # player, but not admin.
+        elif player.is_player():
+        # Daniel modified 27/06/2012
+            tree = PlayerPage(player, self.data)
+            workshop_pages = {
+                              'user' : (UserPlayerPage, self.data)
+                              }
+            tree.putChild('workshop', CreateDir(player, workshop_pages))
+            tree.putChild('id', SessionID(player, self.data.clients))
+        # anon - the audience.
+        else:
+            tree = AdminLoginPage(player)
+            tree.putChild('id', SessionID(player, self.data.clients))
         
-		tree.putChild('home', HomePage(self.data, player))
-		tree.putChild('stages', ThingsList(player, childClass=StagePage, collection=self.data)) 
-		return (IResource, tree, lambda : None)
+        tree.putChild('home', HomePage(self.data, player))
+        tree.putChild('stages', ThingsList(player, childClass=StagePage, collection=self.data)) 
+        return (IResource, tree, lambda : None)
 
 
 #XXX remove references to woven.guard. sometime.
@@ -748,7 +753,7 @@ class SwfConversionWrapper(Resource):
         """Catch results of the process.  If it seems to have worked,
         register the new thing."""
         if exitcode:
-	    #request.write(exitcode)
+        #request.write(exitcode)
             return self.failure_upload(exitcode, swf, thumbnail, form, request)
 
         # if the name is in use, mangle it until it is not.

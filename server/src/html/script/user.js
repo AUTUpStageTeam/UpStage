@@ -17,7 +17,8 @@
  * Nitkalya             17/10/2013 - Popup message box, and redirect to appropriate page
  * Nitkalya             17/10/2013 - Pressing enter when editing own details or creating a new player will submit
  * Lisa Helm and Vanessa Henderson (17/10/2013) changed user permissions to fit with new scheme
- Modified by: Lisa Helm and Vanessa Henderson (18/10/2013) stopped 'admin' level players from creating or editing 'creator' level players
+ * Modified by: Lisa Helm and Vanessa Henderson (18/10/2013) stopped 'admin' level players from creating or editing 'creator' level players
+ * James Williams 		29/05/2014 - Removed function initEventsNewUser() as it was causing multiple pop-up messages
  */
 
 /**
@@ -80,17 +81,6 @@ function initEventsEditUser()
 {
 	enterPressed(document.getElementById('password2'), updatePass);
 	enterPressed(document.getElementById('email'), updateEmail);
-}
-
-
-/**
- * Set up onkeydown events for pass/email input boxes
- * on new user page
- */
-function initEventsNewUser()
-{
-	enterPressed(document.getElementById('password2'), savePlayer);
-	enterPressed(document.getElementById('email'), savePlayer);
 }
 
 function toUser()

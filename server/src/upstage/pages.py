@@ -110,6 +110,7 @@ Modified by: Lisa Helm 02/10/2013  - added funtionality to stageeditpage to allo
 Modified by: Nitkalya Wiriyanuparb  15/10/2013  - Redesigned editplayer page; used a more compact table layout and showed all players
 Modified by: Lisa Helm and Vanessa Henderson (17/10/2013) changed user permissions to fit with new scheme
 Modified by: Lisa Helm and Vanessa Henderson (18/10/2013) fixed stage lock, made it work with new permissions
+Modified by: Vanessa Henderson (25/05/2014) - Changed to allow player to edit their own profiles
 modified by: Nikos Phillips (26/05/2014)    -modified def 'render' in class 'StageEditPage' to check if media is being unassigned or player permission levels are being changed so that the stage is only cleared while saving if its needed.
 """
 
@@ -2228,7 +2229,7 @@ class UserPage(AdminBase):
     
     def render(self, request):
         """if given arguments, refer to the collection"""
-        
+
         def _value(x):
             return form.get(x, [None])[0]
         
@@ -2282,7 +2283,73 @@ class UserPage(AdminBase):
     def text_is_superuser(self, request):
         if(self.player):
             return str(self.player.can_admin())
+
+    def allows_player(self, x):      
+        return self.player.can_make()
+"""
+
+Renders a userpage for a player
+
+"""
+class UserPlayerPage(AdminBase):
+    """ The HTML page that contains code for changing the user's password and email. """
+    filename = "playeruser.xhtml"
+    parent_template="playeruser.xhtml"
+    
+    def __init__(self, player, collection):
+        AdminBase.__init__(self, player, collection)
+    
+    def render(self, request):
+        """if given arguments, refer to the collection"""
+
+        def _value(x):
+            return form.get(x, [None])[0]
         
+        form = request.args
+        
+        submit = _value('submit')
+
+        if form:
+            if submit == 'savepassword':                   
+                try:
+                   self.collection.players.update_player(form, self.player, True)
+                except UpstageError, e:
+                    request.redirect(errorpage(request, str(e), 'user'))
+                
+            elif submit == 'saveemail':
+                try:
+                    self.collection.players.update_email(request.args, self.player)
+                except UpstageError, e:
+                    request.redirect(errorpage(request, str(e), 'user'))
+                    
+        return AdminBase.render(self, request)
+            
+    def text_user(self, request):
+        if (self.player):
+            return self.player.name
+        
+    def text_date(self, request):
+        if (self.player):
+            return self.player.date
+        
+    def text_email(self, request):
+        if(self.player):
+            return self.player.email
+    
+    def text_permission(self, request):
+        if(self.player):
+            if(self.player.is_player()):
+                return 'Player'
+            else:
+                return ''
+        
+    def text_is_superuser(self, request):
+        if(self.player):
+            return str(self.player.can_admin())
+
+    def allows_player(self, x):      
+        return self.player.is_player() 
+
 class StageLog(Resource):
     """Show a plain text version of a stage's chat log"""
     def __init__(self, stage):

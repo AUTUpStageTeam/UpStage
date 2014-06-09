@@ -30,6 +30,7 @@ Modified by: Daniel Han (24/08/2012) - Check if username is available and if not
 Modified by: Nitkalya Wiriyanuparb  02/10/2013  - Throw an error when username is blank or not alphanumeric (creating new users)
 Modified by: Nitkalya Wiriyanuparb  15/10/2013  - Changed player date format to be more consistent
 Modified by: Lisa Helm and Vanessa Henderson (17/10/2013) changed user permissions to fit with new scheme - redefined permissions levels to creator, admin, unlimitedmaker, maker and player
+Modified by: Vanessa Henderson (25/05/2014) - Changed to allow player to edit their own profile information
 """
 
 import md5, os
@@ -430,9 +431,8 @@ class PlayerDict(Xml2Dict):
         
         if newpass != newpass2:
             raise UpstageError('Password did not match!')
-        
-        if player.can_make():
-            self[user].set_password(newpass)
+
+        self[user].set_password(newpass)
             
         self.save()      
         
@@ -493,9 +493,7 @@ class PlayerDict(Xml2Dict):
             self[user].set_email(email)
             
             if 'password' and 'password2' in form:
-                self.update_password(form, player)
-                
-        
+                self.update_password(form, player) 
         self.save()
         
     def delete_player(self, form):

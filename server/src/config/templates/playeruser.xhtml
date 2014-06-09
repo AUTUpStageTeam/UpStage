@@ -1,0 +1,58 @@
+<!include no_menu_master_a.inc>
+<script type ="text/javascript">document.title="UpStage player details";</script>
+<div id="editplayer">
+    <form name="nick" action="%(req:path)s" >
+        <input type="hidden" id="username" name="username" size="16" value="%(user)s" />
+        <input type="hidden" name="is_superuser" size="16" value="%(is_superuser)s" />
+
+        <h2>Details for %(user)s:</h2>
+
+        <table>
+            <tr>
+                <td><b>&nbsp;&nbsp;You've been with us since:&nbsp;&nbsp;</b></td>
+                <td><i>&nbsp;&nbsp;%(date)s&nbsp;&nbsp;</i></td>
+            </tr>
+            <tr>
+                <td><b>&nbsp;&nbsp;Your current contact email is:&nbsp;&nbsp;</b></td>
+                <td><i>&nbsp;&nbsp;%(email)s&nbsp;&nbsp;</i></td>
+            </tr>
+            <tr>
+                <td><b>&nbsp;&nbsp;Your user permission level is:&nbsp;&nbsp;</b></td>
+                <td><i>&nbsp;&nbsp;%(permission)s&nbsp;&nbsp;</i></td>
+            </tr>
+        </table>
+        <div id="linebreak"></div>
+
+        <br /><br />
+        <h1>Change Password:</h1>
+
+<table>
+	<tr>
+		<td><b>&nbsp;&nbsp;New Password:&nbsp;&nbsp;</b></td>
+		<td>&nbsp;&nbsp;<input type="password" name="password" id="password" size="16" />&nbsp;&nbsp;</td>
+	</tr>
+	<tr>
+		<td><b>&nbsp;&nbsp;Confirm Password:&nbsp;&nbsp;</b></td>
+		<td>&nbsp;&nbsp;<input type="password" name="password2" id="password2" size="16" />&nbsp;&nbsp;</td>
+	</tr>
+	<tr>
+		<td><input type="button" onclick="javascript:updatePass();" value="Save Password"></td>
+	</tr>
+</table>
+<br />
+<h1>Change email:</h1>
+
+<table>
+	<tr>
+		<td><b>&nbsp;&nbsp;New email:&nbsp;&nbsp;</b></td>
+		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="email" id="email" size="16" />&nbsp;&nbsp;</td>
+	</tr>
+	<tr>
+		<td><input type="button" onclick="javascript:updateEmail();" value="Save Email"></td>
+	</tr>
+</table>
+  <div id="linebreak"></div>
+  <br />
+</form>
+</div>
+<!include master_b.inc>

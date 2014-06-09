@@ -637,7 +637,7 @@ class upstage.model.ModelAvatars implements TransportInterface
 		drawAvatarMenuItem.separatorBefore = true;
 
         // Mute/Unmute streaming avatar - Ing - 28/8/13
-        if (av.isStream) {
+         if (av.isStream) {
             var toggleLocalAudioMenuItem:ContextMenuItem = new ContextMenuItem("Toggle Mute/Unmute Locally", function(){
                 av.isMutedLocally = !av.isMutedLocally;
                 av.setVolumeAccordingToLocalMuteStatus();
@@ -655,6 +655,7 @@ class upstage.model.ModelAvatars implements TransportInterface
             rotateAvatarRightMenuItem.separatorBefore = true;
             myMenu.customItems.push(toggleLocalAudioMenuItem, toggleGlobalAudioMenuItem);
 
+        
         } else {
             // can only rotate normal avatars
             myMenu.customItems.push(rotateAvatarRightMenuItem, rotateAvatarLeftMenuItem);
