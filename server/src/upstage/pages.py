@@ -111,6 +111,7 @@ Modified by: Nitkalya Wiriyanuparb  15/10/2013  - Redesigned editplayer page; us
 Modified by: Lisa Helm and Vanessa Henderson (17/10/2013) changed user permissions to fit with new scheme
 Modified by: Lisa Helm and Vanessa Henderson (18/10/2013) fixed stage lock, made it work with new permissions
 Modified by: Vanessa Henderson (25/05/2014) - Changed to allow player to edit their own profiles
+modified by: Nikos Phillips (26/05/2014)    -modified def 'render' in class 'StageEditPage' to check if media is being unassigned or player permission levels are being changed so that the stage is only cleared while saving if its needed.
 """
 
 #standard lib
@@ -1082,13 +1083,16 @@ class StageEditPage(Workshop):
             self.message += '<button onclick="javascript:stageChooseSubmit(true); return false;"> Create Stage </button></form>'
         elif action=='save':
             if self.stage:
-                self.stage.update_from_form(form, self.player);
+                needLoad = False
+                if len(self.stage.unassigned) > 0 or self.stage.stageNeedsReload:
+                    needLoad = True
+                self.stage.update_from_form(form, self.player, needLoad);
                 self.message+='Stage saved! '
                 
         #added by Daniel (18/09/2012): Save only
         elif action=='saveonly':
             if self.stage:
-                self.stage.update_from_form(form, self.player, {}, False);
+                self.stage.update_from_form(form, self.player, False, {}, False);
                 self.message+='Stage saved! '
                 self.stage_saved += 'Stage saved! '
         
