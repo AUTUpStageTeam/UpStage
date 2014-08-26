@@ -239,7 +239,9 @@ function savePlayer()
 function deletePlayer()
 {
 	var username = document.getElementById('editplayername').value.trim();
-	requestPage("POST", '/admin/workshop/editplayers?username=' + unescape(username) +
+	var x = comfirm("Do you wish to delete?");
+	if (x == true)
+		requestPage("POST", '/admin/workshop/editplayers?username=' + unescape(username) +
 			'&submit=deleteplayer', toUser);
 }
 
