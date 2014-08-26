@@ -721,7 +721,10 @@ class _UpstageSocket(LineOnlyReceiver):
 
     def handle_DRAW_CLEAR(self, layer=None):
         """clear a layer of drawing"""
-        self.stage.draw_clear_layer(int(layer), self.avatar.ID)
+        if self.drawlayer == 4:
+            self.stage.draw_clear_layer(int(layer), self.avatar.ID)
+        else:
+            self.stage.draw_clear_layer(int(layer))
 
     def handle_DRAW_LAYER(self, layer=None):
         """User want's to use the specified layer"""
