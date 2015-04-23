@@ -1,6 +1,6 @@
 /**
  * Functions used by the user page.
- * 
+ *
  * @author Nicholas Robinson.
  * @history 22/02/10 Initial version created.
  * @note
@@ -8,8 +8,8 @@
  * Changelog:
  * Heath Behrens, Moh - 18-05-2011 - Added a check to see if the password is empty.
  * Daniel, Gavin        24/08/2012 - Removed alert box on toUser so it only gets postback from the server
- * Gavin                29/08/2012 - Made event to close the edit player form 
- * Gavin                13/09/2012 - Added alert for players when they update their password with different inputs 
+ * Gavin                29/08/2012 - Made event to close the edit player form
+ * Gavin                13/09/2012 - Added alert for players when they update their password with different inputs
  * Nitkalya             24/09/2013 - Added email format validation and make sure username and password are not blank when creating new users
  * Nitkalya             02/10/2013 - Added validation to make sure username are alphanumerics only, and changed that weird confirmation message
  * Nitkalya             15/10/2013 - Did not use JS date anymore when creating a new player
@@ -97,14 +97,14 @@ function toUser()
 	    }
         else
         {
-            var html = xmlhttp.responseText;            
+            var html = xmlhttp.responseText;
             var a = html.split('<!-- content_start -->');
             var b = a[1].split('<!-- content_end -->');
             html = b[0];
 
             showAlertBox(html, redirect);
-        }        
-	}    
+        }
+	}
 }
 
 function setAdminLinks()
@@ -127,7 +127,7 @@ function navEditPlayers()
 
 /**
 * Functions used by the Add New Player page.
-* 
+*
 * @author Nicholas Robinson.
 * @history 22/02/10 Initial version created.
 * @note
@@ -139,13 +139,13 @@ function switchPasswordStuff(on)
     var p = document.getElementById("passwordpara");
     var pw = document.getElementById("password");
     var pw2 = document.getElementById("password2");
-    if (on){        
+    if (on){
         p.style.visibility = 'visible';
         p.style.display = 'block';
         pw.disabled = false;
         pw2.disabled = false;
     }
-    else{        
+    else{
         p.style.visibility = 'hidden';
         p.style.display = 'none';
         pw.disabled = true;
@@ -203,14 +203,14 @@ function savePlayer()
 	var unlimitedmaker = stringChecked(document.getElementById('unlimitedmaker').checked, 'unlimitedmaker');
     var maker = stringChecked(document.getElementById('maker').checked, 'maker');
     var creator = stringChecked(document.getElementById('creator').checked, 'creator');
-	
+
 	var hex1 = hex_md5(password);
 	var hex2 = hex_md5(password2);
-	
+
 	if(email == ""){
 		email = "Unset!";
 	}
-	
+
 	requestPage("POST", '/admin/workshop/newplayer?username='+unescape(username) +
 			'&password='+hex1+'&password2='+hex2+'&email='+email+
 			'&player='+player+'&maker='+maker+'&unlimitedmaker='+unlimitedmaker+'&admin='+admin+'&creator='+creator+
@@ -219,7 +219,7 @@ function savePlayer()
 
 /**
 * Functions used by the Edit Players page.
-* 
+*
 * @author Nicholas Robinson.
 * @history 22/02/10 Initial version created.
 * @note
@@ -229,7 +229,7 @@ function savePlayer()
 function deletePlayer()
 {
 	var username = document.getElementById('editplayername').value.trim();
-	var x = comfirm("Do you wish to delete?");
+	var x = confirm("Do you wish to delete?");
 	if (x == true)
 		requestPage("POST", '/admin/workshop/editplayers?username=' + unescape(username) +
 			'&submit=deleteplayer', toUser);
@@ -247,14 +247,14 @@ function updatePlayer()
 
 	var request = '/admin/workshop/editplayers?username='+unescape(username) + '&player='+player+
 		'&maker='+maker+'&unlimitedmaker='+unlimitedmaker+'&admin='+admin+'&creator='+creator;
-	
+
 	// Vibhu Patel (31/08/2011) Check the password fields only if the checkbox is ticked.
 	if(document.getElementById('changepassword').checked)
 	{
 		var password = document.getElementById('password').value.trim();
 		var password2 = document.getElementById('password2').value.trim();
-		
-		if (password != '' && password2 != ''){		
+
+		if (password != '' && password2 != ''){
 			var hex1 = hex_md5(password);
 			var hex2 = hex_md5(password2);
 
@@ -262,7 +262,7 @@ function updatePlayer()
 				alert("Passwords do not match");
 				return false;
 			}
-			
+
 			request += '&password='+hex1+'&password2='+hex2;
 		} else {
 			alert("Password cannot be empty");
@@ -278,7 +278,7 @@ function updatePlayer()
 	}
 
 	request += '&email='+email;
-	
+
 	requestPage("POST", request + '&submit=updateplayer', toUser);
 }
 
@@ -293,8 +293,8 @@ function stringChecked(val, valname)
 	}
 }
 /**
-* Event to close the editing player details form 
-*/   
+* Event to close the editing player details form
+*/
 function closeEdit()
 {
     // Gavin Chan (29/08/2012) Makes the form and components hidden
@@ -323,16 +323,16 @@ function renderPlayer()
 		cType = xmlhttp.getResponseHeader("Content-Type");
 		if(cType == "text/html")
 		{
-            
+
                 var username = (xmlhttp.responseText).split('<name>')[1];
                 var email = (xmlhttp.responseText).split('<email>')[1];
-                var date = (xmlhttp.responseText).split('<date>')[1];                
+                var date = (xmlhttp.responseText).split('<date>')[1];
                 var player = (xmlhttp.responseText).split('<player>')[1];
                 var maker = (xmlhttp.responseText).split('<maker>')[1];
                 var unlimitedmaker = (xmlhttp.responseText).split('<unlimitedmaker>')[1];
                 var admin = (xmlhttp.responseText).split('<admin>')[1];
                 var creator = (xmlhttp.responseText).split('<creator>')[1];
-                
+
                 document.getElementById("editplayername").value = username;
                 document.getElementById("editdate").value = date;
                 document.getElementById("admin").checked = compareBool(admin);
@@ -344,7 +344,7 @@ function renderPlayer()
                 document.getElementById("userdetails").style.display = "inline";
                 document.getElementById("dispplayername").style.display = "inline";
                 document.getElementById("email").value = (email.match(/unset/i)) ? "" : email;
-                
+
                 document.getElementById("admin").disabled=false;
                 document.getElementById("player").disabled=false;
                 document.getElementById("maker").disabled=false;
@@ -353,11 +353,11 @@ function renderPlayer()
                 document.getElementById("changepassword").disabled=false;
                 document.getElementById("deleteplayer").disabled=false;
                 document.getElementById("saveplayer").disabled=false;
-                
+
             if(document.playerpanel.is_creator.value == "True" )
             {
             //I'm a creator editing a creator
-                
+
                 document.getElementById("creator").disabled=false;
                 document.getElementById("edit_player").style.display = "inherit";
                 document.getElementById("no_edit_player").style.display = "none";
@@ -368,7 +368,7 @@ function renderPlayer()
                 document.getElementById("creator").disabled=true;
                 if (compareBool(creator))
                 {
-                //editing a creator                  
+                //editing a creator
                     document.getElementById("admin").disabled=true;
                     document.getElementById("player").disabled=true;
                     document.getElementById("maker").disabled=true;
@@ -380,7 +380,7 @@ function renderPlayer()
                     document.getElementById("saveplayer").disabled=true;
                 }
             }
-            
+
 		}
 		else
 		{
@@ -398,7 +398,7 @@ function setCreator()
     else
     {
         window.onLoad = document.getElementById("creator").disabled=true;
-        
+
     }
 }
 
