@@ -154,7 +154,7 @@ def finalizeSetup():
 	print 'To Create a new server run as root: upstage-admin create'
 	print 'To Start a server run as root: upstage-admin start servername'
 	print 'To See if any servers are active run as root: upstage-admin ls\n'
-	print '												  AUT UpStage Team'
+	print '			        		 AUT UpStage Team'
 	print '\n'
 	print '***************************************************************'
 
