@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 """
-# A very simple script used to install upstage to the appropriate 
-# directories. Ensure that the Server folder is present. 
+# A very simple script used to install upstage to the appropriate
+# directories. Ensure that the Server folder is present.
 # Usage: copy install.py to the directory containing Server folder
-# execute using python install.py 
+# execute using python install.py
 # ensure you are root!
 # To generate a deb file simply type: python install.py deb
 # or if you want to give your package another name: python install.py deb packagename
@@ -49,7 +49,7 @@ def replaceAll(file,searchExp,replaceExp):
 		sys.stdout.write(line)
 
 """
-Compiles the client, Actionscript 3 into swf file. The path to the compiler must be 
+Compiles the client, Actionscript 3 into swf file. The path to the compiler must be
 provided.
 """
 def compile_client(): #compiler_path):
@@ -71,7 +71,7 @@ def compile_client(): #compiler_path):
 
 	os.system('rm -rf ' + temp)
 
-	# using flex - don't know it it still works
+	# using flex - don't know if it still works
 
 	# current_path = os.path.abspath('')
 	# os.system('cp '+current_path+'/client/upstage/org/flex-config.xml '+current_path+'/')
@@ -95,16 +95,16 @@ def parse_control_file():
         for line in f:
             if('Version' in line):
                 version = line.split(':')[1].strip()
-                print version   
+                print version
             if('Package' in line):
-                name = line.split(':')[1].strip();    
+                name = line.split(':')[1].strip();
     return name+'-'+version
 
 """
 Generates a deb file from the source code. The package name
 can be ommitted. In which case it uses the name and version number
 in the control file.
-"""           		
+"""
 def generate_deb(packagename):
     if(not len(packagename)>0):
         packagename = parse_control_file()
@@ -139,7 +139,7 @@ def generate_deb(packagename):
 Cleans up etc.
 """
 def finalizeSetup():
-	print '\n'	
+	print '\n'
 	print 'Finalizing Setup.'
 	print '\n'
 	for call in system_calls:
@@ -147,25 +147,25 @@ def finalizeSetup():
 	print '***************************************************************'
 	print '\n'
 	print 'Thank you for choosing to use UpStage!'
-	print 'Visit upstage.org.nz for more information on UpStage'
+	print 'Visit upstage.org.nz for more information about UpStage'
 	print '\n'
 	print '***************************************************************'
 	print '\n'
 	print 'To Create a new server run as root: upstage-admin create'
 	print 'To Start a server run as root: upstage-admin start servername'
-	print 'To See if any servers are active run as root: upstage-admin ls'
-	print 'AUT UpStage Team (2013)'
+	print 'To See if any servers are active run as root: upstage-admin ls\n'
+	print '												  AUT UpStage Team'
 	print '\n'
 	print '***************************************************************'
 
 """
 Copies files and folders to the installed paths
-"""	
+"""
 def copyFiles(location, noargs):
 	if(noargs):
 		if(os.path.exists(location+'/config')):
 			dir_util.copy_tree(location+'/config', baseDir+'upstage/DEFAULT/config/')
-			print 'Copying Directory: '+location+'/config' + ' -to- '+ baseDir+'upstage/DEFAULT/config/'	
+			print 'Copying Directory: '+location+'/config' + ' -to- '+ baseDir+'upstage/DEFAULT/config/'
 		if(os.path.exists(location+'/html')):
 			dir_util.copy_tree(location+'/html', baseDir+'upstage/DEFAULT/html/')
 			print 'Copying Directory: '+location+'/html' + ' -to- '+ baseDir+'upstage/DEFAULT/html/'
@@ -221,10 +221,10 @@ else:
 	copyFiles(appServerDir, True)
 	finalizeSetup()
 
-		
+
 #print "flex-config.xml created. Please copy the file to <flex compile location><frameworks>"
 
-		#<source-path><path-element>/home/heath/upstage/client/upstage/</path-element></source-path>			
+		#<source-path><path-element>/home/heath/upstage/client/upstage/</path-element></source-path>
 
 #elif (len(sys.argv) == 3):
 #    if(sys.argv[1] == 'deb' and len(sys.argv[2]) >1):
