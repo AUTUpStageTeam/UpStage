@@ -58,7 +58,9 @@ def compile_client(): #compiler_path):
 	os.system('mkdir ' + temp)
 
 	# using mtasc and swfmill - hard code options for now
-	mtasc = 'mtasc -swf ' + temp + '/classes.swf -frame 1 -header 320:200:31 -trace App.debug -version 8 -v -strict -msvc -wimp -cp ' + appClientDir + '/src App.as upstage/Client.as'
+
+	# mtasc = 'mtasc -swf ' + temp + '/classes.swf -frame 1 -header 320:200:31 -trace App.debug -version 8 -v -strict -msvc -wimp -cp ' + appClientDir + '/src App.as upstage/Client.as'
+	mtasc = 'mtasc -v -version 8 -msvc -wimp -strict -frame 1 -header 320:200:30 -trace App.debug -swf temp/classes.swf App.as'
 	print mtasc
 	os.system(mtasc)
 
