@@ -7,7 +7,7 @@ server/src/config/voices/*
 
 # Ant folders
 build/
-temp/
+temp/*
 
 #################
 ## Eclipse
