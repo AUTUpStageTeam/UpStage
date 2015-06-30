@@ -54,13 +54,12 @@ provided.
 """
 def compile_client(): #compiler_path):
 	print "Compiling Client..."
-	temp = appRootDir + '/temp'
+	temp = appRootDir + '/client/src/temp'
 	os.system('mkdir ' + temp)
 
 	# using mtasc and swfmill - hard code options for now
 
-	# mtasc = 'mtasc -swf ' + temp + '/classes.swf -frame 1 -header 320:200:31 -trace App.debug -version 8 -v -strict -msvc -wimp -cp ' + appClientDir + '/src App.as upstage/Client.as'
-	mtasc = 'mtasc -v -version 8 -msvc -wimp -strict -frame 1 -header 320:200:30 -trace App.debug -swf temp/classes.swf App.as'
+	mtasc = 'mtasc -swf ' + temp + '/classes.swf -frame 1 -header 320:200:31 -trace App.debug -version 8 -v -strict -msvc -wimp -cp ' + appClientDir + '/src App.as upstage/Client.as'
 	print mtasc
 	os.system(mtasc)
 
@@ -71,7 +70,7 @@ def compile_client(): #compiler_path):
 	print swfmill
 	os.system(swfmill)
 
-	os.system('rm -rf ' + temp)
+	#os.system('rm -rf ' + temp)
 
 	# using flex - don't know if it still works
 
@@ -156,7 +155,7 @@ def finalizeSetup():
 	print 'To Create a new server run as root: upstage-admin create'
 	print 'To Start a server run as root: upstage-admin start servername'
 	print 'To See if any servers are active run as root: upstage-admin ls\n'
-	print '												  AUT UpStage Team'
+	print '			        		 AUT UpStage Team'
 	print '\n'
 	print '***************************************************************'
 
