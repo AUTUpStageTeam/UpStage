@@ -43,76 +43,76 @@ POLICY_FILE = "<?xml version=\"1.0\"?> \
 
 # AC (22.05.08) - Port for serving policy files
 POLICY_FILE_PORT = 3000
-SWF_PORT 	 = 7230
-WEB_PORT 	 = 8081
-LOG_FILE 	 = 'upstage.log'
-PID_FILE 	 = 'upstage.pid'
-BASE_DIR 	 = '.'
+SWF_PORT = 7230
+WEB_PORT = 8081
+LOG_FILE = 'upstage.log'
+PID_FILE = 'upstage.pid'
+BASE_DIR = '.'
 
 # Declare constants for directories
 ## @brief HTDOCS base html directory name
-HTDOCS     = 'html'
+HTDOCS = 'html'
 CONFIG_DIR = 'config'
 
 #URL paths for various bits. #
 #XXX some of these relate to stuff in web.py
 
-AUDIO_PATH     = 'audio/'   # PQ & EB: 13/10/07 - Used solely for deleting audio
-SWF_URL        = '/swf/'
-MEDIA_URL      = '/media/'
-OLD_MEDIA_URL  = '/oldmedia/'
+AUDIO_PATH = 'audio/'   # PQ & EB: 13/10/07 - Used solely for deleting audio
+SWF_URL = '/swf/'
+MEDIA_URL = '/media/'
+OLD_MEDIA_URL = '/oldmedia/'
 THUMBNAILS_URL = '/media/thumb/'
-SPEECH_URL     = '/speech/'
+SPEECH_URL = '/speech/'
 # PQ & EB: Added AUDIO_URL - 17.9.07 & PQ & EB: Edited 13/10/07
 AUDIO_URL = MEDIA_URL + AUDIO_PATH
 #MISSING_THUMB_URL = '/missing.png'
 #Lisa 21/08/2013 - removed video avatar code
-MISSING_THUMB_URL  = '/image/icon/icon-warning-sign.png'
+MISSING_THUMB_URL = '/image/icon/icon-warning-sign.png'
 MISSING_THUMB_ICON = 'icon-warning-sign'
 
-MEDIA_SUBURL     = MEDIA_URL.strip('/')
+MEDIA_SUBURL = MEDIA_URL.strip('/')
 OLD_MEDIA_SUBURL = OLD_MEDIA_URL.strip('/')
-SWF_SUBURL       = SWF_URL.strip('/')
-SPEECH_SUBURL    = SPEECH_URL.strip('/')
-AUDIO_SUBURL     = AUDIO_URL.strip('/') #PQ & EB: Added 17.9.07
+SWF_SUBURL  = SWF_URL.strip('/')
+SPEECH_SUBURL = SPEECH_URL.strip('/')
+AUDIO_SUBURL = AUDIO_URL.strip('/') #PQ & EB: Added 17.9.07
 
 # PQ & EB Added 13.10.07
 # Paths to music and sfx thumbnail images for the workshop to display
 MUSIC_ICON_IMAGE_URL = '/image/icon/icon-music.png'
-SFX_ICON_IMAGE_URL   = '/image/icon/icon-bullhorn.png'
+SFX_ICON_IMAGE_URL = '/image/icon/icon-bullhorn.png'
 
 # icon styles for music and sfx thumbnails
 MUSIC_ICON = 'icon-music' #Martins
-SFX_ICON   = 'icon-bullhorn' #Martins
+SFX_ICON = 'icon-bullhorn' #Martins
 
 # file system paths
 # these relate to the above url paths
-MEDIA_DIR      = _join(HTDOCS, MEDIA_SUBURL)
-OLD_MEDIA_DIR  = _join(HTDOCS, OLD_MEDIA_SUBURL)
+MEDIA_DIR = _join(HTDOCS, MEDIA_SUBURL)
+OLD_MEDIA_DIR = _join(HTDOCS, OLD_MEDIA_SUBURL)
 THUMBNAILS_DIR = _join(HTDOCS, MEDIA_SUBURL, 'thumb')
 
 #Lisa 21/08/2013 - removed video avatar code
-SWF_DIR      = _join(HTDOCS, SWF_SUBURL)
-ADMIN_DIR    = _join(HTDOCS, 'admin')
-PLAYER_DIR   = _join(HTDOCS, 'admin', 'player')
-SPEECH_DIR   = _join(HTDOCS, SPEECH_SUBURL)
-AUDIO_DIR    = _join(HTDOCS, AUDIO_SUBURL)
+SWF_DIR = _join(HTDOCS, SWF_SUBURL)
+ADMIN_DIR = _join(HTDOCS, 'admin')
+PLAYER_DIR = _join(HTDOCS, 'admin', 'player')
+SPEECH_DIR = _join(HTDOCS, SPEECH_SUBURL)
+AUDIO_DIR = _join(HTDOCS, AUDIO_SUBURL)
 TEMPLATE_DIR = _join(CONFIG_DIR, 'templates')
-STAGE_DIR    = _join(CONFIG_DIR, 'stages')
+STAGE_DIR = _join(CONFIG_DIR, 'stages')
 
 #XML config files
-PLAYERS_XML   = _join(CONFIG_DIR, 'players.xml')
-STAGES_XML    = _join(CONFIG_DIR, 'stages.xml')
-AVATARS_XML   = _join(CONFIG_DIR, 'avatars.xml')
-PROPS_XML     = _join(CONFIG_DIR, 'props.xml')
+PLAYERS_XML = _join(CONFIG_DIR, 'players.xml')
+STAGES_XML = _join(CONFIG_DIR, 'stages.xml')
+AVATARS_XML = _join(CONFIG_DIR, 'avatars.xml')
+PROPS_XML = _join(CONFIG_DIR, 'props.xml')
 BACKDROPS_XML = _join(CONFIG_DIR, 'backdrops.xml')
-AUDIOS_XML    = _join(CONFIG_DIR, 'audios.xml') # PQ & EB: 17.9.07
+AUDIOS_XML = _join(CONFIG_DIR, 'audios.xml') # PQ & EB: 17.9.07
 
 VOICE_SCRIPT_DIR = _join(CONFIG_DIR, 'voices')
 
 #should deleted media be saved in case it is wanted later?
 #(will be saved in OLD_MEDIA_DIR, abouve
-SAVE_DELETED_MEDIA=True
+SAVE_DELETED_MEDIA = True
 
 # how many drawing layers (has to match client, where UI is the restraint)
 DRAW_LAYERS = 5
@@ -136,7 +136,7 @@ UTTERANCE_WRAP = 999999
 
 #thing ids need to have a 'zero' which is guaranteed not to be any thing's id
 THING_NULL_ID = 0
-THING_MIN_ID  = 1
+THING_MIN_ID = 1
 
 LOG_ROTATE_SIZE = 1024 * 1024
 
@@ -160,9 +160,9 @@ SESSION_LIFETIME = 12*3600
 ## @brief NUL constant - you really don't want to change this!
 NUL=chr(0)
 
-CHECK_THUMB_SANITY=False
+CHECK_THUMB_SANITY = False
 
-REGENERATE_VOICE_SCRIPTS=True
+REGENERATE_VOICE_SCRIPTS = True
 
 """ Alan (13/09/07) ==> Constants used for upload size limits """
 ADMIN_SIZE_LIMIT = 1000000
