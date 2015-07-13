@@ -336,12 +336,10 @@ function parseURLs(sMessage:String):String
 /**
  * @brief Create the URL for the message
  */
-function buildURL(sLink:String):String
-{
+function buildURL(sLink:String):String {
 	//if there is no http:// in the message, just www...
-	if (sLink.indexOf("http://") == -1)
-	{
-		//add http:// to the front of the message
+	trace(sLink);
+	if (sLink.indexOf("http://") == -1 && sLink.indexOf("https://") == -1){
 		sLink = "http://" + sLink;
 	}
 	//Create the URL and return it to parseURLs
