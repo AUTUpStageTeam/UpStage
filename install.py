@@ -1,23 +1,23 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 """
-# A very simple script used to install upstage to the appropriate
-# directories. Ensure that the Server folder is present.
-# Usage: copy install.py to the directory containing Server folder
-# execute using python install.py
-# ensure you are root!
-# To generate a deb file simply type: python install.py deb
-# or if you want to give your package another name: python install.py deb packagename
-# @author: Heath Behrens (AUT UpStage Team)
-# Changelog: Created on 09-April-2011
-# Modified: 11/04/2011 - Added function to parse_control_file so deb can now be generated
-# without the user naming the package
-# -Added compiling of the client, generates the flex-config file (needs some work though)
-# -Fixed silly bug with permissions. Added more descriptive comments to the functions.
-# -Added removal of .svn directories which do not play nicely with the script for now. Also added changing of permissions for deb files.
-# -Completed the compiling of the client which now works. Usage is: python install.py cc /path/to/flex
-#
-# Modified by Nitkalya Wiriyanuparb: 22/10/2013 - Used mtasc and swfmill instead of flex, adjusted folder structure, change svn to git
+ A very simple script used to install upstage to the appropriate
+ directories. Ensure that the Server folder is present.
+ Usage: copy install.py to the directory containing Server folder
+ execute using python install.py
+ ensure you are root!
+ To generate a deb file simply type: python install.py deb
+ or if you want to give your package another name: python install.py deb packagename
+ @author: Heath Behrens (AUT UpStage Team)
+ Changelog: Created on 09-April-2011
+ Modified: 11/04/2011 - Added function to parse_control_file so deb can now be generated
+ without the user naming the package
+ -Added compiling of the client, generates the flex-config file (needs some work though)
+ -Fixed silly bug with permissions. Added more descriptive comments to the functions.
+ -Added removal of .svn directories which do not play nicely with the script for now. Also added changing of permissions for deb files.
+ -Completed the compiling of the client which now works. Usage is: python install.py cc /path/to/flex
+
+ Modified by Nitkalya Wiriyanuparb: 22/10/2013 - Used mtasc and swfmill instead of flex, adjusted folder structure, change svn to git
 """
 
 import os
