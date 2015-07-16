@@ -202,7 +202,7 @@ if(len(sys.argv) >= 2):
     # print 'sudo python install.py'
     elif(sys.argv[1] == 'deb' and len(sys.argv) > 2):
 	print "Changing permissions for install scripts."
-	os.system('chmod 755 '+appServerDir+'/DEBIAN/*')
+ 	os.system('chmod 755 '+appServerDir+'/DEBIAN/*')
 	generate_deb(sys.argv[2])
     elif(sys.argv[1] == 'deb'):
 	print "Changing permissions for install scripts."
