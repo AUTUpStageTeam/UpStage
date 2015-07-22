@@ -22,16 +22,16 @@
 
 import os
 import sys
-from distutils import dir_util
-from distutils import file_util
-import shutil
-import tarfile
-import fileinput
+#from distutils import dir_util
+#from distutils import file_util
+#import shutil
+#import tarfile
+#import fileinput
 
-baseDir = '/usr/local/share/'
-serverDir = '/usr/local/'
-config_path = '/usr/local/etc/'
-backup_location = '/etc/cron.weekly/'
+# baseDir = '/usr/local/share/'
+# serverDir = '/usr/local/'
+# config_path = '/usr/local/etc/'
+# backup_location = '/etc/cron.weekly/'
 appCanonicalPath = os.getcwd()
 #appRootDir = os.path.abspath('.').replace(" ", "\ ")
 #appServerDir = os.path.abspath('./server/src').replace(" ", "\ ")
@@ -39,21 +39,21 @@ appServerDir = appCanonicalPath + '/server/src'
 #appClientDir = os.path.abspath('./client').replace(" ", "\ ")
 appClientDir = appCanonicalPath + '/client/src'
 #control_file_location = appRootDir+'/DEBIAN/control'
-system_calls = ['chmod +x /usr/local/upstage/*',
-                'chmod +x /etc/cron.weekly/upstage-backup',
-                'ln -s /usr/local/upstage/* /usr/local/bin/',
-                'ln -s /etc/cron.weekly/upstage-backup /usr/local/bin/']
-server_files = ['chownme.sh','img2swf.py','speaker.py','upstage-admin',
-                'upstage-admin.conf','upstage-backup','upstage-server']
+# system_calls = ['chmod +x /usr/local/upstage/*',
+#                 'chmod +x /etc/cron.weekly/upstage-backup',
+#                 'ln -s /usr/local/upstage/* /usr/local/bin/',
+#                 'ln -s /etc/cron.weekly/upstage-backup /usr/local/bin/']
+# server_files = ['chownme.sh','img2swf.py','speaker.py','upstage-admin',
+#                 'upstage-admin.conf','upstage-backup','upstage-server']
 
-"""
-Replaces a line of text with another line of text in a file. Just a simple helper method.
-"""
-def replaceAll(file,searchExp,replaceExp):
-    for line in fileinput.input(file, inplace=1):
-	if searchExp in line:
-            line = line.replace(searchExp,replaceExp)
-	    sys.stdout.write(line)
+# """
+# Replaces a line of text with another line of text in a file. Just a simple helper method.
+# """
+# def replaceAll(file,searchExp,replaceExp):
+#     for line in fileinput.input(file, inplace=1):
+# 	if searchExp in line:
+#             line = line.replace(searchExp,replaceExp)
+# 	    sys.stdout.write(line)
 
 """
 Compiles the client, Actionscript 3 into swf file. The path to the compiler must be
@@ -159,32 +159,32 @@ def finalizeSetup():
     print '\n'
     print '***************************************************************'
 
-"""
-Copies files and folders to the installed paths
-"""
-def copyFiles(location, noargs):
-    if(noargs):
-        if(os.path.exists(location+'/config')):
-            dir_util.copy_tree(location+'/config', baseDir+'upstage/DEFAULT/config/')
-	    print 'Copying Directory: '+location+'/config' + ' -to- '+ baseDir+'upstage/DEFAULT/config/'
-	if(os.path.exists(location+'/html')):
-	    dir_util.copy_tree(location+'/html', baseDir+'upstage/DEFAULT/html/')
-	    print 'Copying Directory: '+location+'/html' + ' -to- '+ baseDir+'upstage/DEFAULT/html/'
-	if(os.path.exists(location+'/upstage'))	:
-	    dir_util.copy_tree(location+'/upstage', serverDir+'upstage/upstage/')
-	    print 'Copying Directory: '+location+'/upstage' + ' -to- '+ serverDir+'upstage/upstage/'
-	for file in server_files:
-	    if(file == 'upstage-admin.conf'):
-		if(not os.path.exists(config_path+'upstage/')):
-	            print 'Creating: '+config_path+'upstage/'
-		    os.makedirs(config_path+'upstage/')
-		    file_util.copy_file(location+'/'+file, config_path+'upstage/'+file)
-		    print 'Copied: '+location+'/'+file+ ' -to- '+ config_path+'upstage/'+file
-		if(file == 'upstage-backup'):
-		    file_util.copy_file(location+'/'+file, backup_location+file)
-		    print 'copied: '+ location+'/'+file+' -to- '+ backup_location+file
-		    shutil.copyfile(location+'/'+file, serverDir+'upstage/'+file)
-		    print 'copied: '+ location+'/'+file+' -to- '+ serverDir+'upstage/'+file                    
+# """
+# Copies files and folders to the installed paths
+# """
+# def copyFiles(location, noargs):
+#     if(noargs):
+#         if(os.path.exists(location+'/config')):
+#             dir_util.copy_tree(location+'/config', baseDir+'upstage/DEFAULT/config/')
+# 	    print 'Copying Directory: '+location+'/config' + ' -to- '+ baseDir+'upstage/DEFAULT/config/'
+# 	if(os.path.exists(location+'/html')):
+# 	    dir_util.copy_tree(location+'/html', baseDir+'upstage/DEFAULT/html/')
+# 	    print 'Copying Directory: '+location+'/html' + ' -to- '+ baseDir+'upstage/DEFAULT/html/'
+# 	if(os.path.exists(location+'/upstage'))	:
+# 	    dir_util.copy_tree(location+'/upstage', serverDir+'upstage/upstage/')
+# 	    print 'Copying Directory: '+location+'/upstage' + ' -to- '+ serverDir+'upstage/upstage/'
+# 	for file in server_files:
+# 	    if(file == 'upstage-admin.conf'):
+# 		if(not os.path.exists(config_path+'upstage/')):
+# 	            print 'Creating: '+config_path+'upstage/'
+# 		    os.makedirs(config_path+'upstage/')
+# 		    file_util.copy_file(location+'/'+file, config_path+'upstage/'+file)
+# 		    print 'Copied: '+location+'/'+file+ ' -to- '+ config_path+'upstage/'+file
+# 		if(file == 'upstage-backup'):
+# 		    file_util.copy_file(location+'/'+file, backup_location+file)
+# 		    print 'copied: '+ location+'/'+file+' -to- '+ backup_location+file
+# 		    shutil.copyfile(location+'/'+file, serverDir+'upstage/'+file)
+# 		    print 'copied: '+ location+'/'+file+' -to- '+ serverDir+'upstage/'+file                    
 
 """
 Execute the script.
@@ -211,11 +211,11 @@ if(len(sys.argv) >= 2):
 #	print "Changing permissions for install scripts."
 #	os.system('chmod 755 '+appServerDir+'/DEBIAN/*')
 #	generate_deb('')# usage python install.py deb
-    else:
-	print "Removing .git files from current directory and all subdirectories..."
-	os.system('rm -rf `find . -type d -name .git`')
-	copyFiles(appServerDir, True)
-	finalizeSetup()
+#    else:
+#	print "Removing .git files from current directory and all subdirectories..."
+#	os.system('rm -rf `find . -type d -name .git`')
+#	copyFiles(appServerDir, True)
+#	finalizeSetup()
 #print "flex-config.xml created. Please copy the file to <flex compile location><frameworks>"
 
 		#<source-path><path-element>/home/heath/upstage/client/upstage/</path-element></source-path>
