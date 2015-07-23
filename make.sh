@@ -8,8 +8,8 @@ mkdir $OUT
 cp -r ./server/src/* $OUT/
 
 cp -r ./client/* $BUILD/
-mv $BUILD/src/images $BUILD/images
-mv $BUILD/src/fonts $BUILD/fonts
+mv $BUILD/src/image $BUILD/image
+mv $BUILD/src/font $BUILD/font
 
 mtasc -swf $BUILD/src/classes.swf -frame 1 -header 320:200:31 -version 8 -v -strict -msvc -wimp -cp $BUILD/src $BUILD/src/App.as
 
