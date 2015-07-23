@@ -38,6 +38,8 @@ appCanonicalPath = os.getcwd()
 appServerDir = appCanonicalPath + '/server/src'
 #appClientDir = os.path.abspath('./client').replace(" ", "\ ")
 appClientDir = appCanonicalPath + '/client/src'
+buildDir = './build'
+outDir = './dist'
 #control_file_location = appRootDir+'/DEBIAN/control'
 # system_calls = ['chmod +x /usr/local/upstage/*',
 #                 'chmod +x /etc/cron.weekly/upstage-backup',
@@ -211,7 +213,20 @@ if(len(sys.argv) >= 2):
 #	print "Changing permissions for install scripts."
 #	os.system('chmod 755 '+appServerDir+'/DEBIAN/*')
 #	generate_deb('')# usage python install.py deb
-#    else:
+else:
+    print "Consutruct build and out directories"
+    os.system('mkdir ' + buildDir)
+    os.system('mkdir ' + outDir)
+    os.system('cp -r ./server/src/* ' + outDir + '/')
+    os.system('cp -r ./client/* ' + buildDir + '/')
+    print "Compile resources with mtasc"
+    os.system('mtasc -swf simple ' + buildDir + '/src/temp/classes.swf -frame 1 -header 320:200:31 -version 8 -v -strict -msvc -wimp -cp ' + buildDir + '/src/' + buildDir +'/src/App.as')
+    print "Compile resources with swfmill"
+    os.system('swfmill -v simple ' + buildDir + '/src/application.xml ' + buildDir + '/client.swf')
+    print "Move compiled client to the predefined canonical directory: " + outDir
+    os.system('mv ' + buildDir + '/client.swf ' + outDir + '/html/client.swf')
+    print "Remove the temp build directory"
+    os.system('rm -rf ' + buildDir)
 #	print "Removing .git files from current directory and all subdirectories..."
 #	os.system('rm -rf `find . -type d -name .git`')
 #	copyFiles(appServerDir, True)
