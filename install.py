@@ -223,11 +223,11 @@ else:
     os.system('mv '+ buildDir +'/src/image ' + buildDir +'/image')
     os.system('mv '+ buildDir +'/src/font ' + buildDir +'/font')
     print "Compile resources with mtasc"
-    os.system('mtasc -swf simple ' + buildDir + '/src/temp/classes.swf -frame 1 -header 320:200:31 -version 8 -v -strict -msvc -wimp -cp ' + buildDir + '/src' + buildDir +'/src/App.as')
+    os.system('mtasc -swf simple ' + buildDir + '/src/temp/classes.swf -frame 1 -header 320:200:31 -version 8 -v -strict -msvc -wimp -cp ' + buildDir + '/src/' + buildDir +'/src/App.as')
     print "Compile resources with swfmill"
     os.system('swfmill -v simple ' + buildDir + '/src/application.xml ' + buildDir + '/client.swf')
-    print "Move compiled client to the predefined canonical directory: " + outDir
-    os.system('mv ' + buildDir + '/client.swf ' + outDir + '/html/client.swf')
+    #print "Move compiled client to the predefined canonical directory: " + outDir
+    #os.system('mv ' + buildDir + '/client.swf ' + outDir + '/html/client.swf')
     #print "Remove the temp build directory"
     #os.system('rm -rf ' + buildDir)
 #	print "Removing .git files from current directory and all subdirectories..."
