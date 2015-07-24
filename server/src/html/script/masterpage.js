@@ -962,12 +962,15 @@ function warn(type)
 	}
 }
 
-function seSaveOnly() //09/04/2013 Craig - changed embedmessage method name so it is more understandable
-{
-    
+function seSaveOnly(){
+  var shouldSave = window.confirm("Do you with to save stage's current state? This button is designed for rehearsals only. The consequence of using this function may result different displays for different users. Strongly recommend to use \"Save and Reload\" function as soon as media upload complete.");
+  if(shouldSave == true){
+    alert("Stage state saved; however, \"Save and Reload\" function is required to ensure media synchronization");
     document.stageedit.action.value = actions[6];
     requestPage("POST", buildRequest(2),fillPage);
-     
+  }else{
+    alert("No media change submission made. Please do save your work.");
+  }  
 }
 
 //==========================================================================
