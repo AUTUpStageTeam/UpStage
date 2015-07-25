@@ -56,23 +56,23 @@ outDir = './dist'
 # 	    sys.stdout.write(line)
 
 """
-Compiles the client, Actionscript 3 into swf file. The path to the compiler must be
-provided.
+Compiles the Actionscript classes into swf file.
 """
 def compile_client(): #compiler_path):
     print "Compiling Client..."
     temp = appCanonicalPath + '/client/src/temp'
     os.system('mkdir ' + temp)
-    # using mtasc and swfmill - hard code options for now
+    #mtasc produces classes.swf for various AS classes
     mtasc = 'mtasc -swf ' + temp + '/classes.swf -frame 1 -header 320:200:31 -trace App.debug -version 8 -v -strict -msvc -wimp -cp ' + appClientDir + '/ App.as upstage/Client.as'
     print mtasc
     os.system(mtasc)
     os.system('cp -r '+ appClientDir + '/font/*.ttf ' + temp)
     os.system('cp -r '+ appClientDir + '/image/*.png ' + temp)
+    # swfmill produces client.swf according to the setting from application.xml
     swfmill = 'swfmill -v simple ' + appClientDir + '/application.xml ' + appServerDir +'/html/swf/client.swf'
     print swfmill
     os.system(swfmill)
-    #os.system('rm -rf ' + temp)
+    # os.system('rm -rf ' + temp)
     # using flex - don't know if it still works
     # current_path = os.path.abspath('')
     # os.system('cp '+current_path+'/client/upstage/org/flex-config.xml '+current_path+'/')
@@ -140,24 +140,20 @@ def compile_client(): #compiler_path):
 Cleans up etc.
 """
 def finalizeSetup():
-    print '\n'
-    print 'Finalizing Setup.'
-    print '\n'
+#    print '\n'
+#    print 'Finalizing Setup.'
+#    print '\n'
 #    for call in system_calls:
 #        os.system(call)
-    print '***************************************************************'
-    print '\n'
-    print 'Thank you for choosing to use UpStage!'
-    print 'Visit upstage.org.nz for more information about UpStage'
-    print '\n'
-    print '***************************************************************'
-    print '\n'
-    print 'To Create a new server run as root: upstage-admin create'
+    print '\n***************************************************************\n'
+    print 'Thank you for choosing UpStage!, please visit upstage.org.nz for more information about UpStage'
+    print '\n***************************************************************\n'
+    print 'Now please enter "dist" directory to use UpStage server utilities\n'
+    print 'To demonize a new server: upstage-server shall deploy server with a predined setting\n'
     print 'To Start a server run as root: upstage-admin start servername'
     print 'To See if any servers are active run as root: upstage-admin ls\n'
     print '			        		 AUT UpStage Team'
-    print '\n'
-    print '***************************************************************'
+    print '\n***************************************************************\n'
 
 # """
 # Copies files and folders to the installed paths
