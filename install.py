@@ -16,12 +16,10 @@
  -Fixed silly bug with permissions. Added more descriptive comments to the functions.
  -Added removal of .svn directories which do not play nicely with the script for now. Also added changing of permissions for deb files.
  -Completed the compiling of the client which now works. Usage is: python install.py cc /path/to/flex
-
  Modified by Nitkalya Wiriyanuparb: 22/10/2013 - Used mtasc and swfmill instead of flex, adjusted folder structure, change svn to git
 """
 
-import os
-import sys
+import os, sys
 #from distutils import dir_util
 #from distutils import file_util
 #import shutil
