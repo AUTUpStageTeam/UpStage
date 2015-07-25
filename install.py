@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+!/usr/bin/env python
+#default using python2.7.3
 #-*- coding:utf-8 -*-
 """
 A python program to compile UpStage ActionScript Client and prepare the server deployment methods later on.
@@ -37,19 +38,21 @@ def compile_client():
 Cleans up etc.
 """
 def finalizeSetup():
-    print '''\n***************************************************************
-    \n*Thank you for choosing UpStage!, please visit upstage.org.nz *
-    \n*for more information about UpStage.                          *
-    \n***************************************************************
-    \n*Now please enter "dist" directory to use UpStage server      *
-    \n*utilities                                                    *
-    \n***************************************************************
-    \n*To demonize a new server: upstage-server shall deploy server *
-    \n*with a predined setting.                                     *
-    \n*To Start a server : upstage-admin start servername           *
-    \n*To list active instances: upstage-admin ls                   *
-    \n*			        		 AUT UpStage Team   *
-    \n***************************************************************'''
+    print('''
+***************************************************************
+*Thank you for choosing UpStage!, please visit upstage.org.nz *
+*for more information about UpStage.                          *
+***************************************************************
+*Now please enter "dist" directory to use UpStage server      *
+*utilities                                                    *
+***************************************************************
+*To demonize a new server: upstage-server shall deploy server *
+*with a predined setting.                                     *
+*To Start a server : upstage-admin start servername           *
+*To list active instances: upstage-admin ls                   *
+*                                            AUT UpStage Team *
+***************************************************************
+''')
 
 """
 Execute the script.
