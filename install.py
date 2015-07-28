@@ -1,8 +1,8 @@
-!/usr/bin/env python
+#!/usr/bin/env python
 #default using python2.7.3
 #-*- coding:utf-8 -*-
 """
-A python program to compile UpStage ActionScript Client and prepare the server deployment methods later on.
+A python program to serve UpStage ActionScript Client compilation and server deployment methods.
 """
 
 import os, sys
@@ -67,7 +67,7 @@ else:
     os.system('cp -r ./server/src/* ' + outDir + '/')
     os.system('cp -r ./client/* ' + buildDir + '/')
     print "Compile resources with mtasc"
-    os.system('mtasc -swf simple ' + buildDir + '/src/temp/classes.swf -frame 1 -header 320:200:31 -version 8 -v -strict -msvc -wimp -cp ' + buildDir + '/src/' + buildDir +'/src/App.as')
+    os.system('mtasc -swf ' + buildDir + '/src/temp/classes.swf -frame 1 -header 320:200:31 -version 8 -v -strict -msvc -wimp -cp ' + buildDir + '/src/' + buildDir +'/src/ App.as upstage/Client.as')
     print "Compile resources with swfmill"
     os.system('swfmill -v simple ' + buildDir + '/src/application.xml ' + buildDir + '/client.swf')
     print "Move compiled client to the predefined canonical directory: " + outDir
