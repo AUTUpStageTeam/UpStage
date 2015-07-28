@@ -2,7 +2,7 @@
 #default using python2.7.3
 #-*- coding:utf-8 -*-
 """
-A python program to compile UpStage ActionScript Client and prepare the server deployment methods later on.
+A python program to serve UpStage ActionScript Client compilation and server deployment methods.
 """
 
 import os, sys
