@@ -20,7 +20,7 @@ def compile_client():
     temp = appCanonicalPath + '/client/src/temp'
     print "Create temp folder..."
     os.system('mkdir ' + temp)
-    mtasc = 'mtasc -swf ' + temp + '/classes.swf -frame 1 -header 320:200:31 -trace App.debug -version 8 -v -strict -msvc -wimp -cp ' + appClientDir + '/ App.as upstage/Client.as'
+    mtasc = 'mtasc -swf ' + temp + '/classes.swf -frame 1 -header 320:200:31 -trace App.debug -version 8 -v -strict -msvc -wimp -cp ' + appClientDir + '/ App.as'
     print "Prepare mtasc command:"
     print mtasc
     os.system(mtasc)
