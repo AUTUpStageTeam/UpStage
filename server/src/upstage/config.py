@@ -15,21 +15,9 @@
 #Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 """
-Author: 
-Modified by: Phillip Quinlan, Endre Bernhardt, Alan Crow
-Modified Again by: Heath Behrens, Henry Goh and Vibhu Patel (2011) 
-Changelog:
-	Added Voices on line 168 - 219. Called by speaker.py.
-
-  Modified by: Lisa Helm 21/08/2013       - removed all code relating to old video avatar    
-
+Configuration file for UpStage 3.4.5+ demonization process work.
+Service ports (line 34-36) must be identified explicitly.
 """
-
-"""global configuration variables go here"""
-## @brief Config for this server instance
-# XXX will eventually be made to use config parser.
-#
-# Contains directory constants definition of voices and port numbers
 
 from os.path import join as _join
 
@@ -41,7 +29,6 @@ POLICY_FILE = "<?xml version=\"1.0\"?> \
                <allow-access-from domain=\"*\" to-ports=\"*\" /> \
                </cross-domain-policy>"
 
-# AC (22.05.08) - Port for serving policy files
 POLICY_FILE_PORT = 3000
 SWF_PORT = 7230
 WEB_PORT = 8081
