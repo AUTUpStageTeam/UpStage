@@ -26,16 +26,13 @@ import upstage.util.Construct;
  * Chat Input view.
  *
  */
-class upstage.view.ChatInput
-{
+class upstage.view.ChatInput {
     private var tf           :TextField;
     private var history      :Array;
     private var historyIndex :Number = 0;
     private var historyNow   :String = ''; //current text.
 
-    function ChatInput(parent :MovieClip, canAct :Boolean, col :Number)// Added canAct - LK 17/10/07
-    {
-
+    function ChatInput(parent :MovieClip, canAct :Boolean, col :Number){
 		if (canAct){
         	// Chat input
         	this.tf =  Construct.formattedTextField(parent, 'chatInput', 
@@ -49,19 +46,15 @@ class upstage.view.ChatInput
                                                 Client.ANON_CHAT_INPUT_Y, Client.CHAT_INPUT_W, 
                                                 Client.CHAT_INPUT_H, 1, true);
 		}
-
         //this.tf.type= 'input';  
-        
         // AC (10/06/08) - Initial set to disable until stage loaded fully.
         this.setEnabled(false);
-        
         this.tf.border = true;
         this.tf.borderColor = Client.BORDER_COLOUR;
         this.tf.textColor = Client.TEXT_COLOUR;
         //Heath / Vibhu 09/08/2011 - Added to allow media managment system to correctly modify the colours of the chat fields
         this.tf.background = true;
         this.tf.backgroundColor = col;
-
         this.history = [];
         trace('ChatInput constructor done... ');
     }
@@ -69,8 +62,7 @@ class upstage.view.ChatInput
 	/**
 	 * @brief Allows or prevents text chat input.
 	 */
-	function setEnabled(enabled :Boolean) :Void
-	{
+	function setEnabled(enabled :Boolean):Void{
 		if (enabled) {
 			this.tf.type="input";
 			this.tf.selectable=true;
@@ -84,8 +76,7 @@ class upstage.view.ChatInput
     /**
      * @brief Put the application focus on the text field
      */
-    function focus() :Void
-    {
+    function focus():Void{
         Selection.setFocus(this.tf);
         var n :Number = Selection.getEndIndex();
         Selection.setSelection(n, n);
