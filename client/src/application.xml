@@ -39,7 +39,7 @@
        The Application classes have been compiled into the classes.swf file,
        which we import as an asset.
     -->
-  <clip import="temp/classes.swf" />
+  <clip import="classes.swf" />
 
   <!-- imported images -->
 
