@@ -32,7 +32,7 @@
 """img2swf -- convert image files to swf format
 Usage:
 
- img2swf NEW.SWF THUMBNAIL.JPG  ORIGINAL.JPG [ ORIG2.JPG [ ORIG3.JPG [...]]] 
+ img2swf NEW.SWF THUMBNAIL.JPG  ORIGINAL.JPG [ ORIG2.JPG [ ORIG3.JPG [...]]]
 
 ORIGINAL.JPG (or PNG, GIF) will be converted to SWF and saved as NEW.SWF.
 If more than one image is given, they are set up as consecutive frames in the
@@ -69,7 +69,7 @@ def do_nothing(tfn, swf):
 # calls gif2png with filter and optimise options (-f0)
 # @param swf output file name
 # @param tfn input file name
-# FIXED BY VISHAAL 01/06/09, straight gif2wf converter 
+# FIXED BY VISHAAL 01/06/09, straight gif2wf converter
 # instead of gif->png->swf
 def do_gif(tfn, swf):
     #png = tempfile.mkstemp('.png')[1]
@@ -140,6 +140,12 @@ def thumbnailer(filetype, tfn, thumb):
         shutil.move(tempf, thumb)
     except IOError, e:
         print "%s\n%s\nrenaming error: %s" % (tempf, thumb, e)
+
+    print "Attempting to chmod %s to 750" % thumb
+    try:
+        os.chmod(thumb, 0750)
+    except Exception, e:
+        print "Failed to chmod %s as 750 due to: %s" % (thumb, e)
 
 
 ## @brief Convert an image to a swf
